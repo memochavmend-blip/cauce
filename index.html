@@ -403,6 +403,45 @@ details[open] .mas{transform:rotate(45deg)}
 .franja-horas .campo-in{width:70px;text-align:center}
 .franja-horas span{font-size:13px;color:var(--tinta-baja)}
 
+/* ══════════════ v4 · el 80/20 por actividad ══════════════ */
+.sec.mueven.cuenta{border-color:color-mix(in srgb,var(--llama) 48%,var(--linea));background:color-mix(in srgb,var(--llama) 10%,transparent)}
+.sec.mueven.cuenta .sec-t{color:var(--tinta)}
+
+/* La semana: siete marcas por actividad */
+.lista.sem{border-top:1px solid var(--linea)}
+.sem-fila{display:grid;grid-template-columns:1fr auto;gap:4px 12px;width:100%;text-align:left;padding:13px 0;border-bottom:1px solid var(--linea)}
+button.sem-fila:hover .sem-nom{color:var(--tinta)}
+.sem-nom{font-size:14.5px;line-height:1.35;color:var(--tinta);min-width:0}
+.sem-peso{display:inline-block;margin-left:7px;font-size:9px;vertical-align:middle;color:var(--llama)}
+.sem-dias{display:flex;gap:4px;grid-column:1;align-self:center}
+.sem-d{width:20px;height:20px;border-radius:50%;border:1px solid var(--linea-fuerte);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--tinta-baja);flex-shrink:0}
+.sem-d.on{background:var(--llama);border-color:var(--llama);color:#1A1006;font-weight:700}
+.sem-d.hoy{border-color:var(--tinta-baja)}
+.sem-d.futuro{opacity:.4}
+.sem-estado{grid-column:2;grid-row:1 / span 2;align-self:center;font-size:12.5px;line-height:1.4;color:var(--tinta-baja);white-space:nowrap}
+.sem-fila.logrado .sem-estado{color:var(--oro);font-weight:600}
+
+/* Doble clic: el detalle de la semana */
+.sem-detalle{border-top:1px solid var(--linea-fuerte);margin:0 0 16px}
+.sem-dia{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--linea)}
+.sem-dia-n{font-size:13px;color:var(--tinta-baja);flex:0 0 92px}
+.sem-dia-v{font-size:13.5px;line-height:1.45;color:var(--tinta-baja);text-align:right}
+.sem-dia.on .sem-dia-n{color:var(--tinta);font-weight:600}
+.sem-dia.on .sem-dia-v{color:var(--tinta)}
+.sem-dia.hoy{background:color-mix(in srgb,var(--llama) 7%,transparent);margin:0 -10px;padding-left:10px;padding-right:10px;border-radius:8px}
+.veredicto-sem{font-family:var(--serif);font-size:1.08rem;line-height:1.5;color:var(--tinta-baja);margin:0 0 6px;padding-left:12px;border-left:2px solid var(--linea-fuerte)}
+.veredicto-sem.logrado{color:var(--oro);border-left-color:var(--oro)}
+
+/* ── v5 · subacciones ── */
+.paso-mas{display:flex;align-items:center;gap:12px;width:100%;min-height:40px;font-size:13.5px;color:var(--tinta-baja);text-align:left;transition:color .2s}
+.paso-mas:hover{color:var(--tinta)}
+.paso-mas svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;flex-shrink:0}
+.sub-lista{border-top:1px solid var(--linea-fuerte);margin-bottom:6px}
+.sub-lista .tarea{min-height:48px}
+.sub-lista .tarea-cuerpo{padding:12px 0}
+.quitar-sub{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tinta-baja);border-radius:50%;transition:color .2s,background .2s}
+.quitar-sub:hover{color:var(--brasa);background:color-mix(in srgb,var(--brasa) 9%,transparent)}
+
 </style>
 </head>
 <body>
@@ -463,7 +502,7 @@ const Guardado = (() => {
   }
   return { leer, escribir, persistente: () => claude() || local };
 })();
-const CLAVE = "cauce:estado:v3", CLAVE_V2 = "cauce:estado:v2", VERSION = 3;
+const CLAVE = "cauce:estado:v5", CLAVE_V4 = "cauce:estado:v4", CLAVE_V3 = "cauce:estado:v3", CLAVE_V2 = "cauce:estado:v2", VERSION = 5;
 
 /* ════════ TIEMPO ════════ */
 const DIA = 86400000;
@@ -478,6 +517,8 @@ const hoyISO = () => aISO(new Date());
 const sumarDias = (s, n) => { const d = deISO(s); d.setDate(d.getDate() + n); return aISO(d); };
 const sumarMeses = (s, n) => { const d = deISO(s), dia = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + n); const u = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); d.setDate(Math.min(dia, u)); return aISO(d); };
 const diasEntre = (a, b) => Math.round((deISO(b) - deISO(a)) / DIA);
+const lunesDe = s => { const d = deISO(s), n = (d.getDay() + 6) % 7; d.setDate(d.getDate() - n); return aISO(d); };
+const semanaDe = s => { const l = lunesDe(s); return Array.from({ length: 7 }, (_, i) => sumarDias(l, i)); };
 const domingoTras = (s, semanas) => { const d = deISO(s); d.setDate(d.getDate() + semanas * 7); while(d.getDay() !== 0) d.setDate(d.getDate() + 1); return aISO(d); };
 const proximoDia = (s, dow) => { const d = deISO(s); do{ d.setDate(d.getDate() + 1); } while(d.getDay() !== dow); return aISO(d); };
 const fechaLarga = s => { const d = deISO(s); return DIAS[d.getDay()] + " " + d.getDate() + " de " + MESES[d.getMonth()]; };
@@ -539,7 +580,7 @@ function semilla(){
     nombre: "Mi oficio", resultado: "Un resultado visible que alguien más pueda contar sin mí.",
     terminadoCuando: "Existe y lo presenté. No perfecto: suficiente." });
   const pasion = nuevaMetaBase({ rol: "secundaria", lane: "pasion",
-    abre: "No tiene que pagar nada todavía. Esa suele ser la condición para que siga siendo pasión.",
+    abre: "Es el futuro que estoy construyendo. Hoy no tiene que pagar nada, y eso no la hace menos seria.",
     nombre: "Mi pasión", resultado: "La primera vez que la muestro en público.",
     terminadoCuando: "Lo mostré frente a gente, aunque sea poca." });
   const etapas = (m, nombres) => { m.etapas = nombres.map(n => ({ id: uid(), nombre: n, hecha: false })); };
@@ -567,14 +608,15 @@ function semilla(){
     [4, "Mostrarla"],
     [4, "Anotar qué funcionó y qué no"]
   ]);
-  const rut = (nombre, area, dias, extra) => Object.assign({ id: uid(), nombre, area, franja: "jornada", frecuencia: "semana", dias, diaMes: 1, pasos: [] }, extra || {});
+  const rut = (nombre, area, dias, extra) => Object.assign({ id: uid(), nombre, area, franja: "jornada", frecuencia: "semana", dias, diaMes: 1, pasos: [], semanal: 0, peso: false }, extra || {});
   const rutinas = [
-    rut("Ejercicio", "Cuerpo", [1,3,5], { franja: "manana" }),
+    rut("Ejercicio", "Cuerpo", [1,2,3,4,5], { franja: "manana", semanal: 5, peso: true }),
     rut("Silencio, oración o meditación", "Otro", [1,2,3,4,5,6,0], { franja: "manana" }),
+    rut("Mis 5 del trabajo", "Trabajo", [1,2,3,4,5], { peso: true, semanal: 5 }),
     rut("Correo y aprobaciones", "Trabajo", [1,2,3,4,5]),
     rut("Seguimiento con el equipo", "Trabajo", [1,2,3,4,5]),
     rut("Planear la semana del equipo", "Trabajo", [1]),
-    rut("Cierre del mes", "Trabajo", [], { frecuencia: "mes", diaMes: 1, pasos: ["Primer paso del proceso", "Segundo paso", "Revisión", "Entrega"] }),
+    rut("Cierre del mes", "Trabajo", [], { frecuencia: "mes", diaMes: 1, pasos: ["Primera parte del proceso", "Segunda parte", "Tercera parte", "Revisión", "Entrega"] }),
     rut("Revisar mis finanzas", "Inversión", [], { frecuencia: "mes", diaMes: 5, franja: "manana" })
   ];
   const idea = (texto, tipo, condicion, vence) => ({ id: uid(), texto, estado: "espera", tipo, condicion, vence, creado: hoy });
@@ -618,6 +660,27 @@ function semilla(){
 
 /* ════════ ESQUEMA ════════ */
 const MIGRACIONES = {
+  /* v5: cada actividad puede desglosarse en subacciones; el 80% de ellas la da por hecha */
+  5: e => {
+    Object.values(e.dias || {}).forEach(d => {
+      if(!d.sub) d.sub = {};
+      const vi = d.pasosHechos || {};
+      Object.keys(vi).forEach(rid => {
+        const r = (e.rutinas || []).find(x => x.id === rid); if(!r || d.sub[rid]) return;
+        d.sub[rid] = (r.pasos || []).map((t, i) => ({ t, h: (vi[rid] || []).indexOf(i) >= 0 }));
+      });
+      delete d.pasosHechos;
+    });
+    return e;
+  },
+  /* v4: el 80/20 por actividad — meta semanal y actividades de peso */
+  4: e => {
+    (e.rutinas || []).forEach(r => {
+      if(typeof r.semanal !== "number") r.semanal = 0;
+      if(typeof r.peso !== "boolean") r.peso = false;
+    });
+    return e;
+  },
   /* v3: el día se organiza por franjas; las metas tienen lugar en la vida; aparecen turnos, hobby y diario */
   3: e => {
     const base = semilla();
@@ -647,7 +710,7 @@ function normalizar(e){
   e.temporada = Object.assign({ n: 1, inicio: hoy, fin: domingoTras(hoy, 12) }, e.temporada || {});
   ["metas", "acciones", "rutinas", "pendientes", "ideas", "base"].forEach(k => { if(!Array.isArray(e[k])) e[k] = []; });
   e.metas.forEach(m => { if(!Array.isArray(m.etapas)) m.etapas = []; });
-  e.rutinas.forEach(r => { if(!Array.isArray(r.dias)) r.dias = []; if(!Array.isArray(r.pasos)) r.pasos = []; if(!r.frecuencia) r.frecuencia = "semana"; if(!r.franja) r.franja = "jornada"; });
+  e.rutinas.forEach(r => { if(!Array.isArray(r.dias)) r.dias = []; if(!Array.isArray(r.pasos)) r.pasos = []; if(!r.frecuencia) r.frecuencia = "semana"; if(!r.franja) r.franja = "jornada"; if(typeof r.semanal !== "number") r.semanal = 0; if(typeof r.peso !== "boolean") r.peso = false; });
   e.metas.forEach(m => { if(!m.lane) m.lane = "oficio"; if(m.abre == null) m.abre = ""; });
   e.acciones.forEach(a => { if(typeof a.pospuesta !== "number") a.pospuesta = 0; });
   e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
@@ -682,12 +745,40 @@ function tocaRutina(r, f){
   if(r.frecuencia === "mes"){ const u = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); return d.getDate() === Math.min(+r.diaMes || 1, u); }
   return (r.dias || []).map(Number).includes(d.getDay());
 }
-function diaVacio(){ return { planeado: false, tres: [], sec: [], mueven: [], franjas: {}, secNo: false, omitidas: [], rutHechas: {}, pasosHechos: {}, cerrado: false }; }
+function diaVacio(){ return { planeado: false, tres: [], sec: [], mueven: [], franjas: {}, secNo: false, omitidas: [], rutHechas: {}, sub: {}, cerrado: false }; }
 function diaDe(f){ return Object.assign(diaVacio(), E.dias[f] || {}); }
 function diaMut(f){ const d = E.dias[f] = Object.assign(diaVacio(), E.dias[f] || {}); return d; }
 const accion = id => E.acciones.find(a => a.id === id);
 const MAX_MUEVEN = 2;
+const rutina = id => E.rutinas.find(r => r.id === id) || null;
+const pieza = id => accion(id) || rutina(id);
+const esRutina = x => !!(x && x.frecuencia);
+const hechaPieza = (x, d) => esRutina(x) ? !!d.rutHechas[x.id] : !!(x && x.hecha);
 const Rg = {
+  /* ── El 80/20 por actividad, en cadencia semanal ──
+     Meta de la semana: la que escribiste, o los días en que está programada.
+     Suficiente = 80% de esa meta. Con metas de 1 o 2 no hay holgura: o pasó o no pasó. */
+  metaSemanal: r => r.semanal > 0 ? r.semanal : (r.frecuencia === "mes" ? 1 : (r.dias || []).length),
+  seguidas: () => E.rutinas.filter(r => r.frecuencia !== "mes" && !r.pausada && (r.semanal > 0 || r.peso)),
+  /* Subacciones de hoy: las que escribiste, o la plantilla de la rutina si aún no la has tocado */
+  sub: (r, d) => (d.sub && d.sub[r.id]) ? d.sub[r.id] : (r.pasos || []).map(t => ({ t, h: false })),
+  /* El 80% dentro de la actividad: con 3 o más subacciones hay holgura; con 1 o 2, no */
+  sufDe: n => n >= 3 ? Math.ceil(n * 0.8) : n,
+  estadoSub: (r, d) => { const sub = Rg.sub(r, d), hechas = sub.filter(x => x.h).length;
+    return { sub, n: sub.length, hechas, suf: Rg.sufDe(sub.length), lista: sub.length > 0 && hechas >= Rg.sufDe(sub.length) }; },
+  suficiente: r => { const m = Rg.metaSemanal(r); return m >= 3 ? Math.ceil(m * 0.8) : m; },
+  semanaRutina: (r, f) => {
+    const hoy = hoyISO();
+    const dias = semanaDe(f).map(k => ({ fecha: k, hecha: k <= hoy && !!((E.dias[k] || {}).rutHechas || {})[r.id] }));
+    const hechas = dias.filter(x => x.hecha).length, meta = Rg.metaSemanal(r), suf = Rg.suficiente(r);
+    return { dias, hechas, meta, suf, estado: !meta ? "libre" : hechas >= meta ? "completo" : hechas >= suf ? "suficiente" : hechas ? "va" : "cero" };
+  },
+  semanaMeta: (m, f) => {
+    const dias = semanaDe(f).map(k => ({ fecha: k, hecha: E.acciones.some(a => a.metaId === m.id && a.hecha && a.hechaEl === k) }));
+    return { dias, hechas: E.acciones.filter(a => a.metaId === m.id && a.hecha && a.hechaEl && semanaDe(f).includes(a.hechaEl)).length };
+  },
+  /* Lo que pesa: rutinas marcadas de peso y las acciones de tus metas */
+  dePeso: f => E.rutinas.filter(r => r.peso && tocaRutina(r, f)),
   /* ── La rutina: el día en franjas ── */
   franja: id => E.franjas.find(x => x.id === id) || null,
   franjaAhora: () => { const h = new Date().getHours(); return (E.franjas.find(x => h >= x.desde && h < x.hasta) || E.franjas[0] || {}).id; },
@@ -696,7 +787,8 @@ const Rg = {
   /* Dónde cae cada acción del día: la del turno va a la tarde, el resto a la jornada */
   franjaDe: (a, d) => (d.franjas && d.franjas[a.id]) || (Rg.turnoHoy(hoyISO()).metaId === a.metaId ? "tarde" : "jornada"),
   accionesDia: d => d.tres.concat(d.sec).map(accion).filter(Boolean),
-  mueven: d => d.mueven.map(accion).filter(Boolean),
+  mueven: d => d.mueven.map(pieza).filter(Boolean),
+  diaCuenta: d => { const m = Rg.mueven(d); return m.length >= MAX_MUEVEN && m.every(x => hechaPieza(x, d)); },
   restoDia: d => Rg.accionesDia(d).filter(a => !d.mueven.includes(a.id)),
   /* El último tramo de una etapa: lo que falta ya cuesta más de lo que aporta */
   etapa80: m => {
@@ -744,16 +836,26 @@ const etapaTexto = m => { const e = Rg.etapaActual(m); if(!e) return "Ruta compl
 /* ════════ ACCIONES (cambios de estado) ════════ */
 const A = {
   marcarAccion(a){ a.hecha = !a.hecha; a.hechaEl = a.hecha ? hoyISO() : null; if(a.hecha){ delete a.sugerir; a.pospuesta = 0; } },
-  marcarRutina(r, f){ const d = diaMut(f), v = !d.rutHechas[r.id]; d.rutHechas[r.id] = v; if(r.pasos.length) d.pasosHechos[r.id] = v ? r.pasos.map((_, i) => i) : []; },
-  marcarPaso(r, i, f){ const d = diaMut(f), arr = d.pasosHechos[r.id] || (d.pasosHechos[r.id] = []), k = arr.indexOf(i); if(k >= 0) arr.splice(k, 1); else arr.push(i); d.rutHechas[r.id] = arr.length >= r.pasos.length; },
+  marcarRutina(r, f){ const d = diaMut(f), v = !d.rutHechas[r.id]; d.rutHechas[r.id] = v;
+    const sub = Rg.sub(r, d); if(sub.length) d.sub[r.id] = sub.map(x => ({ t: x.t, h: v })); },
+  /* Marcar una subacción recalcula la actividad: al 80%, se da por hecha sola */
+  marcarSub(r, i, f){ const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
+    if(!sub[i]) return null; sub[i].h = !sub[i].h;
+    const antes = !!d.rutHechas[r.id], e = Rg.estadoSub(r, d);
+    d.rutHechas[r.id] = e.lista;
+    return { antes, ahora: e.lista, e }; },
+  nuevaSub(r, texto, f){ const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
+    sub.push({ t: texto, h: false }); d.rutHechas[r.id] = Rg.estadoSub(r, d).lista; },
+  quitarSub(r, i, f){ const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
+    sub.splice(i, 1); d.rutHechas[r.id] = sub.length ? Rg.estadoSub(r, d).lista : false; },
   marcarPend(p){ p.hecha = !p.hecha; p.hechaEl = p.hecha ? hoyISO() : null; },
   /* Las 2 que mueven: el 20% del día */
-  mueve(a){
-    const d = diaMut(hoyISO()), i = d.mueven.indexOf(a.id);
+  mueve(x){
+    const d = diaMut(hoyISO()), i = d.mueven.indexOf(x.id);
     if(i >= 0){ d.mueven.splice(i, 1); return "quitada"; }
-    if(d.mueven.filter(x => { const y = accion(x); return y && !y.hecha; }).length >= MAX_MUEVEN) return "lleno";
-    d.mueven.push(a.id);
-    if(!d.tres.includes(a.id) && !d.sec.includes(a.id)){ const m = Rg.meta(a.metaId); (m && m.rol === "principal" ? d.tres : d.sec).push(a.id); }
+    if(d.mueven.filter(id => { const y = pieza(id); return y && !hechaPieza(y, d); }).length >= MAX_MUEVEN) return "lleno";
+    d.mueven.push(x.id);
+    if(!esRutina(x) && !d.tres.includes(x.id) && !d.sec.includes(x.id)){ const m = Rg.meta(x.metaId); (m && m.rol === "principal" ? d.tres : d.sec).push(x.id); }
     return "ok";
   },
   aFranja(a, fr){ const d = diaMut(hoyISO()); d.franjas = d.franjas || {}; d.franjas[a.id] = fr; },
@@ -786,7 +888,11 @@ const A = {
     if(p && !d.tres.length) d.tres = Rg.sugeridas(p, MAX_TRES).map(a => a.id);
     const hayTurno = t.metaId && s && t.metaId === s.id;
     if(s && !d.sec.length && !d.secNo && hayTurno) d.sec = Rg.sugeridas(s, 1).map(a => a.id);
-    if(!d.mueven.length) d.mueven = d.tres.slice(0, MAX_MUEVEN);
+    if(!d.mueven.length){
+      const pes = Rg.dePeso(f).filter(r => !d.omitidas.includes(r.id)).map(r => r.id);
+      d.mueven = d.tres.slice(0, MAX_MUEVEN);
+      if(d.mueven.length < MAX_MUEVEN && pes.length) d.mueven = d.mueven.concat(pes.slice(0, MAX_MUEVEN - d.mueven.length));
+    }
     d.planeado = true;
   },
   soltarIdea(i, razon){ i.estado = "soltada"; i.cerradaEl = hoyISO(); i.razon = razon || ""; },
@@ -846,15 +952,15 @@ function filaAccion(a, conEtapa){
     `<button class="tarea-cuerpo" data-accion="ver-accion" data-id="${a.id}"><span class="tarea-t">${esc(a.texto)}</span>${sub ? `<span class="tarea-s">${sub}</span>` : ""}</button></div>`;
 }
 function filaRutina(r, d){
-  const hecha = !!d.rutHechas[r.id], n = r.pasos.length, hechos = (d.pasosHechos[r.id] || []).length, abierta = S.abiertas.includes(r.id);
-  const pasosTxt = n ? (hecha ? "Todos los pasos hechos" : hechos + " de " + n + " pasos") : "";
-  const sub = [r.area !== "Trabajo" ? r.area : "", pasosTxt].filter(Boolean).join(", ");
+  const hecha = !!d.rutHechas[r.id], e = Rg.estadoSub(r, d), abierta = S.abiertas.includes(r.id);
+  const txtSub = e.n ? (e.hechas >= e.n ? "Las " + e.n + ", hechas" : e.lista ? e.hechas + " de " + e.n + " · suficiente" : e.hechas + " de " + e.n + (e.n >= 3 ? " · con " + e.suf + " basta" : "")) : "";
+  const sub = [r.area !== "Trabajo" ? r.area : "", txtSub].filter(Boolean).join(" · ");
   let html = `<div class="tarea${hecha ? " hecha" : ""}"><button class="check" role="checkbox" aria-checked="${hecha}" aria-label="${hecha ? "Desmarcar" : "Marcar como hecha"}: ${esc(r.nombre)}" data-accion="marcar-rutina" data-id="${r.id}"><span class="check-c">${ICO.check}</span></button>` +
     `<button class="tarea-cuerpo" data-accion="ver-rutina-hoy" data-id="${r.id}"><span class="tarea-t">${esc(r.nombre)}</span>${sub ? `<span class="tarea-s">${esc(sub)}</span>` : ""}</button>` +
-    (n ? `<span class="tarea-lado"><button class="plegar" data-accion="plegar" data-id="${r.id}" aria-expanded="${abierta}" aria-label="${abierta ? "Ocultar" : "Ver"} pasos de ${esc(r.nombre)}">${ICO.abajo}</button></span>` : "") + `</div>`;
-  if(n && abierta){
-    const hs = d.pasosHechos[r.id] || [];
-    html += `<div class="pasos">${r.pasos.map((x, i) => { const h = hs.includes(i); return `<button class="paso-f${h ? " hecho" : ""}" role="checkbox" aria-checked="${h}" data-accion="marcar-paso" data-id="${r.id}" data-i="${i}"><span class="check-c">${ICO.check}</span><span>${esc(x)}</span></button>`; }).join("")}</div>`;
+    (e.n ? `<span class="tarea-lado"><button class="plegar" data-accion="plegar" data-id="${r.id}" aria-expanded="${abierta}" aria-label="${abierta ? "Ocultar" : "Ver"} las partes de ${esc(r.nombre)}">${ICO.abajo}</button></span>` : "") + `</div>`;
+  if(e.n && abierta){
+    html += `<div class="pasos">${e.sub.map((x, i) => `<button class="paso-f${x.h ? " hecho" : ""}" role="checkbox" aria-checked="${x.h}" data-accion="marcar-sub" data-id="${r.id}" data-i="${i}"><span class="check-c">${ICO.check}</span><span>${esc(x.t)}</span></button>`).join("")}` +
+      `<button class="paso-mas" data-accion="ver-rutina-hoy" data-id="${r.id}">${ICO.mas}<span>Agregar o quitar</span></button></div>`;
   }
   return html;
 }
@@ -908,14 +1014,22 @@ function tarjetaRefugio(f){
 }
 
 /* El 20%: dos cosas, y el día ya valió */
+/* Una pieza de las 2 que mueven: puede ser acción de meta o rutina de peso */
+function filaPieza(x, d){
+  if(!esRutina(x)) return filaAccion(x, true);
+  const hecha = !!d.rutHechas[x.id], sem = Rg.semanaRutina(x, hoyISO());
+  const sub = sem.meta >= 3 ? (sem.estado === "completo" ? "Completo esta semana" : sem.estado === "suficiente" ? "Suficiente esta semana: " + sem.hechas + " de " + sem.meta : sem.hechas + " de " + sem.meta + " esta semana") : x.area;
+  return `<div class="tarea${hecha ? " hecha" : ""}"><button class="check" role="checkbox" aria-checked="${hecha}" aria-label="${hecha ? "Desmarcar" : "Marcar como hecha"}: ${esc(x.nombre)}" data-accion="marcar-rutina" data-id="${x.id}"><span class="check-c">${ICO.check}</span></button>` +
+    `<button class="tarea-cuerpo" data-accion="ver-semana" data-id="${x.id}" data-tipo="rutina"><span class="tarea-t">${esc(x.nombre)}</span><span class="tarea-s">${esc(sub)}</span></button></div>`;
+}
 function seccionMueven(d){
-  const m = Rg.mueven(d), hechas = m.filter(a => a.hecha).length;
-  const puntos = [0, 1].map(i => `<span class="punto${m[i] && m[i].hecha ? " on" : ""}"></span>`).join("");
-  let html = `<section class="sec mueven" aria-label="Las 2 que mueven"><div class="sec-cab"><h2 class="sec-t">Las 2 que mueven</h2><span class="puntos" role="img" aria-label="${Math.min(hechas, 2)} de 2 hechas">${puntos}</span></div>` +
-    `<p class="sec-s">El 20% de hoy. Si solo hacen estas dos, el día ya valió.</p><div class="lista">`;
-  html += m.map(a => filaAccion(a, true)).join("");
-  if(m.length < MAX_MUEVEN) html += `<p class="vacio">${m.length ? "Puedes elegir otra." : "Aún no eliges."} <button data-accion="elegir" data-cual="mueven">Elegir${m.length ? " otra" : "las"}</button>${m.length ? "" : ` o <button data-accion="plan-auto">usar las siguientes de tu ruta</button>.`}</p>`;
-  else if(hechas >= MAX_MUEVEN) html += `<p class="vacio">Hechas. Lo que sigue es extra: <button data-accion="elegir" data-cual="mueven">tomar otra</button>.</p>`;
+  const m = Rg.mueven(d), hechas = m.filter(x => hechaPieza(x, d)).length, cuenta = Rg.diaCuenta(d);
+  const puntos = [0, 1].map(i => `<span class="punto${m[i] && hechaPieza(m[i], d) ? " on" : ""}"></span>`).join("");
+  let html = `<section class="sec mueven${cuenta ? " cuenta" : ""}" aria-label="Las 2 que mueven"><div class="sec-cab"><h2 class="sec-t">${cuenta ? "El día cuenta" : "Las 2 que mueven"}</h2><span class="puntos" role="img" aria-label="${Math.min(hechas, 2)} de 2 hechas">${puntos}</span></div>` +
+    `<p class="sec-s">${cuenta ? "Hiciste lo que más pesa. Lo demás es extra: no lo debes." : "El 20% de hoy. Si solo salen estas dos, el día ya cuenta."}</p><div class="lista">`;
+  html += m.map(x => filaPieza(x, d)).join("");
+  if(m.length < MAX_MUEVEN) html += `<p class="vacio">${m.length ? "Puedes elegir otra." : "Aún no eliges."} <button data-accion="elegir" data-cual="mueven">Elegir${m.length ? " otra" : "las"}</button>${m.length ? "" : ` o <button data-accion="plan-auto">usar lo sugerido</button>.`}</p>`;
+  else if(cuenta) html += `<p class="vacio">¿Te queda cuerda? <button data-accion="elegir" data-cual="mueven">Tomar otra</button>, sin obligación.</p>`;
   return html + `</div></section>`;
 }
 
@@ -988,12 +1102,50 @@ function pintarMetas(){
 function filaRutinaConfig(r){
   const cuando = r.frecuencia === "mes" ? "Día " + r.diaMes + " de cada mes" : diasTexto(r.dias);
   const fr = Rg.franja(r.franja) || {};
-  return `<button class="fila-i" data-accion="editar-rutina" data-id="${r.id}"><span class="tarea-cuerpo"><span class="tarea-t">${esc(r.nombre)}</span><span class="tarea-s">${esc([fr.nombre || "", r.area, r.pasos.length ? r.pasos.length + " pasos" : "", r.pausada ? "en pausa" : ""].filter(Boolean).join(" · "))}</span></span><span class="fila-d">${esc(cuando)}</span></button>`;
+  const metaTxt = r.frecuencia !== "mes" && r.semanal > 0 ? r.semanal + "×/semana" : "";
+  const partes = r.pasos.length ? r.pasos.length + " partes fijas" : "";
+  return `<button class="fila-i" data-accion="editar-rutina" data-id="${r.id}"><span class="tarea-cuerpo"><span class="tarea-t">${esc(r.nombre)}${r.peso ? `<span class="sem-peso">●</span>` : ""}</span><span class="tarea-s">${esc([fr.nombre || "", r.area, metaTxt, partes, r.pausada ? "en pausa" : ""].filter(Boolean).join(" · "))}</span></span><span class="fila-d">${esc(cuando)}</span></button>`;
 }
+/* Los siete días de la semana, marcados donde pasó */
+function marcasSemana(dias, f){
+  const hoy = hoyISO();
+  return `<span class="sem-dias" aria-hidden="true">${dias.map((x, i) => `<span class="sem-d${x.hecha ? " on" : ""}${x.fecha === hoy ? " hoy" : ""}${x.fecha > hoy ? " futuro" : ""}">${LETRAS[(i + 1) % 7]}</span>`).join("")}</span>`;
+}
+function filaSemanaRutina(r, f){
+  const w = Rg.semanaRutina(r, f);
+  const et = w.meta < 1 ? "" : w.estado === "completo" ? "Completo"
+    : w.estado === "suficiente" ? "Suficiente · " + w.hechas + " de " + w.meta
+    : w.hechas ? w.hechas + " de " + w.meta
+    : w.meta + " por semana";
+  const cls = w.estado === "completo" || w.estado === "suficiente" ? " logrado" : "";
+  return `<button class="sem-fila${cls}" data-accion="ver-semana" data-id="${r.id}" data-tipo="rutina">` +
+    `<span class="sem-nom">${esc(r.nombre)}${r.peso ? `<span class="sem-peso" title="Cuenta para las 2 que mueven">●</span>` : ""}</span>` +
+    marcasSemana(w.dias, f) + `<span class="sem-estado">${esc(et)}</span></button>`;
+}
+function filaSemanaMeta(m, f){
+  const w = Rg.semanaMeta(m, f);
+  return `<button class="sem-fila${w.hechas ? " logrado" : ""}" data-accion="ver-semana" data-id="${m.id}" data-tipo="meta">` +
+    `<span class="sem-nom">${esc(m.nombre)}</span>` + marcasSemana(w.dias, f) +
+    `<span class="sem-estado">${w.hechas ? w.hechas + (w.hechas === 1 ? " acción" : " acciones") : "Sin mover"}</span></button>`;
+}
+function seccionSemana(f){
+  const seg = Rg.seguidas(), otras = E.rutinas.filter(r => r.frecuencia !== "mes" && !r.pausada && !seg.includes(r));
+  const l = lunesDe(f);
+  return `<section class="sec"><div class="sec-cab"><h2 class="sec-t">Esta semana</h2><span class="fila-d">${fechaCorta(l)} – ${fechaCorta(sumarDias(l, 6))}</span></div>` +
+    `<p class="sec-s">El 80/20 por actividad: con el 80% de lo que te propusiste, ya avanzaste. El resto es extra, no deuda.</p>` +
+    `<div class="lista sem">${Rg.activas().map(m => filaSemanaMeta(m, f)).join("")}` +
+    (seg.length ? seg.map(r => filaSemanaRutina(r, f)).join("")
+      : `<p class="vacio">Ninguna rutina tiene meta semanal todavía. Abre una y dile cuántas veces por semana la quieres: el 80% de esa meta ya cuenta como suficiente.</p>`) + `</div>` +
+    `<p class="nota-suave">Toca una para ver qué la movió. Con metas de una o dos veces no hay holgura: o pasó o no pasó.</p>` +
+    (otras.length ? `<details class="plegable" style="margin:10px 0 0"><summary><span class="sec-s" style="margin:0">Las otras ${otras.length} rutinas, sin meta semanal</span><span class="mas" aria-hidden="true">+</span></summary><div class="lista sem">${otras.map(r => filaSemanaRutina(r, f)).join("")}</div></details>` : "") +
+    `</section>`;
+}
+
 function pintarRutinas(){
   const sem = E.rutinas.filter(r => r.frecuencia !== "mes"), mes = E.rutinas.filter(r => r.frecuencia === "mes");
   const hoyD = deISO(hoyISO()).getDay();
   let html = `<header class="cab"><div><h1 class="saludo" tabindex="-1">Rutina</h1><p class="fecha">La forma de tu día. Lo que se repite aparece en Hoy solo cuando toca.</p></div></header>`;
+  html += seccionSemana(hoyISO());
   html += `<section class="sec"><h2 class="sec-t">Tu día</h2><p class="sec-s">Cuatro franjas, de tu hoja de 24 horas. Cada rutina y cada acción vive en una.</p><div class="lista">` +
     E.franjas.map(fr => `<div class="fila-i"><span class="tarea-cuerpo"><span class="tarea-t">${esc(fr.nombre)}</span><span class="tarea-s">${esc(fr.nota)} · ${E.rutinas.filter(r => (r.franja || "jornada") === fr.id).length} rutinas</span></span><span class="fila-d">${fr.desde}:00–${fr.hasta === 24 ? "24" : fr.hasta}:00</span></div>`).join("") + `</div></section>`;
   html += `<section class="sec"><h2 class="sec-t">El turno de la tarde</h2><p class="sec-s">Una cosa por día, no tres. Es lo que evita que el estudio, el negocio y la pasión se peleen la misma tarde.</p><div class="lista">` +
@@ -1003,7 +1155,7 @@ function pintarRutinas(){
   html += `<section class="sec"><h2 class="sec-t">Cada semana</h2><div class="lista" style="margin-top:8px">${sem.map(filaRutinaConfig).join("") || `<p class="vacio">Sin rutinas semanales.</p>`}</div></section>`;
   html += `<section class="sec"><h2 class="sec-t">Cada mes</h2><div class="lista" style="margin-top:8px">${mes.map(filaRutinaConfig).join("") || `<p class="vacio">Sin rutinas mensuales.</p>`}</div></section>`;
   html += `<div class="fila-botones"><button class="btn-borde" data-accion="nueva-rutina">Nueva rutina</button></div>`;
-  html += `<p class="nota-suave">Si un proceso tiene varios pasos (como el cierre), agrégalos a la rutina: en Hoy se marcan uno por uno.</p>`;
+  html += `<p class="nota-suave">Toda actividad se puede partir: entra a ella en Hoy y escribe lo que la compone. Con el 80% de las partes hechas, la actividad queda hecha.</p>`;
   $("#vista").innerHTML = html;
 }
 
@@ -1075,27 +1227,37 @@ function hojaElegir(cual){
   const m = cual === "sec" ? sec : p; if(!m) return;
   let sug;
   if(cual === "mueven"){
-    sug = Rg.pendientesMeta(p).slice(0, 6);
-    if(sec && t.metaId === sec.id) sug = sug.slice(0, 4).concat(Rg.pendientesMeta(sec).slice(0, 2));
-    sug = sug.filter(a => !d.mueven.includes(a.id));
+    sug = Rg.pendientesMeta(p).slice(0, 5);
+    if(sec && t.metaId === sec.id) sug = sug.slice(0, 3).concat(Rg.pendientesMeta(sec).slice(0, 2));
+    sug = sug.concat(Rg.dePeso(hoyISO()).filter(r => !d.omitidas.includes(r.id) && !d.rutHechas[r.id]));
+    sug = sug.filter(x => !d.mueven.includes(x.id));
   } else {
     const ya = d.tres.concat(d.sec);
     sug = Rg.pendientesMeta(m).filter(a => !ya.includes(a.id)).slice(0, 8);
   }
   hoja(cual === "mueven" ? "¿Qué mueve hoy?" : cual === "tres" ? "Elige para hoy" : "Una para " + esc(m.nombre),
     cual === "mueven" ? "Máximo dos. Las siguientes de tu ruta, en orden." : "Las siguientes de tu ruta, en orden. Toca una para sumarla a tu día.",
-    `<div class="lista" style="border-top-color:var(--linea-fuerte)">${sug.map(a => { const mm = Rg.meta(a.metaId); return `<button class="opcion-fila" data-accion="elegir-hoy" data-id="${a.id}" data-cual="${cual}"><span class="tarea-t">${esc(a.texto)}</span><span class="tarea-s">${esc([mm && mm.rol !== "principal" ? mm.nombre : "", (Rg.etapaDe(a) || {}).nombre || ""].filter(Boolean).join(" · "))}</span></button>`; }).join("") || `<p class="vacio">No hay acciones pendientes. Escribe una.</p>`}` +
+    `<div class="lista" style="border-top-color:var(--linea-fuerte)">${sug.map(x => { if(esRutina(x)) return `<button class="opcion-fila" data-accion="elegir-hoy" data-id="${x.id}" data-cual="${cual}"><span class="tarea-t">${esc(x.nombre)}</span><span class="tarea-s">Rutina · ${esc(x.area)}</span></button>`;
+      const mm = Rg.meta(x.metaId); return `<button class="opcion-fila" data-accion="elegir-hoy" data-id="${x.id}" data-cual="${cual}"><span class="tarea-t">${esc(x.texto)}</span><span class="tarea-s">${esc([mm && mm.rol !== "principal" ? mm.nombre : "", (Rg.etapaDe(x) || {}).nombre || ""].filter(Boolean).join(" · "))}</span></button>`; }).join("") || `<p class="vacio">No hay acciones pendientes. Escribe una.</p>`}` +
     P.agregar("eNueva", "Escribir otra acción…", "elegir-nueva", ` data-cual="${cual}"`) + `</div>` + errH());
 }
 function hojaRutinaHoy(id){
-  const r = E.rutinas.find(x => x.id === id); if(!r) return;
-  hoja(esc(r.nombre), esc(r.area) + ". " + (r.frecuencia === "mes" ? "Día " + r.diaMes + " de cada mes." : diasTexto(r.dias) + "."),
-    (r.pasos.length ? `<div class="dato"><p class="dato-et">Pasos</p>${r.pasos.map((p, i) => `<p class="dato-v">${i + 1}. ${esc(p)}</p>`).join("")}</div>` : "") +
+  const r = rutina(id); if(!r) return;
+  const d = diaDe(hoyISO()), e = Rg.estadoSub(r, d), hecha = !!d.rutHechas[r.id];
+  const linea = !e.n ? "Esta actividad se cumple sola: una marca y ya. Si quieres partirla, escribe debajo lo que la compone hoy."
+    : e.n < 3 ? "Con " + e.n + (e.n === 1 ? " parte" : " partes") + " no hay holgura: se dan por hechas todas."
+    : "Con " + e.suf + " de " + e.n + " la actividad se da por hecha. Ese es el 80%.";
+  hoja(esc(r.nombre), esc([Rg.franja(r.franja) && Rg.franja(r.franja).nombre, r.area, r.frecuencia === "mes" ? "día " + r.diaMes + " de cada mes" : diasTexto(r.dias)].filter(Boolean).join(" · ")) + ". " + esc(linea),
+    `<div class="lista sub-lista">${e.sub.map((x, i) => `<div class="tarea${x.h ? " hecha" : ""}"><button class="check" role="checkbox" aria-checked="${x.h}" aria-label="${esc(x.t)}" data-accion="marcar-sub" data-id="${r.id}" data-i="${i}" data-hoja="1"><span class="check-c">${ICO.check}</span></button>` +
+      `<span class="tarea-cuerpo"><span class="tarea-t">${esc(x.t)}</span></span>` +
+      `<span class="tarea-lado"><button class="quitar-sub" data-accion="quitar-sub" data-id="${r.id}" data-i="${i}" aria-label="Quitar">✕</button></span></div>`).join("")}` +
+      P.agregar("sub_" + r.id, e.n ? "Agregar otra…" : "¿Qué la compone hoy? Ej. enviar el reporte", "nueva-sub", ` data-rut="${r.id}"`) + `</div>` +
+    (e.n ? `<p class="campo-ayuda">${hecha ? "Hecha." : e.lista ? "Ya es suficiente." : e.hechas + " de " + e.n + "."} Lo que escribas aquí es de hoy; mañana la actividad vuelve limpia${r.pasos.length ? " con sus partes fijas" : ""}.</p>` : "") +
     dos(bot("Hoy no aplica", "omitir-rutina", r.id), bot("Editar rutina", "editar-rutina", r.id, "llena")));
 }
 function hojaRutina(id){
   const r = E.rutinas.find(x => x.id === id) || (S.rutBorrador && S.rutBorrador.id === id ? S.rutBorrador : null); if(!r) return;
-  S.rut = { dias: r.dias.slice(), frec: r.frecuencia, area: r.area, franja: r.franja || "jornada" };
+  S.rut = { dias: r.dias.slice(), frec: r.frecuencia, area: r.area, franja: r.franja || "jornada", peso: !!r.peso };
   const ultimo = [["1", "Día 1"]].concat(Array.from({ length: 27 }, (_, i) => [String(i + 2), "Día " + (i + 2)]));
   hoja(r.nombre ? "Editar rutina" : "Nueva rutina", "Se repite sola. Cuando toca, aparece en Hoy.",
     P.inp("rNom", "Nombre", r.nombre, "Ej. Conciliaciones diarias") +
@@ -1104,7 +1266,12 @@ function hojaRutina(id){
     `<p class="campo-et">Se repite</p><div class="segmento">${[["semana", "Días de la semana"], ["mes", "Una vez al mes"]].map(o => `<button class="seg${o[0] === r.frecuencia ? " activo" : ""}" data-accion="rut-frec" data-v="${o[0]}">${o[1]}</button>`).join("")}</div>` +
     `<div id="rutDias"${r.frecuencia === "mes" ? " hidden" : ""}><div class="dias">${[1,2,3,4,5,6,0].map(x => `<button class="dia${r.dias.includes(x) ? " on" : ""}" aria-pressed="${r.dias.includes(x)}" aria-label="${NOMBRES_DIA[x]}" data-accion="rut-dia" data-v="${x}">${LETRAS[x]}</button>`).join("")}</div></div>` +
     `<div id="rutMes"${r.frecuencia === "mes" ? "" : " hidden"}>${P.sel("rDiaMes", "Día del mes", ultimo, String(r.diaMes || 1))}</div>` +
-    P.area("rPasos", "Pasos (opcional, uno por línea)", r.pasos.join("\n"), "Ej. Conciliar deferred revenue", 3) + errH() +
+    `<div id="rutSemanal"${r.frecuencia === "mes" ? " hidden" : ""}>` +
+      P.sel("rSemanal", "¿Cuántas veces por semana quieres?", [["0", "Las que estén programadas"]].concat(Array.from({ length: 7 }, (_, i) => [String(i + 1), (i + 1) + (i ? " veces" : " vez")])), String(r.semanal || 0)) +
+      `<p class="campo-ayuda" style="margin-top:-12px">Con 3 o más, el 80% ya cuenta como suficiente: 4 de 5 basta. Con 1 o 2 no hay holgura.</p></div>` +
+    `<div class="fila"><div><div class="fila-txt">Cuenta para las 2 que mueven</div><div class="fila-ayuda">Aparece como candidata al planear el día, junto a las acciones de tus metas.</div></div><button class="switch${r.peso ? " on" : ""}" role="switch" aria-checked="${!!r.peso}" aria-label="Cuenta para las 2 que mueven" data-accion="rut-peso"></button></div>` +
+    P.area("rPasos", "Partes fijas (opcional, una por línea)", r.pasos.join("\n"), "Ej. Conciliar deferred revenue") +
+    `<p class="campo-ayuda" style="margin-top:-12px">Son las que se repiten siempre, como los pasos de un cierre. Si lo dejas vacío, escribes las de cada día al entrar a la actividad. En ambos casos, con el 80% hechas la actividad queda hecha.</p>` + errH() +
     dos(bot("Cancelar", "cerrar-hoja"), bot("Guardar", "guardar-rutina", r.id, "llena")) +
     `<div class="hoja-pie"><button class="leve" data-accion="borrar-rutina" data-id="${r.id}">Eliminar rutina</button><button class="leve" data-accion="pausar-rutina" data-id="${r.id}">${r.pausada ? "Reactivar" : "Pausar"}</button></div>`);
 }
@@ -1154,6 +1321,33 @@ function hojaBase(id){
   hoja("Base: " + esc(b.nombre), "No compite ni se mide.", P.inp("bNom", "Nombre", b.nombre) + P.area("bForma", "Cómo se protege", b.forma, "", 2) +
     dos(bot("Quitar", "quitar-base", b.id), bot("Guardar", "guardar-base", b.id, "llena")));
 }
+function hojaSemana(id, tipo){
+  const f = hoyISO(), hoy = f;
+  if(tipo === "meta"){
+    const m = Rg.meta(id); if(!m) return;
+    const w = Rg.semanaMeta(m, f), sem = semanaDe(f);
+    const acc = E.acciones.filter(a => a.hecha && a.hechaEl && a.metaId === m.id && sem.includes(a.hechaEl)).sort((a, b) => a.hechaEl.localeCompare(b.hechaEl));
+    hoja(esc(m.nombre), "Lo que la movió esta semana. " + esc(etapaTexto(m)) + ".",
+      `<div class="sem-detalle">${w.dias.map((x, i) => `<div class="sem-dia${x.hecha ? " on" : ""}${x.fecha === hoy ? " hoy" : ""}"><span class="sem-dia-n">${NOMBRES_DIA[(i + 1) % 7]}</span><span class="sem-dia-v">${x.hecha ? acc.filter(a => a.hechaEl === x.fecha).map(a => esc(a.texto)).join(" · ") : (x.fecha > hoy ? "—" : "Sin mover")}</span></div>`).join("")}</div>` +
+      `<p class="campo-ayuda">${w.hechas ? w.hechas + (w.hechas === 1 ? " acción movió" : " acciones movieron") + " esta meta." : "Esta meta no se movió esta semana."}</p>` +
+      dos(bot("Cerrar", "cerrar-hoja"), bot("Ver la ruta", "ruta", m.id, "llena")));
+    return;
+  }
+  const r = rutina(id); if(!r) return;
+  const w = Rg.semanaRutina(r, f);
+  const linea = w.meta < 1 ? "Sin meta semanal."
+    : w.meta < 3 ? "Meta de la semana: " + w.meta + (w.meta === 1 ? " vez" : " veces") + ". Con una o dos no hay holgura."
+    : "Meta de la semana: " + w.meta + ". Con " + w.suf + " ya es suficiente — ese es tu 80%.";
+  const veredicto = w.estado === "completo" ? "Completo. Lo hiciste todo."
+    : w.estado === "suficiente" ? "Suficiente. Ya avanzaste; lo que falte es extra, no deuda."
+    : w.estado === "va" ? "Vas " + w.hechas + " de " + w.meta + ". Con " + w.suf + " ya es suficiente."
+    : "Todavía no empieza la semana para esta. Con " + w.suf + " de " + w.meta + " basta.";
+  hoja(esc(r.nombre), esc([Rg.franja(r.franja) && Rg.franja(r.franja).nombre, r.area].filter(Boolean).join(" · ")) + ". " + esc(linea),
+    `<div class="sem-detalle">${w.dias.map((x, i) => { const dw = (i + 1) % 7, toca = (r.dias || []).includes(dw);
+      return `<div class="sem-dia${x.hecha ? " on" : ""}${x.fecha === hoy ? " hoy" : ""}"><span class="sem-dia-n">${NOMBRES_DIA[dw]}</span><span class="sem-dia-v">${x.hecha ? "Hecho" : x.fecha > hoy ? (toca ? "Toca" : "—") : (toca ? "No pasó" : "—")}</span></div>`; }).join("")}</div>` +
+    `<p class="veredicto-sem${w.estado === "completo" || w.estado === "suficiente" ? " logrado" : ""}">${esc(veredicto)}</p>` +
+    dos(bot("Cerrar", "cerrar-hoja"), bot("Editar rutina", "editar-rutina", r.id, "llena")));
+}
 function hojaProposito(){
   hoja("Propósito", "No es un trabajo ni una pasión: es el para qué. Puede estar en todo lo demás. Una o dos líneas; se relee, no se cumple.",
     P.area("prTxt", "", E.ajustes.proposito, "Ej. construir una vida que sostenga a los míos sin dejar de crear", 3) +
@@ -1188,16 +1382,18 @@ function hojaAjustes(){
     `<button class="pref-reset" data-accion="borrar">Borrar todo y volver al ejemplo</button>`);
 }
 const GUIA = [
-  ["Cada mañana, 2 minutos", "Planea tu día. Tu rutina ya está puesta por franjas; solo eliges las 2 que mueven: el 20% que produce el 80%. Si no sabes cuáles, «Usar lo sugerido» toma las siguientes de tu ruta."],
+  ["Cada mañana, 2 minutos", "Planea tu día. Tu rutina ya está puesta por franjas; solo eliges las 2 que mueven: el 20% que produce el 80%. Pueden ser acciones de tus metas o rutinas que marcaste de peso. Cuando las dos salen, el día cuenta — aunque el resto no se haga."],
   ["Durante el día", "Sigue tu rutina y marca. Lo que surja va con el botón +: un pendiente, una acción para una meta o una idea para después."],
   ["La tarde tiene turno", "Un solo frente por tarde, no tres. Lo configuras en Rutina y Cauce lo respeta al planear."],
   ["Cada noche, 1 minuto", "Cierra el día: marcas, sueltas en una línea y lo que no se hizo pasa a mañana. Si algo ya lo moviste dos veces, Cauce te pide comprometerlo con alguien o hacerlo más chico."],
-  ["Cada domingo, 10 minutos", "Planea la semana. Lo que avanzaste, las etapas que ya van en el 80% y qué hacer con tus ideas."]
+  ["El 80% dentro de la actividad", "Entra a una actividad en Hoy y escribe lo que la compone: «mis 5 del trabajo» pueden ser cerrar un flujo, aprobar algo, enviar un reporte. Con 4 de 5, la actividad queda hecha sola. Si una actividad se cumple sola, como leer noticias, no necesita partes."],
+  ["El 80% a lo largo de la semana", "A cada rutina le pones cuántas veces por semana la quieres. Gym 4 de 5 ya es suficiente, y la quinta es extra. En Rutina → Esta semana lo ves todo junto; toca una para ver qué la movió."],
+  ["Cada domingo, 10 minutos", "Planea la semana. Lo que avanzaste, cómo quedó tu 80/20 por actividad y qué hacer con tus ideas."]
 ];
 function hojaGuia(){
   hoja("Cómo se usa Cauce", "Tu día en cuatro momentos.",
     `<ol class="guia-uso">${GUIA.map((g, i) => `<li><span class="n">${i + 1}</span><div><b>${g[0]}</b><span>${g[1]}</span></div></li>`).join("")}</ol>` +
-    `<p class="campo-ayuda">Las piezas: <b>Metas</b> (dos, con su ruta de etapas; una es Oficio y otra Pasión), <b>Rutina</b> (tus franjas, procesos y turnos), <b>Pendientes</b> (lo suelto de hoy) e <b>Ideas</b> (lo que puede esperar). Aparte están <b>Bienestar</b>, que no compite ni se mide, y <b>Hobby</b>, que no tiene tareas. Cada temporada, unas doce semanas, revisas tus metas.</p>` +
+    `<p class="campo-ayuda">Las piezas: <b>Metas</b> (dos, con su ruta de etapas; una es Oficio y otra Pasión — la pasión es futuro, no pasatiempo), <b>Rutina</b> (tus franjas, procesos y turnos), <b>Pendientes</b> (lo suelto de hoy) e <b>Ideas</b> (lo que puede esperar). Aparte están <b>Bienestar</b>, que no compite ni se mide, y <b>Hobby</b>, que no tiene tareas. Cada temporada, unas doce semanas, revisas tus metas.</p>` +
     dos(bot("Entendido", "cerrar-hoja", null, "llena")));
 }
 function hojaRefugio(){
@@ -1259,10 +1455,10 @@ function flujoBienvenida(){
   E.marcas.onboarding = true; guardar();
   const p = Rg.principal(), s = Rg.secundaria();
   abrirFlujo([
-    { html: () => MARCA + P.tit("Tu día, guiado") + P.txt("Cauce te dice qué hacer hoy: tu rutina de siempre y las 2 acciones que mueven tu meta principal. Lo demás espera en su lugar." + (E.marcas.migrado ? " Traje lo que ya tenías de la versión anterior." : "")) + P.btn("Seguir") },
+    { html: () => MARCA + P.tit("Tu día, guiado") + P.txt("Cauce te dice qué hacer hoy: tu rutina de siempre y las 2 cosas que mueven tus metas. Lo demás espera en su lugar." + (E.marcas.migrado ? " Traje lo que ya tenías de la versión anterior." : "")) + P.btn("Seguir") },
     { html: () => P.tit("Cada mañana, dos minutos") + `<ol class="guia-uso"><li><span class="n">1</span><div><b>Tu rutina</b><span>Mañana, jornada, tarde y noche. Ya está puesta.</span></div></li><li><span class="n">2</span><div><b>Las 2 que mueven ${esc(p ? p.nombre : "tu meta")}</b><span>El 20% del día. Si solo salen esas dos, el día valió.</span></div></li><li><span class="n">3</span><div><b>El turno de la tarde</b><span>Una cosa, no tres: hoy ${esc(s ? s.nombre : "lo que toque")}, mañana otra.</span></div></li><li><span class="n">4</span><div><b>Tus pendientes</b><span>Lo suelto de hoy.</span></div></li></ol>` + P.btn("Seguir") },
     { html: () => P.tit("Marca, suelta, cierra.") + P.txt("Toca el círculo para marcar. En la noche, un minuto: escribes en una línea lo que sueltas y lo pendiente pasa a mañana, sin culpa. Si algo ya lo moviste dos veces, Cauce te va a pedir que lo comprometas con alguien: eso es lo que de verdad lo destraba.") + P.btn("Seguir") },
-    { html: () => P.tit("Una cosa más: el 80%") + P.txt("Cuando una etapa llega al 80%, Cauce te ofrece cerrarla. No es dejar las cosas a medias: es entregar y corregir después, en vez de pulir hasta el 100% y no entregar nunca. Lo que falte vuelve solo si de verdad hace falta.") + P.btn("Seguir") },
+    { html: () => P.tit("El 80% manda, no el 100%") + P.txt("La misma regla en tres niveles. Dentro de una actividad: 4 de sus 5 partes y queda hecha. A lo largo de la semana: gym 4 de 5 y ya avanzaste. Y en una etapa: cuando falta el último tramo, Cauce te ofrece cerrarla — entregar y corregir, en vez de pulir y no entregar nunca.") + P.btn("Seguir") },
     { html: () => P.tit("Viene con un ejemplo vacío") + P.txt("Dos metas de muestra con su ruta, una rutina por franjas y los turnos de la tarde. Todo es editable: empieza por Metas y Rutina, o importa tus datos si ya los tienes. La guía siempre está en el signo de interrogación.") + P.btn("Planear mi primer día", "planear") + P.sec("Tengo datos para importar", "importar") + P.sec("Explorar primero", "explorar"),
       leer: (ctx, v) => { ctx.siguiente = v; } }
   ], { fin: ctx => { if(ctx.siguiente === "planear") setTimeout(flujoPlanDia, 60);
@@ -1289,15 +1485,18 @@ function flujoPlanDia(){
       : P.txt("Hoy no toca ninguna rutina.")) + P.btn("Seguir")
   }];
   if(p) pasos.push({
-    html: c => { let cand = [...new Set(c.mueven.concat(Rg.sugeridas(p, 5).map(a => a.id)))];
+    html: c => { let cand = [...new Set(c.mueven.concat(Rg.sugeridas(p, 4).map(a => a.id)))];
       if(hayTurno) cand = cand.concat(Rg.sugeridas(s, 2).map(a => a.id));
-      const lista = [...new Set(cand)].map(accion).filter(a => a && !a.hecha);
-      return P.tit("¿Qué mueve hoy?") + P.txt("Dos, no cinco. Si solo salen estas dos, el día ya valió. " + esc(etapaTexto(p)) + ".") +
-        `<div class="onb-opts">${lista.map(a => { const mm = Rg.meta(a.metaId); return P.marca(esc(a.texto), a.id, "mueven", c.mueven.includes(a.id), MAX_MUEVEN, esc([mm && mm.rol !== "principal" ? mm.nombre : "", (Rg.etapaDe(a) || {}).nombre || ""].filter(Boolean).join(" · "))); }).join("")}</div>` +
+      cand = cand.concat(Rg.dePeso(f).filter(r => c.incluir.includes(r.id)).map(r => r.id));
+      const lista = [...new Set(cand)].map(pieza).filter(x => x && !hechaPieza(x, d));
+      return P.tit("¿Qué mueve hoy?") + P.txt("Dos, no cinco. Si solo salen estas dos, el día ya cuenta. " + esc(etapaTexto(p)) + ".") +
+        `<div class="onb-opts">${lista.map(x => { if(esRutina(x)){ const w = Rg.semanaRutina(x, f);
+            return P.marca(esc(x.nombre), x.id, "mueven", c.mueven.includes(x.id), MAX_MUEVEN, esc(w.meta >= 3 ? "Rutina · " + w.hechas + " de " + w.meta + " esta semana" : "Rutina · " + x.area)); }
+          const mm = Rg.meta(x.metaId); return P.marca(esc(x.texto), x.id, "mueven", c.mueven.includes(x.id), MAX_MUEVEN, esc([mm && mm.rol !== "principal" ? mm.nombre : "", (Rg.etapaDe(x) || {}).nombre || ""].filter(Boolean).join(" · "))); }).join("")}</div>` +
         `<div class="lista" style="margin:-6px 0 18px">${P.agregar("planNueva", "Escribir otra acción…", "plan-nueva", ` data-cual="mueven"`)}</div>` + P.err() + P.btn("Seguir"); },
     leer: c => { if(!c.mueven.length) return errorPaso("Elige al menos una. Si hoy no hay espacio para tu meta, activa «Semana difícil» en Ajustes.");
-      c.mueven.forEach(id => { const a = accion(id), m = a && Rg.meta(a.metaId); if(!a) return;
-        const lista = m && m.rol === "principal" ? c.tres : c.sec;
+      c.mueven.forEach(id => { const a = accion(id); if(!a) return;
+        const m = Rg.meta(a.metaId), lista = m && m.rol === "principal" ? c.tres : c.sec;
         if(!c.tres.includes(id) && !c.sec.includes(id)) lista.push(id); }); }
   });
   pasos.push({
@@ -1315,9 +1514,9 @@ function flujoPlanDia(){
         (ps.length > 5 ? `<p class="nota-suave" style="margin-top:-8px">Día cargado. ¿Algo puede pasar a mañana?</p>` : "") + P.btn("Seguir"); }
   });
   pasos.push({ sinAtras: false,
-    html: c => { const mv = c.mueven.map(accion).filter(Boolean), rsI = rs.filter(r => c.incluir.includes(r.id)), ps = Rg.pendHoy(hoyISO()).filter(x => !x.hecha);
+    html: c => { const mv = c.mueven.map(pieza).filter(Boolean), rsI = rs.filter(r => c.incluir.includes(r.id)), ps = Rg.pendHoy(hoyISO()).filter(x => !x.hecha);
       return P.tit("Tu día") + `<div class="resumen">` +
-        fila("Las 2 que mueven", mv.map((a, i) => (i + 1) + ". " + a.texto).join("  ")) +
+        fila("Las 2 que mueven", mv.map((x, i) => (i + 1) + ". " + (esRutina(x) ? x.nombre : x.texto)).join("  ")) +
         fila("Turno de la tarde", c.secNo ? "Libre" : (t.texto || "Libre")) +
         fila("Rutina", rsI.length ? rsI.map(r => r.nombre).join(", ") : "Sin rutinas hoy") +
         fila("Pendientes", ps.length ? ps.map(x => x.texto).join(", ") : "Ninguno") + `</div>` + P.btn("Empezar el día", "ok"); },
@@ -1393,10 +1592,19 @@ function aplicarEtapas(m, nombres){
 /* ── Planear la semana ── */
 function flujoSemana(){
   const f = hoyISO(), p = Rg.principal(), s = Rg.secundaria(), hechas = Rg.hechasEnSemana(f);
+  const pasada = sumarDias(f, -7);
   const pasos = [{
     html: () => P.tit("Lo que avanzaste") + (hechas.length
       ? `<div class="resumen">${[p, s].filter(Boolean).map(m => { const hs = hechas.filter(a => a.metaId === m.id); return hs.length ? `<div class="res-fila"><p class="res-et">${esc(m.nombre)}</p>${hs.map(a => `<p class="res-v">✓ ${esc(a.texto)}</p>`).join("")}</div>` : ""; }).join("")}</div>`
       : P.txt("Esta semana no se movió ninguna meta. Hay semanas así; lo que importa es la que empieza.")) + P.btn("Seguir")
+  }, {
+    html: () => { const con = Rg.seguidas().filter(r => Rg.metaSemanal(r) >= 3);
+      const w = con.map(r => ({ r, s: Rg.semanaRutina(r, pasada) }));
+      const ok = w.filter(x => x.s.estado === "completo" || x.s.estado === "suficiente");
+      return P.tit("Tu 80/20 de la semana que cierra") +
+        (w.length ? `<div class="lista sem" style="margin:0 0 20px">${w.map(x => `<div class="sem-fila${x.s.estado === "completo" || x.s.estado === "suficiente" ? " logrado" : ""}"><span class="sem-nom">${esc(x.r.nombre)}</span>${marcasSemana(x.s.dias, pasada)}<span class="sem-estado">${x.s.estado === "completo" ? "Completo" : x.s.estado === "suficiente" ? "Suficiente" : x.s.hechas + " de " + x.s.meta}</span></div>`).join("")}</div>` +
+            P.txt(ok.length === w.length ? "Todas llegaron al 80%. Eso es el objetivo: no el 100%." : ok.length ? ok.length + " de " + w.length + " llegaron al 80%. Para las que no, la pregunta no es esforzarse más: es si la meta semanal está bien puesta." : "Ninguna llegó al 80%. Antes de prometerte más, baja la meta semanal a lo que de verdad cabe.")
+          : P.txt("Todavía no sigues ninguna actividad por semana. En Rutina puedes decir «gym, 5 veces por semana» y Cauce marca 4 como suficiente.")) + P.btn("Seguir"); }
   }];
   [p, s].filter(Boolean).forEach(m => pasos.push(pasoSemanaMeta(m.id)));
   Rg.bandeja().forEach(i => pasos.push(pasoSemanaIdea(i.id)));
@@ -1525,7 +1733,7 @@ const pasoRPrincipal = {
     const act = Rg.activas();
     if(act.length < 2) return P.tit(act.length ? "Manda: " + esc(act[0].nombre) : "Sin metas activas") + P.txt(act.length ? "Con una sola meta, ella manda y queda un lugar libre." : "Una temporada sin metas es una temporada de operar y descansar. Es válida.") + P.btn("Seguir");
     if(!Array.isArray(c.pri) || !c.pri.length) c.pri = [(Rg.principal() || act[0]).id];
-    return P.tit("¿Cuál manda?") + P.txt("La que manda recibe las 2 que mueven; la otra, el turno de la tarde. Tu oficio manda por defecto; si eliges otra, escribe por qué.") +
+    return P.tit("¿Cuál manda?") + P.txt("La que manda aporta la mayoría de las 2 que mueven; la otra toma el turno de la tarde. Tu oficio manda por defecto; si eliges otra, escribe por qué.") +
       `<div class="onb-opts">${act.map(m => P.marca(esc(m.nombre), m.id, "pri", c.pri.includes(m.id), 1, esc(m.resultado))).join("")}</div>` +
       P.inp("rpPri", "Si tu activo principal no manda, ¿por qué?", "", "Solo si aplica") + P.err() + P.btn("Seguir");
   },
@@ -1553,8 +1761,8 @@ const pasoRFin = {
 const man = () => sumarDias(hoyISO(), 1);
 function trasMarcar(a, m, etapaAntes){
   if(!a.hecha) return;
-  const d = diaDe(hoyISO()), tres = d.tres.map(accion).filter(Boolean);
-  if(d.tres.includes(a.id) && tres.length >= MAX_TRES && tres.every(x => x.hecha)) nota("Las tres de hoy, hechas.");
+  const d = diaDe(hoyISO());
+  if(Rg.diaCuenta(d)) nota("El día cuenta. Lo demás es extra.");
   else if(m && !etapaAntes && Rg.etapaCompleta(m)) nota("Terminaste la etapa «" + Rg.etapaActual(m).nombre + "».");
   else nota("Hecho.");
 }
@@ -1563,6 +1771,7 @@ const ACC = {
   /* navegación y momentos del día */
   "tab": d => { S.tab = d.tab; $("#lienzo").scrollTop = 0; cerrarHoja(); pintar(); const h = $("#vista h1"); if(h) try{ h.focus({ preventScroll: true }); }catch(e){} },
   "guia": () => hojaGuia(),
+  "ver-semana": d => hojaSemana(d.id, d.tipo),
   "editar-proposito": () => hojaProposito(),
   "guardar-proposito": () => { cambiar(() => { E.ajustes.proposito = val("prTxt"); }); cerrarHoja(); },
   "editar-turno": d => hojaTurno(+d.d),
@@ -1590,11 +1799,11 @@ const ACC = {
   "marcar-accion": d => { const a = accion(d.id); if(!a) return; const m = Rg.meta(a.metaId), antes = m && Rg.etapaCompleta(m); cambiar(() => A.marcarAccion(a)); refrescarRuta(); trasMarcar(a, m, antes); },
   "ver-accion": d => hojaAccion(d.id),
   "meta-lane": (d, b) => { S.lane = d.v; $$('#hojas [data-accion="meta-lane"]').forEach(x => x.classList.toggle("on", x === b)); },
-  "mueve": d => { const a = accion(d.id); if(!a) return; let r; cambiar(() => { r = A.mueve(a); diaMut(hoyISO()).planeado = true; });
+  "mueve": d => { const a = pieza(d.id); if(!a) return; let r; cambiar(() => { r = A.mueve(a); diaMut(hoyISO()).planeado = true; });
     if(r === "lleno") return errorPaso("Ya tienes dos. Quita una primero: son el 20%, no la lista completa.");
     cerrarHoja(); nota(r === "quitada" ? "Fuera de las 2." : "Es una de las 2 que mueven hoy."); },
   "elegir": d => hojaElegir(d.cual),
-  "elegir-hoy": d => { const a = accion(d.id); if(!a) return; let r;
+  "elegir-hoy": d => { const a = pieza(d.id); if(!a) return; let r;
     if(d.cual === "mueven"){ cambiar(() => { r = A.mueve(a); diaMut(hoyISO()).planeado = true; });
       if(r === "lleno") return errorPaso("Ya tienes dos. Quita una primero."); cerrarHoja(); nota("Es una de las 2 que mueven hoy."); return; }
     cambiar(() => { r = A.aHoy(a); const dd = diaMut(hoyISO()); if(dd.tres.length >= MAX_TRES) dd.planeado = true; });
@@ -1619,8 +1828,21 @@ const ACC = {
   "quitar-base": d => { cambiar(() => { E.base = E.base.filter(x => x.id !== d.id); }); cerrarHoja(); nota("Quitado de la base."); },
 
   /* operación */
-  "marcar-rutina": d => { const r = E.rutinas.find(x => x.id === d.id); if(!r) return; cambiar(() => A.marcarRutina(r, hoyISO())); },
-  "marcar-paso": d => { const r = E.rutinas.find(x => x.id === d.id); if(!r) return; cambiar(() => A.marcarPaso(r, +d.i, hoyISO())); if(diaDe(hoyISO()).rutHechas[r.id]) nota(r.nombre + ": todos los pasos, hechos."); },
+  "marcar-rutina": d => { const r = rutina(d.id); if(!r) return; const antes = Rg.diaCuenta(diaDe(hoyISO()));
+    cambiar(() => A.marcarRutina(r, hoyISO()));
+    const dd = diaDe(hoyISO());
+    if(!antes && Rg.diaCuenta(dd)) nota("El día cuenta. Lo demás es extra.");
+    else if(dd.rutHechas[r.id] && Rg.metaSemanal(r) >= 3){ const w = Rg.semanaRutina(r, hoyISO());
+      if(w.hechas === w.suf) nota(r.nombre + ": " + w.hechas + " de " + w.meta + ". Ya es suficiente esta semana."); } },
+  "marcar-sub": d => { const r = rutina(d.id); if(!r) return; let res;
+    const antesDia = Rg.diaCuenta(diaDe(hoyISO()));
+    cambiar(() => { res = A.marcarSub(r, +d.i, hoyISO()); });
+    if(d.hoja) hojaRutinaHoy(r.id);
+    if(res && !res.antes && res.ahora){
+      if(!antesDia && Rg.diaCuenta(diaDe(hoyISO()))) nota("El día cuenta. Lo demás es extra.");
+      else nota(r.nombre + ": " + res.e.hechas + " de " + res.e.n + ". Suficiente, queda hecha.");
+    } },
+  "quitar-sub": d => { const r = rutina(d.id); if(!r) return; cambiar(() => A.quitarSub(r, +d.i, hoyISO())); hojaRutinaHoy(r.id); },
   "plegar": d => { const i = S.abiertas.indexOf(d.id); if(i >= 0) S.abiertas.splice(i, 1); else S.abiertas.push(d.id); pintar(); },
   "ver-rutina-hoy": d => hojaRutinaHoy(d.id),
   "omitir-rutina": d => { cambiar(() => { const dd = diaMut(hoyISO()); if(!dd.omitidas.includes(d.id)) dd.omitidas.push(d.id); }); cerrarHoja(); nota("Hoy no. Mañana aparece como siempre."); },
@@ -1629,13 +1851,14 @@ const ACC = {
   "nueva-rutina": () => { S.rutBorrador = { id: uid(), nombre: "", area: "Trabajo", franja: "jornada", frecuencia: "semana", dias: [1,2,3,4,5], diaMes: 1, pasos: [] }; hojaRutina(S.rutBorrador.id); },
   "rut-franja": (d, b) => { S.rut.franja = d.v; $$('#hojas [data-accion="rut-franja"]').forEach(x => x.classList.toggle("on", x === b)); },
   "rut-area": (d, b) => { S.rut.area = d.v; $$('#hojas [data-accion="rut-area"]').forEach(x => x.classList.toggle("on", x === b)); },
-  "rut-frec": (d, b) => { S.rut.frec = d.v; $$('#hojas [data-accion="rut-frec"]').forEach(x => x.classList.toggle("activo", x === b)); $("#rutDias").hidden = d.v === "mes"; $("#rutMes").hidden = d.v !== "mes"; },
+  "rut-frec": (d, b) => { S.rut.frec = d.v; $$('#hojas [data-accion="rut-frec"]').forEach(x => x.classList.toggle("activo", x === b)); $("#rutDias").hidden = d.v === "mes"; $("#rutMes").hidden = d.v !== "mes"; const sm = $("#rutSemanal"); if(sm) sm.hidden = d.v === "mes"; },
+  "rut-peso": (d, b) => { S.rut.peso = !S.rut.peso; b.classList.toggle("on", S.rut.peso); b.setAttribute("aria-checked", String(S.rut.peso)); },
   "rut-dia": (d, b) => { const v = +d.v, i = S.rut.dias.indexOf(v); if(i >= 0) S.rut.dias.splice(i, 1); else S.rut.dias.push(v); const on = S.rut.dias.includes(v); b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); },
   "guardar-rutina": d => {
     let r = E.rutinas.find(x => x.id === d.id); const nuevo = !r; if(nuevo) r = S.rutBorrador; if(!r) return;
     const nombre = val("rNom"); if(!nombre) return errorPaso("Ponle un nombre a la rutina.");
     if(S.rut.frec !== "mes" && !S.rut.dias.length) return errorPaso("Elige al menos un día.");
-    cambiar(() => { Object.assign(r, { nombre, area: S.rut.area, franja: S.rut.franja, frecuencia: S.rut.frec, dias: S.rut.dias.slice().sort(), diaMes: +val("rDiaMes") || 1, pasos: val("rPasos").split("\n").map(x => x.trim()).filter(Boolean) }); if(nuevo){ delete r.nueva; E.rutinas.push(r); S.rutBorrador = null; } });
+    cambiar(() => { Object.assign(r, { nombre, area: S.rut.area, franja: S.rut.franja, frecuencia: S.rut.frec, dias: S.rut.dias.slice().sort(), diaMes: +val("rDiaMes") || 1, semanal: +val("rSemanal") || 0, peso: !!S.rut.peso, pasos: val("rPasos").split("\n").map(x => x.trim()).filter(Boolean) }); if(nuevo){ delete r.nueva; E.rutinas.push(r); S.rutBorrador = null; } });
     cerrarHoja(); nota(nuevo ? "Rutina creada. Aparece en Hoy los días que toca." : "Rutina guardada.");
   },
   "borrar-rutina": d => { cambiar(() => { E.rutinas = E.rutinas.filter(x => x.id !== d.id); }); S.rutBorrador = null; cerrarHoja(); nota("Rutina eliminada."); },
@@ -1718,6 +1941,9 @@ const ENTER = {
   "nueva-accion": t => { const m = Rg.meta(t.dataset.meta); if(!m) return; cambiar(() => A.nuevaAccion(m, t.value.trim())); S.refoco = t.id; pintar(); nota("Acción agregada a la etapa actual."); },
   "nueva-idea": t => { cambiar(() => A.nuevaIdea(t.value.trim())); S.refoco = t.id; pintar(); nota("Idea guardada. Se revisa el domingo."); },
   "nuevo-hobby": t => { cambiar(() => E.hobbies.push({ id: uid(), nombre: t.value.trim() })); S.refoco = t.id; pintar(); },
+  "nueva-sub": t => { const r = rutina(t.dataset.rut); if(!r) return; const txt = t.value.trim(), id = t.id;
+    cambiar(() => A.nuevaSub(r, txt, hoyISO())); hojaRutinaHoy(r.id);
+    setTimeout(() => { const el = document.getElementById(id); if(el) el.focus(); }, 90); },
   "agregar-rapido": () => ACC["agregar-rapido"](),
   "elegir-nueva": t => { const cual = t.dataset.cual, m = cual === "sec" ? Rg.secundaria() : Rg.principal(); if(!m) return; let r;
     cambiar(() => { const a = A.nuevaAccion(m, t.value.trim()); r = cual === "mueven" ? A.mueve(a) : A.aHoy(a); diaMut(hoyISO()).planeado = true; });
@@ -1757,6 +1983,8 @@ try{ mqOscuro && mqOscuro.addEventListener("change", () => { if(!E || E.ajustes.
 /* ════════ ARRANQUE ════════ */
 async function arrancar(){
   let g = await Guardado.leer(CLAVE);
+  if(!g || !Array.isArray(g.metas)) g = await Guardado.leer(CLAVE_V4);
+  if(!g || !Array.isArray(g.metas)) g = await Guardado.leer(CLAVE_V3);
   if(!g || !Array.isArray(g.metas)) g = await Guardado.leer(CLAVE_V2);
   if(!g || !Array.isArray(g.metas)) g = semilla();
   E = normalizar(migrar(g)); podar(E); aplicarTema();
