@@ -442,6 +442,108 @@ button.sem-fila:hover .sem-nom{color:var(--tinta)}
 .quitar-sub{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tinta-baja);border-radius:50%;transition:color .2s,background .2s}
 .quitar-sub:hover{color:var(--brasa);background:color-mix(in srgb,var(--brasa) 9%,transparent)}
 
+/* ════════ v7 · el peso por orden ════════ */
+/* El porcentaje de cada subacción: presente pero en segundo plano. Monoespaciado
+   para que la columna de números se lea de un vistazo, como una tabla. */
+.paso-p{ margin-left:auto; font-family:var(--mono); font-size:11px; letter-spacing:.02em;
+  color:var(--tinta-baja); font-variant-numeric:tabular-nums; flex:0 0 auto; padding-left:10px; }
+.paso-f.hecho .paso-p{ color:var(--oro); }
+.sub-mando{ display:flex; align-items:center; gap:2px; }
+.mover{ display:grid; place-items:center; width:30px; height:30px; border:0; background:none;
+  color:var(--tinta-tenue); cursor:pointer; border-radius:8px; padding:0; }
+.mover svg{ width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:2;
+  stroke-linecap:round; stroke-linejoin:round; }
+.mover:hover{ color:var(--tinta); background:var(--panel); }
+.mover:active{ transform:scale(.9); }
+/* La barra del peso: una sola línea, sin número grande. Mide, no califica. */
+.peso-barra{ height:3px; border-radius:2px; background:var(--linea); overflow:hidden; margin:14px 0 10px; }
+.peso-barra > span{ display:block; height:100%; border-radius:2px;
+  background:linear-gradient(90deg, var(--oro), var(--llama));
+  transition:width .36s cubic-bezier(.22,.61,.36,1); }
+
+/* ── Editar el texto precargado ── */
+.onb-opt-fila{ display:flex; align-items:stretch; gap:6px; }
+.onb-opt-fila > .onb-opt{ flex:1 1 auto; min-width:0; }
+.onb-edit{ flex:0 0 auto; width:38px; border:1px solid var(--linea); border-radius:12px;
+  background:var(--noche); color:var(--tinta-tenue); cursor:pointer; display:grid; place-items:center; }
+.onb-edit svg{ width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8;
+  stroke-linecap:round; stroke-linejoin:round; }
+.onb-edit:hover{ color:var(--tinta); border-color:var(--linea-fuerte); background:var(--panel); }
+.onb-opt-edit{ border:1px solid var(--cera); border-radius:12px; padding:10px 12px 12px; background:var(--noche); }
+.onb-opt-edit .campo-area{ margin:0 0 10px; }
+.onb-opt-edit .mini-seg{ justify-content:flex-end; }
+
+/* ════════ v7 · la flama ════════ */
+/* Nombre + flama. La flama se llena con las semanas del mes al 80/20; la figura
+   es una sola, grande, y la fecha del hito va al lado para que no pueda mentir. */
+.flama-caja{ display:flex; gap:16px; align-items:flex-start; margin:4px 0 20px; }
+.flama-fig{ position:relative; flex:0 0 auto; width:46px; height:52px; }
+.flama-fig .fl-base, .flama-fig .fl-llena{ position:absolute; inset:0; display:block; }
+.flama-fig svg{ width:100%; height:100%; display:block; }
+.flama-fig .fl-base svg{ fill:none; stroke:var(--linea-fuerte); stroke-width:1.4; }
+.flama-fig .fl-llena{ clip-path:inset(calc(100% - var(--llena, 0%)) 0 0 0);
+  transition:clip-path .5s cubic-bezier(.22,.61,.36,1); }
+.flama-fig .fl-llena svg{ fill:var(--cera); stroke:none; }
+.flama-fig.viva .fl-llena svg{ fill:url(#fgrad); fill:var(--llama); }
+.flama-fig.viva .fl-base svg{ stroke:var(--oro); }
+.flama-cuerpo{ flex:1 1 auto; min-width:0; padding-top:3px; }
+/* Una muesca por semana del mes: cerrada, en curso, o por venir */
+.muescas{ display:flex; gap:5px; margin-bottom:9px; }
+.muesca{ width:26px; height:5px; border-radius:3px; background:var(--linea); }
+.muesca.porVenir{ background:none; box-shadow:inset 0 0 0 1px var(--linea); }
+.muesca.on{ background:var(--llama); }
+.muesca.curso{ box-shadow:inset 0 0 0 1px var(--cera); }
+.muesca.curso.on{ background:var(--oro); box-shadow:none; }
+.flama-txt{ font-size:13px; color:var(--tinta-baja); margin:0 0 4px; }
+.flama-hito{ font-size:13px; margin:0; line-height:1.45; }
+.flama-hito .enlace-llano{ border:0; background:none; padding:0; text-align:left; font:inherit;
+  color:var(--tinta-baja); cursor:pointer; }
+.flama-hito .enlace-llano b{ color:var(--tinta); font-weight:600; }
+.flama-hito .enlace-llano:hover{ color:var(--tinta); }
+.flama-hito.vencido .enlace-llano, .flama-hito.vencido .enlace-llano b{ color:var(--brasa); }
+.flama-aviso{ font-size:13px; color:var(--tinta-baja); margin:0; }
+.tarea-s.vencido{ color:var(--brasa); }
+
+/* ── Mapear rutina → meta ── */
+.map-lista{ margin:0 0 18px; }
+.map-f{ padding:12px 0; border-top:1px solid var(--linea); }
+.map-f:last-child{ border-bottom:1px solid var(--linea); }
+.map-n{ display:flex; flex-direction:column; gap:1px; margin-bottom:9px; }
+.map-c{ margin:0; }
+.map-c .chip{ font-size:12px; padding:5px 11px; }
+
+/* Afinado de la flama: visible aun apagada (es una meta viva, no un error),
+   y las semanas sin datos no se dibujan como semanas falladas. */
+.flama-fig{ width:52px; height:58px; }
+.flama-fig .fl-base svg{ stroke:var(--cera); stroke-width:1.5; opacity:.85; }
+.flama-fig.viva .fl-base svg{ stroke:var(--oro); opacity:1; }
+.muesca{ width:30px; height:6px; }
+.muesca.sinDatos{ background:none; box-shadow:inset 0 0 0 1px var(--linea); opacity:.5; }
+.muesca.curso{ box-shadow:inset 0 0 0 1.5px var(--cera); background:none; }
+.muesca.curso.on{ background:var(--llama); box-shadow:none; }
+.meta-nom{ margin-bottom:12px; }
+
+/* ── La rutina por bloques, con flechas que mueven dentro y entre bloques ── */
+.bloque-t{ font-family:var(--mono); font-size:11px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--tinta-baja); margin:22px 0 2px; display:flex; align-items:baseline; gap:9px; }
+.bloque-t span{ letter-spacing:.03em; text-transform:none; color:var(--tinta-tenue); font-size:11px; }
+.rut-f{ display:flex; align-items:stretch; border-bottom:1px solid var(--linea); }
+.rut-f:last-child{ border-bottom:0; }
+.rut-f > .fila-i{ flex:1 1 auto; min-width:0; border-bottom:0; }
+.rut-mando{ flex:0 0 auto; display:flex; flex-direction:column; justify-content:center; gap:1px; padding-right:2px; }
+.rut-mando .mover{ width:30px; height:26px; }
+/* A qué meta alimenta esta rutina: la cadena, visible donde se edita */
+.alimenta{ display:inline-flex; align-items:center; gap:4px; margin-top:4px;
+  font-size:11px; color:var(--oro); }
+.alimenta svg{ width:11px; height:11px; fill:currentColor; stroke:none; flex:0 0 auto; }
+
+/* ── Pendientes: avance, no castigo ── */
+.pend-cuenta{ font-family:var(--mono); font-size:11px; color:var(--tinta-baja);
+  font-variant-numeric:tabular-nums; }
+.pend-barra{ height:3px; border-radius:2px; background:var(--linea); overflow:hidden; margin:2px 0 6px; }
+.pend-barra > span{ display:block; height:100%; border-radius:2px; background:var(--tinta-tenue);
+  transition:width .36s cubic-bezier(.22,.61,.36,1); }
+
 </style>
 </head>
 <body>
@@ -502,7 +604,7 @@ const Guardado = (() => {
   }
   return { leer, escribir, persistente: () => claude() || local };
 })();
-const CLAVE = "cauce:estado:v5", CLAVE_V4 = "cauce:estado:v4", CLAVE_V3 = "cauce:estado:v3", CLAVE_V2 = "cauce:estado:v2", VERSION = 5;
+const CLAVE = "cauce:estado:v7", CLAVE_V6 = "cauce:estado:v6", CLAVE_V5 = "cauce:estado:v5", CLAVE_V4 = "cauce:estado:v4", CLAVE_V3 = "cauce:estado:v3", CLAVE_V2 = "cauce:estado:v2", VERSION = 7;
 
 /* ════════ TIEMPO ════════ */
 const DIA = 86400000;
@@ -518,6 +620,9 @@ const sumarDias = (s, n) => { const d = deISO(s); d.setDate(d.getDate() + n); re
 const sumarMeses = (s, n) => { const d = deISO(s), dia = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + n); const u = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); d.setDate(Math.min(dia, u)); return aISO(d); };
 const diasEntre = (a, b) => Math.round((deISO(b) - deISO(a)) / DIA);
 const lunesDe = s => { const d = deISO(s), n = (d.getDay() + 6) % 7; d.setDate(d.getDate() - n); return aISO(d); };
+const desplazarHora = (hhmm, mins) => { const p = String(hhmm || "00:00").split(":");
+  const t = Math.max(0, Math.min(1439, (+p[0] || 0) * 60 + (+p[1] || 0) + mins));
+  return pad2(Math.floor(t / 60)) + ":" + pad2(t % 60); };
 const semanaDe = s => { const l = lunesDe(s); return Array.from({ length: 7 }, (_, i) => sumarDias(l, i)); };
 const domingoTras = (s, semanas) => { const d = deISO(s); d.setDate(d.getDate() + semanas * 7); while(d.getDay() !== 0) d.setDate(d.getDate() + 1); return aISO(d); };
 const proximoDia = (s, dow) => { const d = deISO(s); do{ d.setDate(d.getDate() + 1); } while(d.getDay() !== dow); return aISO(d); };
@@ -565,7 +670,11 @@ const ICO = {
   mas: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   ayuda: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.9.7c0 1.7-2.5 2.1-2.5 3.7"/><path d="M12 17.1v.2"/></svg>',
   ajustes: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>',
-  abajo: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
+  abajo: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+  arriba: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>',
+  asa: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h8M8 12h8M8 17h8"/></svg>',
+  llama: '<svg viewBox="0 0 24 24" aria-hidden="true" class="ico-llama"><path d="M12 2.6c2.6 3.1 5.6 5.4 5.6 9.5a5.6 5.6 0 0 1-11.2 0c0-2 .9-3.4 2.1-4.9.5 1 1.1 1.7 1.9 2.1-.3-2.5.2-4.6 1.6-6.7z"/></svg>',
+  lapiz: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3z"/></svg>'
 };
 
 /* ════════ SEMILLA ════════
@@ -580,7 +689,7 @@ function semilla(){
     nombre: "Mi oficio", resultado: "Un resultado visible que alguien más pueda contar sin mí.",
     terminadoCuando: "Existe y lo presenté. No perfecto: suficiente." });
   const pasion = nuevaMetaBase({ rol: "secundaria", lane: "pasion",
-    abre: "Es el futuro que estoy construyendo. Hoy no tiene que pagar nada, y eso no la hace menos seria.",
+    abre: "Una puerta abre la otra: escribe qué hace posible el oficio para esto.",
     nombre: "Mi pasión", resultado: "La primera vez que la muestro en público.",
     terminadoCuando: "Lo mostré frente a gente, aunque sea poca." });
   const etapas = (m, nombres) => { m.etapas = nombres.map(n => ({ id: uid(), nombre: n, hecha: false })); };
@@ -608,15 +717,32 @@ function semilla(){
     [4, "Mostrarla"],
     [4, "Anotar qué funcionó y qué no"]
   ]);
-  const rut = (nombre, area, dias, extra) => Object.assign({ id: uid(), nombre, area, franja: "jornada", frecuencia: "semana", dias, diaMes: 1, pasos: [], semanal: 0, peso: false }, extra || {});
+  /* Los hitos son lo que tiene fecha y cierra la meta. La flama mide constancia;
+     el hito mide si el resultado llegó. Sin hito, la flama no tendría final. */
+  principal.tipo = "cierra";
+  principal.hitos = [
+    { id: uid(), texto: "Primera versión existiendo", fecha: sumarDias(hoy, 28), hecho: false, hechoEl: null },
+    { id: uid(), texto: "Probada en condiciones reales", fecha: sumarDias(hoy, 56), hecho: false, hechoEl: null },
+    { id: uid(), texto: "Presentada a quien le importa", fecha: sumarDias(hoy, 84), hecho: false, hechoEl: null }
+  ];
+  pasion.tipo = "cierra";
+  pasion.hitos = [
+    { id: uid(), texto: "Segunda versión terminada", fecha: sumarDias(hoy, 42), hecho: false, hechoEl: null },
+    { id: uid(), texto: "Mostrada en público", fecha: sumarDias(hoy, 98), hecho: false, hechoEl: null }
+  ];
+  const rut = (nombre, area, dias, extra) => Object.assign({ id: uid(), nombre, area, franja: "jornada", frecuencia: "semana", dias, diaMes: 1, pasos: [], semanal: 0, peso: false, hora: "", meta: null }, extra || {});
   const rutinas = [
-    rut("Ejercicio", "Cuerpo", [1,2,3,4,5], { franja: "manana", semanal: 5, peso: true }),
-    rut("Silencio, oración o meditación", "Otro", [1,2,3,4,5,6,0], { franja: "manana" }),
-    rut("Mis 5 del trabajo", "Trabajo", [1,2,3,4,5], { peso: true, semanal: 5 }),
-    rut("Correo y aprobaciones", "Trabajo", [1,2,3,4,5]),
-    rut("Seguimiento con el equipo", "Trabajo", [1,2,3,4,5]),
-    rut("Planear la semana del equipo", "Trabajo", [1]),
-    rut("Cierre del mes", "Trabajo", [], { frecuencia: "mes", diaMes: 1, pasos: ["Primera parte del proceso", "Segunda parte", "Tercera parte", "Revisión", "Entrega"] }),
+    /* Bienestar se protege con hora, no con flama: por eso meta: null */
+    rut("Ejercicio", "Cuerpo", [1,2,3,4,5], { franja: "manana", semanal: 5, peso: true, hora: "06:30" }),
+    rut("Silencio, oración o meditación", "Otro", [1,2,3,4,5,6,0], { franja: "manana", hora: "07:15" }),
+    /* El orden de las partes es el peso: la de arriba pesa más */
+    rut("Mis 5 del trabajo", "Trabajo", [1,2,3,4,5], { peso: true, semanal: 5, hora: "09:30", meta: principal.id }),
+    rut("Correo y aprobaciones", "Trabajo", [1,2,3,4,5], { hora: "11:00", meta: principal.id }),
+    rut("Seguimiento con el equipo", "Trabajo", [1,2,3,4,5], { hora: "15:00", meta: principal.id }),
+    rut("Planear la semana del equipo", "Trabajo", [1], { semanal: 1, hora: "16:00", meta: principal.id }),
+    rut("Sesión de mi pasión", "Otro", [2,4,6], { franja: "tarde", semanal: 3, hora: "19:30", meta: pasion.id,
+      pasos: ["Lo que de verdad la mueve", "Lo segundo en importancia", "Preparar lo de la próxima vez", "Revisar lo hecho"] }),
+    rut("Cierre del mes", "Trabajo", [], { frecuencia: "mes", diaMes: 1, meta: principal.id, pasos: ["Primera parte del proceso", "Segunda parte", "Tercera parte", "Revisión", "Entrega"] }),
     rut("Revisar mis finanzas", "Inversión", [], { frecuencia: "mes", diaMes: 5, franja: "manana" })
   ];
   const idea = (texto, tipo, condicion, vence) => ({ id: uid(), texto, estado: "espera", tipo, condicion, vence, creado: hoy });
@@ -660,6 +786,43 @@ function semilla(){
 
 /* ════════ ESQUEMA ════════ */
 const MIGRACIONES = {
+  /* v7: la cadena. Cada rutina apunta a una meta (el campo que faltaba para que
+     el día suba a la semana y la semana a la flama). Las metas se parten en dos
+     tipos: las que se cierran —llevan flama e hitos con fecha— y las que solo se
+     sostienen. El 80/20 semanal se guarda al cerrar cada semana, porque los días
+     se podan a los 14 y la flama tiene que sobrevivir al podado. */
+  7: e => {
+    const prin = (e.metas || []).find(m => m.rol === "principal");
+    const sec = (e.metas || []).find(m => m.rol === "secundaria");
+    /* Mapeo inicial: solo lo obvio —el área del oficio— queda puesto. El resto
+       queda sin meta, que es una respuesta válida, y se ajusta en «Mapear». */
+    const areaOficio = AREAS[0];
+    (e.rutinas || []).forEach(r => {
+      if(typeof r.meta === "undefined") r.meta = (prin && r.area === areaOficio) ? prin.id : null;
+    });
+    if(sec) sec.rol = "secundaria";
+    (e.metas || []).forEach(m => {
+      if(!m.tipo) m.tipo = "cierra";
+      if(!Array.isArray(m.hitos)) m.hitos = [];
+      /* Las acciones con fecha al final del texto —«(31 oct)»— ya eran hitos */
+      if(!m.hitos.length){
+        (e.acciones || []).filter(a => a.metaId === m.id).forEach(a => {
+          const g = /\((\d{1,2}) (ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic)\)\s*$/.exec(a.texto);
+          if(!g) return;
+          const mes = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"].indexOf(g[2]) + 1;
+          const hoy = hoyISO(), anio = +hoy.slice(0, 4), cand = anio + "-" + String(mes).padStart(2, "0") + "-" + String(+g[1]).padStart(2, "0");
+          m.hitos.push({ id: uid(), texto: a.texto.replace(/\s*\([^)]*\)\s*$/, ""),
+            fecha: cand >= hoy ? cand : (anio + 1) + cand.slice(4), hecho: !!a.hecha, hechoEl: a.hechaEl || null, de: a.id });
+        });
+        m.hitos.sort((a, b) => a.fecha.localeCompare(b.fecha));
+      }
+    });
+    if(sec) sec.tipo = "cierra";
+    if(!e.semanas) e.semanas = {};
+    return e;
+  },
+  /* v6: las rutinas pueden llevar hora; el día se ordena por ella */
+  6: e => { (e.rutinas || []).forEach(r => { if(typeof r.hora !== "string") r.hora = ""; }); return e; },
   /* v5: cada actividad puede desglosarse en subacciones; el 80% de ellas la da por hecha */
   5: e => {
     Object.values(e.dias || {}).forEach(d => {
@@ -710,8 +873,11 @@ function normalizar(e){
   e.temporada = Object.assign({ n: 1, inicio: hoy, fin: domingoTras(hoy, 12) }, e.temporada || {});
   ["metas", "acciones", "rutinas", "pendientes", "ideas", "base"].forEach(k => { if(!Array.isArray(e[k])) e[k] = []; });
   e.metas.forEach(m => { if(!Array.isArray(m.etapas)) m.etapas = []; });
-  e.rutinas.forEach(r => { if(!Array.isArray(r.dias)) r.dias = []; if(!Array.isArray(r.pasos)) r.pasos = []; if(!r.frecuencia) r.frecuencia = "semana"; if(!r.franja) r.franja = "jornada"; if(typeof r.semanal !== "number") r.semanal = 0; if(typeof r.peso !== "boolean") r.peso = false; });
-  e.metas.forEach(m => { if(!m.lane) m.lane = "oficio"; if(m.abre == null) m.abre = ""; });
+  e.rutinas.forEach(r => { if(!Array.isArray(r.dias)) r.dias = []; if(!Array.isArray(r.pasos)) r.pasos = []; if(!r.frecuencia) r.frecuencia = "semana"; if(!r.franja) r.franja = "jornada"; if(typeof r.semanal !== "number") r.semanal = 0; if(typeof r.peso !== "boolean") r.peso = false; if(typeof r.hora !== "string") r.hora = ""; if(typeof r.meta === "undefined") r.meta = null; });
+  e.metas.forEach(m => { if(!m.lane) m.lane = "oficio"; if(m.abre == null) m.abre = ""; if(!m.tipo) m.tipo = "cierra"; if(!Array.isArray(m.hitos)) m.hitos = []; });
+  /* Una rutina no puede apuntar a una meta que ya no existe */
+  e.rutinas.forEach(r => { if(r.meta && !e.metas.some(m => m.id === r.meta)) r.meta = null; });
+  e.semanas = e.semanas && typeof e.semanas === "object" ? e.semanas : {};
   e.acciones.forEach(a => { if(typeof a.pospuesta !== "number") a.pospuesta = 0; });
   e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
   e.semana = Object.assign({ intencionBase: "", fecha: null }, e.semana || {});
@@ -719,6 +885,34 @@ function normalizar(e){
   e.marcas = Object.assign({ onboarding: false, ultimaSemana: null, ultimaVisita: null }, e.marcas || {});
   asegurarRoles(e);
   return e;
+}
+/* ── Congelar la semana antes de que se poden sus días ──
+   El resultado semanal de cada meta se calcula de los días y se guarda en
+   E.semanas. Sin esto, la flama se vaciaría sola cada catorce días. */
+function semanaDeMeta(e, m, lunes){
+  const rs = (e.rutinas || []).filter(r => r.meta === m.id && r.frecuencia !== "mes" && !r.pausada);
+  const dias = semanaDe(lunes), hoy = hoyISO();
+  let ok = 0, total = 0;
+  rs.forEach(r => {
+    const metaSem = r.semanal > 0 ? r.semanal : (r.dias || []).length;
+    if(!metaSem) return;
+    total += 1;
+    const hechas = dias.filter(k => k <= hoy && !!((e.dias[k] || {}).rutHechas || {})[r.id]).length;
+    if(hechas >= (metaSem >= 4 ? metaSem - 1 : metaSem)) ok += 1;
+  });
+  return total ? { ok, total, logro: ok * 5 >= total * 4 } : null;
+}
+function cerrarSemanas(e){
+  const esteLunes = lunesDe(hoyISO());
+  [...new Set(Object.keys(e.dias).map(lunesDe))].filter(l => l < esteLunes).forEach(l => {
+    if(e.semanas[l]) return;
+    const reg = { metas: {}, cerrada: true };
+    e.metas.forEach(m => { const s = semanaDeMeta(e, m, l); if(s) reg.metas[m.id] = s.logro; });
+    if(Object.keys(reg.metas).length) e.semanas[l] = reg;
+  });
+  /* Un año de semanas pesa poco, pero no se guarda para siempre */
+  const corte = sumarDias(hoyISO(), -400);
+  Object.keys(e.semanas).forEach(k => { if(k < corte) delete e.semanas[k]; });
 }
 /* El historial no se vuelve archivo: los días viejos y los pendientes cerrados se borran solos */
 function podar(e){
@@ -762,11 +956,31 @@ const Rg = {
   seguidas: () => E.rutinas.filter(r => r.frecuencia !== "mes" && !r.pausada && (r.semanal > 0 || r.peso)),
   /* Subacciones de hoy: las que escribiste, o la plantilla de la rutina si aún no la has tocado */
   sub: (r, d) => (d.sub && d.sub[r.id]) ? d.sub[r.id] : (r.pasos || []).map(t => ({ t, h: false })),
-  /* El 80% dentro de la actividad: con 3 o más subacciones hay holgura; con 1 o 2, no */
-  sufDe: n => n >= 3 ? Math.ceil(n * 0.8) : n,
-  estadoSub: (r, d) => { const sub = Rg.sub(r, d), hechas = sub.filter(x => x.h).length;
-    return { sub, n: sub.length, hechas, suf: Rg.sufDe(sub.length), lista: sub.length > 0 && hechas >= Rg.sufDe(sub.length) }; },
-  suficiente: r => { const m = Rg.metaSemanal(r); return m >= 3 ? Math.ceil(m * 0.8) : m; },
+  /* ── El peso lo da el orden ──
+     La primera subacción es la que más pesa: peso = n − i. Con cinco partes los
+     pesos son 5·4·3·2·1 y las tres de arriba ya valen el 80%. Esto es lo que hace
+     que el 20% exista: si todas pesaran igual, soltar una de cuatro sería el 25%
+     y no habría nada que soltar. Hecha cuando lo que falta pesa 20% o menos.
+     La comparación es entera (peso·5 ≥ total·4): sin redondeos que mientan. */
+  pesoSub: (i, n) => n - i,
+  totalSub: n => n * (n + 1) / 2,
+  pctSub: (i, n) => n ? Math.round((n - i) * 100 / Rg.totalSub(n)) : 0,
+  /* Cuántas, contadas desde la más pesada, bastan para el 80% */
+  bastanSub: n => { const t = Rg.totalSub(n); let s = 0;
+    for(let k = 0; k < n; k++){ s += Rg.pesoSub(k, n); if(s * 5 >= t * 4) return k + 1; } return n; },
+  estadoSub: (r, d) => {
+    const sub = Rg.sub(r, d), n = sub.length, total = Rg.totalSub(n);
+    const peso = sub.reduce((s, x, i) => s + (x.h ? Rg.pesoSub(i, n) : 0), 0);
+    return { sub, n, total, peso, hechas: sub.filter(x => x.h).length,
+      pct: total ? Math.round(peso * 100 / total) : 0,
+      faltaPct: total ? Math.round((total - peso) * 100 / total) : 0,
+      suf: Rg.bastanSub(n), lista: n > 0 && peso * 5 >= total * 4 };
+  },
+  /* El 80/20 de la semana: los días no se pueden partir, así que el 80% se dice
+     en días enteros. Con 4 o más, te puedes saltar una y sigues avanzando
+     (5 → 4 es el 80% justo; 7 → 6 es un día libre a la semana). Con 3 o menos
+     no hay holgura que no sea una mentira: o pasó o no pasó. */
+  suficiente: r => { const m = Rg.metaSemanal(r); return m >= 4 ? m - 1 : m; },
   semanaRutina: (r, f) => {
     const hoy = hoyISO();
     const dias = semanaDe(f).map(k => ({ fecha: k, hecha: k <= hoy && !!((E.dias[k] || {}).rutHechas || {})[r.id] }));
@@ -777,12 +991,56 @@ const Rg = {
     const dias = semanaDe(f).map(k => ({ fecha: k, hecha: E.acciones.some(a => a.metaId === m.id && a.hecha && a.hechaEl === k) }));
     return { dias, hechas: E.acciones.filter(a => a.metaId === m.id && a.hecha && a.hechaEl && semanaDe(f).includes(a.hechaEl)).length };
   },
+  /* ── La cadena: rutina → semana → mes → flama ──
+     Cada rutina apunta a una meta. La semana de una meta llega al 80/20 cuando
+     el 80% de sus rutinas llegó a su propia cadencia. La flama se llena con las
+     semanas del mes en curso —4 o 5 muescas, legibles— y cada mes logrado queda
+     como marca. No se escala al año a propósito: una barra que avanza 2% por
+     semana durante cincuenta semanas no se siente, y una flama llena mientras
+     el hito vence sería una mentira. Por eso al lado va siempre la fecha. */
+  rutinasDe: m => E.rutinas.filter(r => r.meta === m.id && !r.pausada),
+  semanasDelMes: f => { const d = deISO(f), pri = aISO(new Date(d.getFullYear(), d.getMonth(), 1)),
+      ult = aISO(new Date(d.getFullYear(), d.getMonth() + 1, 0)), fin = lunesDe(ult), out = [];
+    for(let k = lunesDe(pri); k <= fin; k = sumarDias(k, 7)) out.push(k);
+    return out; },
+  semanaLograda: (m, l) => { const s = semanaDeMeta(E, m, l); return !!(s && s.logro); },
+  mesesLogrados: m => {
+    const porMes = {};
+    Object.keys(E.semanas).forEach(l => { const k = l.slice(0, 7), reg = E.semanas[l];
+      if(!reg || !(m.id in reg.metas)) return;
+      porMes[k] = porMes[k] || { ok: 0, n: 0 };
+      porMes[k].n += 1; if(reg.metas[m.id]) porMes[k].ok += 1; });
+    return Object.keys(porMes).filter(k => porMes[k].n && porMes[k].ok * 5 >= porMes[k].n * 4).sort();
+  },
+  proximoHito: m => (m.hitos || []).filter(h => !h.hecho).sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)))[0] || null,
+  flama: m => {
+    const f = hoyISO(), estaL = lunesDe(f);
+    const semanas = Rg.semanasDelMes(f).map(l => {
+      if(l > estaL) return { lunes: l, estado: "porVenir", logro: false };
+      if(l === estaL) return { lunes: l, estado: "curso", logro: Rg.semanaLograda(m, l) };
+      const reg = E.semanas[l];
+      if(reg && (m.id in reg.metas)) return { lunes: l, estado: "cerrada", logro: !!reg.metas[m.id] };
+      /* Una semana sin registro no es una semana fallada: es una semana en la que
+         la app no existía. No cuenta ni a favor ni en contra. */
+      const hubo = semanaDe(l).some(k => E.dias[k]);
+      return { lunes: l, estado: hubo ? "cerrada" : "sinDatos", logro: hubo ? Rg.semanaLograda(m, l) : false };
+    });
+    const vivas = semanas.filter(s => s.estado === "cerrada" || s.estado === "curso");
+    const prendidas = vivas.filter(s => s.logro).length;
+    const hito = Rg.proximoHito(m);
+    return { semanas, prendidas, contadas: vivas.length, total: semanas.length,
+      pct: vivas.length ? Math.round(prendidas * 100 / vivas.length) : 0,
+      meses: Rg.mesesLogrados(m), hito,
+      semanasAlHito: hito ? Math.max(0, Math.ceil(diasEntre(f, hito.fecha) / 7)) : null,
+      vencido: !!(hito && hito.fecha < f), sinRutinas: !Rg.rutinasDe(m).length };
+  },
+  cierran: () => E.metas.filter(m => m.tipo !== "sostiene" && (m.rol === "principal" || m.rol === "secundaria")),
   /* Lo que pesa: rutinas marcadas de peso y las acciones de tus metas */
   dePeso: f => E.rutinas.filter(r => r.peso && tocaRutina(r, f)),
   /* ── La rutina: el día en franjas ── */
   franja: id => E.franjas.find(x => x.id === id) || null,
   franjaAhora: () => { const h = new Date().getHours(); return (E.franjas.find(x => h >= x.desde && h < x.hasta) || E.franjas[0] || {}).id; },
-  rutinasFranja: (f, fr) => Rg.rutinasHoy(f).filter(r => (r.franja || "jornada") === fr),
+  rutinasFranja: (f, fr) => Rg.rutinasHoy(f).filter(r => (r.franja || "jornada") === fr).sort((a, b) => (a.hora || "99:99").localeCompare(b.hora || "99:99")),
   turnoHoy: f => E.turnos[deISO(f).getDay()] || { texto: "", metaId: null },
   /* Dónde cae cada acción del día: la del turno va a la tarde, el resto a la jornada */
   franjaDe: (a, d) => (d.franjas && d.franjas[a.id]) || (Rg.turnoHoy(hoyISO()).metaId === a.metaId ? "tarde" : "jornada"),
@@ -822,6 +1080,9 @@ const Rg = {
   etapaCompleta: m => { const e = Rg.etapaActual(m); if(!e) return null; const acc = Rg.accionesEtapa(m, e.id); return acc.length && acc.every(a => a.hecha) ? e : null; },
   rutinasHoy: f => E.rutinas.filter(r => tocaRutina(r, f)),
   pendHoy: f => E.pendientes.filter(p => (!p.hecha && p.fecha <= f) || (p.hecha && p.hechaEl === f)),
+  /* El avance de pendientes no toca la flama ni el 80/20: es una lista aparte */
+  avancePend: f => { const ps = Rg.pendHoy(f), hechas = ps.filter(p => p.hecha).length;
+    return { n: ps.length, hechas, pct: ps.length ? Math.round(hechas * 100 / ps.length) : 0 }; },
   bandeja: () => E.ideas.filter(i => i.estado === "bandeja"),
   espera: () => E.ideas.filter(i => i.estado === "espera").sort((a, b) => String(a.vence || "9999").localeCompare(String(b.vence || "9999"))),
   cerradas: () => E.ideas.filter(i => ["soltada", "decidida", "convertida"].includes(i.estado)),
@@ -848,6 +1109,36 @@ const A = {
     sub.push({ t: texto, h: false }); d.rutHechas[r.id] = Rg.estadoSub(r, d).lista; },
   quitarSub(r, i, f){ const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
     sub.splice(i, 1); d.rutHechas[r.id] = sub.length ? Rg.estadoSub(r, d).lista : false; },
+  /* ── Mover una rutina ──
+     Dentro del bloque intercambia horas (así las juntas reales no se pierden).
+     Desde el extremo, salta al bloque vecino y toma una hora de ese bloque. */
+  moverRutina(r, paso){
+    const frId = r.franja || "jornada";
+    const hs = E.rutinas.filter(x => x.frecuencia !== "mes" && (x.franja || "jornada") === frId)
+      .sort((a, b) => (a.hora || "99:99").localeCompare(b.hora || "99:99"));
+    const i = hs.indexOf(r), j = i + paso;
+    if(j >= 0 && j < hs.length){
+      const nb = hs[j];
+      if(r.hora && nb.hora){ const h = r.hora; r.hora = nb.hora; nb.hora = h; }
+      else {
+        const fr = Rg.franja(frId) || { desde: 7, hasta: 18 };
+        const base = nb.hora || pad2(paso < 0 ? fr.desde : Math.max(0, fr.hasta - 1)) + ":00";
+        r.hora = desplazarHora(base, paso < 0 ? -5 : 5);
+      }
+      return "dentro";
+    }
+    const idx = E.franjas.findIndex(f => f.id === frId), k = idx + paso;
+    if(idx < 0 || k < 0 || k >= E.franjas.length) return null;
+    const dest = E.franjas[k];
+    r.franja = dest.id;
+    r.hora = pad2(paso < 0 ? Math.max(0, dest.hasta - 1) : dest.desde) + (paso < 0 ? ":30" : ":00");
+    return dest.nombre;
+  },
+  /* Mover una subacción cambia su peso: subir es "esta pesa más" */
+  moverSub(r, i, paso, f){ const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
+    const j = i + paso; if(!sub[i] || !sub[j]) return false;
+    const t = sub[i]; sub[i] = sub[j]; sub[j] = t;
+    d.rutHechas[r.id] = Rg.estadoSub(r, d).lista; return true; },
   marcarPend(p){ p.hecha = !p.hecha; p.hechaEl = p.hecha ? hoyISO() : null; },
   /* Las 2 que mueven: el 20% del día */
   mueve(x){
@@ -905,7 +1196,7 @@ const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const val = id => { const el = document.getElementById(id); return el ? String(el.value || "").trim() : ""; };
-const S = { tab: "hoy", abiertas: [], ocultarSemana: false, refoco: null, foco: null };
+const S = { tab: "hoy", abiertas: [], ocultarSemana: false, refoco: null, foco: null, editando: null };
 let guardarT = null;
 function guardar(){ clearTimeout(guardarT); guardarT = setTimeout(() => { Guardado.escribir(CLAVE, E); }, 220); }
 function cambiar(fn){ fn(); asegurarRoles(E); guardar(); pintar(); }
@@ -922,7 +1213,15 @@ const P = {
   btn: (t, v) => `<button class="onb-btn" data-accion="flujo-sig" data-valor="${v || ""}">${t}</button>`,
   sec: (t, v) => `<button class="onb-saltar" data-accion="flujo-sig" data-valor="${v || ""}">${t}</button>`,
   opc: (t, v, s) => `<button class="onb-opt" data-accion="flujo-sig" data-valor="${v}"><span class="opt-t">${t}</span>${s ? `<span class="opt-s">${s}</span>` : ""}</button>`,
-  marca: (t, v, campo, on, max, s) => `<button class="onb-opt${on ? " on" : ""}" aria-pressed="${!!on}" data-accion="flujo-marcar" data-campo="${campo}" data-max="${max}" data-valor="${v}"><span class="opt-t">${t}</span>${s ? `<span class="opt-s">${s}</span>` : ""}</button>`,
+  /* Con `edit` la opción trae lápiz: el texto precargado es un borrador, no un dogma.
+     Mientras se edita, la opción se vuelve un campo en su lugar. */
+  marca: (t, v, campo, on, max, s, edit) => {
+    const op = `<button class="onb-opt${on ? " on" : ""}" aria-pressed="${!!on}" data-accion="flujo-marcar" data-campo="${campo}" data-max="${max}" data-valor="${v}"><span class="opt-t">${t}</span>${s ? `<span class="opt-s">${s}</span>` : ""}</button>`;
+    if(!edit) return op;
+    if(S.editando === v) return `<div class="onb-opt-edit"><textarea id="optEdit" class="campo-area" rows="2" data-enter="plan-editar-ok" data-id="${v}" aria-label="Editar el texto">${t}</textarea>` +
+      `<div class="mini-seg"><button class="mini" data-accion="plan-editar-no">Cancelar</button><button class="mini on" data-accion="plan-editar-ok" data-id="${v}">Guardar</button></div></div>`;
+    return `<div class="onb-opt-fila">${op}<button class="onb-edit" data-accion="plan-editar" data-id="${v}" aria-label="Editar el texto de: ${t}">${ICO.lapiz}</button></div>`;
+  },
   agregar: (id, ph, enter, datos) => `<div class="agregar"><button class="agregar-mas" data-accion="enviar" data-para="${id}" aria-label="Agregar">${ICO.mas}</button><input id="${id}" data-enter="${enter}"${datos || ""} placeholder="${esc(ph)}" enterkeyhint="done" autocomplete="off" aria-label="${esc(ph)}"></div>`,
   err: () => `<p class="paso-err" id="pasoErr" role="alert"></p>`
 };
@@ -953,13 +1252,17 @@ function filaAccion(a, conEtapa){
 }
 function filaRutina(r, d){
   const hecha = !!d.rutHechas[r.id], e = Rg.estadoSub(r, d), abierta = S.abiertas.includes(r.id);
-  const txtSub = e.n ? (e.hechas >= e.n ? "Las " + e.n + ", hechas" : e.lista ? e.hechas + " de " + e.n + " · suficiente" : e.hechas + " de " + e.n + (e.n >= 3 ? " · con " + e.suf + " basta" : "")) : "";
-  const sub = [r.area !== "Trabajo" ? r.area : "", txtSub].filter(Boolean).join(" · ");
+  const txtSub = !e.n ? ""
+    : e.hechas >= e.n ? "Las " + e.n + ", hechas"
+    : e.lista ? e.pct + "% del peso · ya cuenta"
+    : e.hechas ? e.hechas + " de " + e.n + " · " + e.pct + "%"
+    : e.n + " partes · con " + e.suf + " de arriba basta";
+  const sub = [r.hora || "", r.area !== "Trabajo" ? r.area : "", txtSub].filter(Boolean).join(" · ");
   let html = `<div class="tarea${hecha ? " hecha" : ""}"><button class="check" role="checkbox" aria-checked="${hecha}" aria-label="${hecha ? "Desmarcar" : "Marcar como hecha"}: ${esc(r.nombre)}" data-accion="marcar-rutina" data-id="${r.id}"><span class="check-c">${ICO.check}</span></button>` +
     `<button class="tarea-cuerpo" data-accion="ver-rutina-hoy" data-id="${r.id}"><span class="tarea-t">${esc(r.nombre)}</span>${sub ? `<span class="tarea-s">${esc(sub)}</span>` : ""}</button>` +
     (e.n ? `<span class="tarea-lado"><button class="plegar" data-accion="plegar" data-id="${r.id}" aria-expanded="${abierta}" aria-label="${abierta ? "Ocultar" : "Ver"} las partes de ${esc(r.nombre)}">${ICO.abajo}</button></span>` : "") + `</div>`;
   if(e.n && abierta){
-    html += `<div class="pasos">${e.sub.map((x, i) => `<button class="paso-f${x.h ? " hecho" : ""}" role="checkbox" aria-checked="${x.h}" data-accion="marcar-sub" data-id="${r.id}" data-i="${i}"><span class="check-c">${ICO.check}</span><span>${esc(x.t)}</span></button>`).join("")}` +
+    html += `<div class="pasos">${e.sub.map((x, i) => `<button class="paso-f${x.h ? " hecho" : ""}" role="checkbox" aria-checked="${x.h}" data-accion="marcar-sub" data-id="${r.id}" data-i="${i}"><span class="check-c">${ICO.check}</span><span>${esc(x.t)}</span><span class="paso-p">${Rg.pctSub(i, e.n)}%</span></button>`).join("")}` +
       `<button class="paso-mas" data-accion="ver-rutina-hoy" data-id="${r.id}">${ICO.mas}<span>Agregar o quitar</span></button></div>`;
   }
   return html;
@@ -1055,8 +1358,14 @@ function seccionFranjas(f, d, ref){
 
 function seccionPend(f){
   const ps = Rg.pendHoy(f), abiertos = ps.filter(p => !p.hecha).length;
-  let html = `<section class="sec"><div class="sec-cab"><h2 class="sec-t">Pendientes</h2></div><p class="sec-s">Lo suelto de hoy: no es rutina ni parte de una meta.</p><div class="lista">`;
-  html += ps.map(p => filaPend(p, f)).join("");
+  /* Indicador propio, separado de la rutina y de las metas. Mide avance, no
+     cumplimiento: no entra en ninguna flama y no hay nada que fallar aquí. */
+  const av = Rg.avancePend(f);
+  let html = `<section class="sec"><div class="sec-cab"><h2 class="sec-t">Pendientes</h2>` +
+    (av.n ? `<span class="pend-cuenta">${av.hechas} de ${av.n}</span>` : "") + `</div>` +
+    `<p class="sec-s">Lo suelto: no es rutina ni parte de una meta. Esto solo muestra el avance.</p>`;
+  if(av.n) html += `<div class="pend-barra" role="img" aria-label="${av.hechas} de ${av.n} pendientes"><span style="width:${av.pct}%"></span></div>`;
+  html += `<div class="lista">` + ps.map(p => filaPend(p, f)).join("");
   html += P.agregar("nuevoPend", "Agregar pendiente…", "nuevo-pend") + `</div>`;
   if(abiertos > 5) html += `<p class="nota-suave">Día cargado. Toca un pendiente para pasarlo a mañana.</p>`;
   return html + `</section>`;
@@ -1067,17 +1376,72 @@ function rutaPuntos(m){
   const e = Rg.etapaActual(m);
   return m.etapas.map((x, k) => (k ? `<span class="ruta-l${m.etapas[k - 1].hecha ? " hecha" : ""}"></span>` : "") + `<span class="ruta-p${x.hecha ? " hecha" : x === e ? " actual" : ""}"></span>`).join("");
 }
+/* ── La flama ──
+   Nombre y flama, como pediste. La fecha del próximo hito va al lado porque una
+   flama sola mentiría: se puede llenar de constancia mientras el hito vence. */
+function bloqueFlama(m){
+  const fl = Rg.flama(m), h = fl.hito;
+  const muescas = fl.semanas.map(s => `<span class="muesca ${s.estado}${s.logro ? " on" : ""}"></span>`).join("");
+  const mesTxt = !fl.contadas ? "El mes empieza"
+    : fl.contadas === 1 && !fl.prendidas ? "Primera semana en curso"
+    : fl.prendidas + " de " + fl.contadas + (fl.contadas === 1 ? " semana" : " semanas") + " al 80/20";
+  const mesesTxt = fl.meses.length ? " · " + fl.meses.length + (fl.meses.length === 1 ? " mes logrado" : " meses logrados") : "";
+  return `<div class="flama-caja">` +
+    `<div class="flama-fig${fl.prendidas ? " viva" : ""}" style="--llena:${fl.pct}%" role="img" aria-label="Flama de ${esc(m.nombre)}: ${mesTxt} este mes">` +
+      `<span class="fl-base">${ICO.llama}</span><span class="fl-llena">${ICO.llama}</span></div>` +
+    `<div class="flama-cuerpo"><div class="muescas" aria-hidden="true">${muescas}</div>` +
+    `<p class="flama-txt">${esc(mesTxt + mesesTxt)}</p>` +
+    (fl.sinRutinas
+      ? `<p class="flama-aviso">Ninguna rutina la alimenta todavía. <button class="enlace" data-accion="mapear">Mapear rutinas</button></p>`
+      : h ? `<p class="flama-hito${fl.vencido ? " vencido" : ""}"><button class="enlace-llano" data-accion="hitos" data-id="${m.id}">${esc(h.texto)} · <b>${fechaMedia(h.fecha)}</b>${fl.vencido ? " · venció" : fl.semanasAlHito === 0 ? " · esta semana" : " · " + fl.semanasAlHito + (fl.semanasAlHito === 1 ? " semana" : " semanas")}</button></p>`
+      : `<p class="flama-aviso">Sin próximo hito. <button class="enlace" data-accion="hitos" data-id="${m.id}">Poner uno con fecha</button></p>`) +
+    `</div></div>`;
+}
 function tarjetaMeta(m){
   const e = Rg.etapaActual(m), sig = e ? Rg.accionesEtapa(m, e.id).filter(a => !a.hecha).slice(0, 4) : [];
   const comp = Rg.etapaCompleta(m), ochenta = comp ? null : Rg.etapa80(m);
-  return `<section class="meta ${m.rol}" aria-label="${esc(m.nombre)}"><p class="meta-rol">${m.rol === "principal" ? `<span class="flama" aria-hidden="true"></span>Meta principal` : "Meta secundaria"}<span class="lane">${esc(LANES[m.lane] || "")}</span></p>` +
-    `<h2 class="meta-nom">${esc(m.nombre)}</h2><p class="meta-res">${esc(m.resultado)}</p>` +
+  const conEtapas = m.rol === "principal";
+  const cab = `<section class="meta ${m.rol}" aria-label="${esc(m.nombre)}"><p class="meta-rol">${m.rol === "principal" ? "Meta principal" : "Meta secundaria"}<span class="lane">${esc(LANES[m.lane] || "")}</span></p>` +
+    `<h2 class="meta-nom">${esc(m.nombre)}</h2>` + (m.tipo === "sostiene" ? "" : bloqueFlama(m));
+  /* Etapas solo en el oficio: lo demás vive en la rutina y en los hitos */
+  if(!conEtapas) return cab +
+    `<div class="meta-acc"><button class="btn-sec" data-accion="hitos" data-id="${m.id}">Hitos</button><button class="btn-sec" data-accion="editar-meta" data-id="${m.id}">Editar meta</button></div></section>`;
+  return cab + `<p class="meta-res">${esc(m.resultado)}</p>` +
     (m.abre ? `<p class="meta-abre"><b>Abre:</b> ${esc(m.abre)}</p>` : "") +
     (m.etapas.length ? `<div class="ruta" aria-hidden="true">${rutaPuntos(m)}</div>` : "") +
     `<p class="ruta-txt">${e ? `Etapa ${Rg.idxEtapa(m, e.id) + 1} de ${m.etapas.length}: <b>${esc(e.nombre)}</b>` : m.etapas.length ? "<b>Ruta completa.</b> Toca revisar esta meta." : "Todavía no tiene etapas."}</p>` +
     `<div class="lista">${sig.map(a => filaAccion(a, false)).join("")}${comp ? `<p class="vacio">Terminaste esta etapa. <button data-accion="etapa-hecha" data-id="${m.id}">Pasar a la siguiente</button></p>` : ochenta ? `<p class="vacio">Último tramo: ${Rg.faltan(m) === 1 ? "falta una" : "faltan " + Rg.faltan(m)}. Ya es suficiente. <button data-accion="etapa-hecha" data-id="${m.id}">Cerrar etapa</button></p>` : ""}` +
     P.agregar("na_" + m.id, "Agregar acción a esta etapa…", "nueva-accion", ` data-meta="${m.id}"`) + `</div>` +
-    `<div class="meta-acc"><button class="btn-sec" data-accion="ruta" data-id="${m.id}">Ver la ruta completa</button><button class="btn-sec" data-accion="editar-meta" data-id="${m.id}">Editar meta</button></div></section>`;
+    `<div class="meta-acc"><button class="btn-sec" data-accion="hitos" data-id="${m.id}">Hitos</button><button class="btn-sec" data-accion="ruta" data-id="${m.id}">Ver la ruta</button><button class="btn-sec" data-accion="editar-meta" data-id="${m.id}">Editar meta</button></div></section>`;
+}
+/* ── Mapear: el campo que hacía falta para que la cadena suba ── */
+function hojaMapear(){
+  const metas = Rg.activas(), sinMapear = E.rutinas.filter(r => !r.pausada && !r.meta).length;
+  const fila = r => `<div class="map-f"><div class="map-n"><span class="tarea-t">${esc(r.nombre)}</span>` +
+    `<span class="tarea-s">${esc([r.hora || "", r.frecuencia === "mes" ? "mensual" : diasTexto(r.dias), r.semanal > 0 ? r.semanal + "×/sem" : ""].filter(Boolean).join(" · "))}</span></div>` +
+    `<div class="chips map-c">${metas.map(m => `<button class="chip${r.meta === m.id ? " on" : ""}" data-accion="map-rut" data-id="${r.id}" data-v="${m.id}">${esc(m.nombre)}</button>`).join("")}` +
+    `<button class="chip${r.meta ? "" : " on"}" data-accion="map-rut" data-id="${r.id}" data-v="">Ninguna</button></div></div>`;
+  hoja("Qué alimenta qué", "Cada rutina apunta a una meta. Eso es lo que hace que el día suba a la semana, la semana al mes y el mes a la flama. «Ninguna» está bien: el gimnasio y la oración se protegen con hora, no con flama." +
+    (sinMapear ? " Faltan " + sinMapear + "." : ""),
+    E.franjas.map(fr => { const rr = E.rutinas.filter(r => !r.pausada && (r.franja || "jornada") === fr.id)
+        .sort((a, b) => (a.hora || "99:99").localeCompare(b.hora || "99:99"));
+      return rr.length ? `<p class="campo-et">${esc(fr.nombre)}</p><div class="map-lista">${rr.map(fila).join("")}</div>` : ""; }).join("") +
+    dos("", bot("Listo", "cerrar-hoja", "", "llena")));
+}
+/* ── Hitos: lo que tiene fecha y cierra la meta ── */
+function hojaHitos(id){
+  const m = Rg.meta(id); if(!m) return;
+  const hs = (m.hitos || []).slice().sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+  const hoy = hoyISO();
+  hoja("Hitos · " + esc(m.nombre), "Lo que tiene fecha. La flama mide constancia; estos miden si la meta de verdad cierra. Sin hitos, la flama no tiene final.",
+    `<div class="lista">${hs.map(h => `<div class="tarea${h.hecho ? " hecha" : ""}">` +
+      `<button class="check" role="checkbox" aria-checked="${!!h.hecho}" aria-label="${h.hecho ? "Reabrir" : "Marcar logrado"}: ${esc(h.texto)}" data-accion="marcar-hito" data-id="${m.id}" data-h="${h.id}"><span class="check-c">${ICO.check}</span></button>` +
+      `<span class="tarea-cuerpo"><span class="tarea-t">${esc(h.texto)}</span><span class="tarea-s${!h.hecho && h.fecha < hoy ? " vencido" : ""}">${fechaMedia(h.fecha)}${!h.hecho && h.fecha < hoy ? " · venció" : ""}</span></span>` +
+      `<span class="tarea-lado"><button class="quitar-sub" data-accion="quitar-hito" data-id="${m.id}" data-h="${h.id}" aria-label="Quitar">✕</button></span></div>`).join("") ||
+      `<p class="vacio">Todavía no hay hitos.</p>`}</div>` +
+    `<p class="campo-et">Agregar hito</p>` + P.inp("hTxt", "Qué cierra", "", "Ej. la primera versión, en uso") +
+    P.inp("hFecha", "Para cuándo", "", "", "date") + errH() +
+    dos(bot("Cerrar", "cerrar-hoja"), bot("Agregar", "nuevo-hito", m.id, "llena")));
 }
 function pintarMetas(){
   const f = hoyISO(), p = Rg.principal(), s = Rg.secundaria();
@@ -1099,12 +1463,23 @@ function pintarMetas(){
 }
 
 /* ── Rutinas ── */
-function filaRutinaConfig(r){
+function filaRutinaConfig(r, mover){
   const cuando = r.frecuencia === "mes" ? "Día " + r.diaMes + " de cada mes" : diasTexto(r.dias);
   const fr = Rg.franja(r.franja) || {};
   const metaTxt = r.frecuencia !== "mes" && r.semanal > 0 ? r.semanal + "×/semana" : "";
   const partes = r.pasos.length ? r.pasos.length + " partes fijas" : "";
-  return `<button class="fila-i" data-accion="editar-rutina" data-id="${r.id}"><span class="tarea-cuerpo"><span class="tarea-t">${esc(r.nombre)}${r.peso ? `<span class="sem-peso">●</span>` : ""}</span><span class="tarea-s">${esc([fr.nombre || "", r.area, metaTxt, partes, r.pausada ? "en pausa" : ""].filter(Boolean).join(" · "))}</span></span><span class="fila-d">${esc(cuando)}</span></button>`;
+  const alimenta = r.meta ? (Rg.meta(r.meta) || {}).nombre : "";
+  const fila = `<button class="fila-i" data-accion="editar-rutina" data-id="${r.id}"><span class="tarea-cuerpo"><span class="tarea-t">${esc(r.nombre)}${r.peso ? `<span class="sem-peso">●</span>` : ""}</span>` +
+    `<span class="tarea-s">${esc([r.hora || "sin hora", fr.nombre || "", r.area, metaTxt, partes, r.pausada ? "en pausa" : ""].filter(Boolean).join(" · "))}</span>` +
+    (alimenta ? `<span class="alimenta">${ICO.llama}${esc(alimenta)}</span>` : "") + `</span><span class="fila-d">${esc(cuando)}</span></button>`;
+  if(!mover) return fila;
+  /* Una sola flecha hace las dos cosas: ordena dentro del bloque y, desde el
+     extremo, salta al bloque vecino. No hay dos verdades sobre el orden —
+     la hora manda siempre, y moverse la ajusta. */
+  return `<div class="rut-f">${fila}<span class="rut-mando">` +
+    `<button class="mover" data-accion="subir-rut" data-id="${r.id}" aria-label="Mover ${esc(r.nombre)} más temprano">${ICO.arriba}</button>` +
+    `<button class="mover" data-accion="bajar-rut" data-id="${r.id}" aria-label="Mover ${esc(r.nombre)} más tarde">${ICO.abajo}</button>` +
+    `</span></div>`;
 }
 /* Los siete días de la semana, marcados donde pasó */
 function marcasSemana(dias, f){
@@ -1152,7 +1527,12 @@ function pintarRutinas(){
     [1,2,3,4,5,6,0].map(dw => { const t = E.turnos[dw] || { texto: "" };
       return `<button class="fila-i${dw === hoyD ? " hoy" : ""}" data-accion="editar-turno" data-d="${dw}"><span class="tarea-cuerpo"><span class="tarea-t">${NOMBRES_DIA[dw]}</span></span><span class="fila-d">${esc(t.texto || "libre")}</span></button>`; }).join("") + `</div></section>`;
   if(E.marcas.rutinasDeEjemplo !== false) html += `<div class="base-linea"><b>Estas son de ejemplo.</b> Cámbialas por tus procesos reales: toca una para editarla, o agrega las tuyas. <button class="enlace" data-accion="rutinas-ok">Ya son las mías</button></div>`;
-  html += `<section class="sec"><h2 class="sec-t">Cada semana</h2><div class="lista" style="margin-top:8px">${sem.map(filaRutinaConfig).join("") || `<p class="vacio">Sin rutinas semanales.</p>`}</div></section>`;
+  html += `<section class="sec"><h2 class="sec-t">Cada semana</h2><p class="sec-s">Por bloque y por hora, como ocurre. Las flechas mueven dentro del bloque y, desde el extremo, al bloque de al lado.</p>` +
+    (sem.length ? E.franjas.map(fr => { const rr = sem.filter(r => (r.franja || "jornada") === fr.id)
+          .sort((a, b) => (a.hora || "99:99").localeCompare(b.hora || "99:99"));
+        return rr.length ? `<p class="bloque-t">${esc(fr.nombre)} <span>${fr.desde}:00–${fr.hasta === 24 ? "24" : fr.hasta}:00</span></p>` +
+          `<div class="lista">${rr.map(r => filaRutinaConfig(r, true)).join("")}</div>` : ""; }).join("")
+      : `<p class="vacio">Sin rutinas semanales.</p>`) + `</section>`;
   html += `<section class="sec"><h2 class="sec-t">Cada mes</h2><div class="lista" style="margin-top:8px">${mes.map(filaRutinaConfig).join("") || `<p class="vacio">Sin rutinas mensuales.</p>`}</div></section>`;
   html += `<div class="fila-botones"><button class="btn-borde" data-accion="nueva-rutina">Nueva rutina</button></div>`;
   html += `<p class="nota-suave">Toda actividad se puede partir: entra a ella en Hoy y escribe lo que la compone. Con el 80% de las partes hechas, la actividad queda hecha.</p>`;
@@ -1246,14 +1626,20 @@ function hojaRutinaHoy(id){
   const d = diaDe(hoyISO()), e = Rg.estadoSub(r, d), hecha = !!d.rutHechas[r.id];
   const linea = !e.n ? "Esta actividad se cumple sola: una marca y ya. Si quieres partirla, escribe debajo lo que la compone hoy."
     : e.n < 3 ? "Con " + e.n + (e.n === 1 ? " parte" : " partes") + " no hay holgura: se dan por hechas todas."
-    : "Con " + e.suf + " de " + e.n + " la actividad se da por hecha. Ese es el 80%.";
-  hoja(esc(r.nombre), esc([Rg.franja(r.franja) && Rg.franja(r.franja).nombre, r.area, r.frecuencia === "mes" ? "día " + r.diaMes + " de cada mes" : diasTexto(r.dias)].filter(Boolean).join(" · ")) + ". " + esc(linea),
+    : "El orden es el peso: la de arriba pesa más. Con las " + e.suf + " primeras llegas al 80% y la actividad ya cuenta.";
+  hoja(esc(r.nombre), esc([r.hora || "", Rg.franja(r.franja) && Rg.franja(r.franja).nombre, r.area, r.frecuencia === "mes" ? "día " + r.diaMes + " de cada mes" : diasTexto(r.dias)].filter(Boolean).join(" · ")) + ". " + esc(linea),
     `<div class="lista sub-lista">${e.sub.map((x, i) => `<div class="tarea${x.h ? " hecha" : ""}"><button class="check" role="checkbox" aria-checked="${x.h}" aria-label="${esc(x.t)}" data-accion="marcar-sub" data-id="${r.id}" data-i="${i}" data-hoja="1"><span class="check-c">${ICO.check}</span></button>` +
-      `<span class="tarea-cuerpo"><span class="tarea-t">${esc(x.t)}</span></span>` +
-      `<span class="tarea-lado"><button class="quitar-sub" data-accion="quitar-sub" data-id="${r.id}" data-i="${i}" aria-label="Quitar">✕</button></span></div>`).join("")}` +
+      `<span class="tarea-cuerpo"><span class="tarea-t">${esc(x.t)}</span>${e.n > 1 ? `<span class="tarea-s">${Rg.pctSub(i, e.n)}% del peso</span>` : ""}</span>` +
+      `<span class="tarea-lado sub-mando">` +
+        (i > 0 ? `<button class="mover" data-accion="subir-sub" data-id="${r.id}" data-i="${i}" aria-label="Subir: ${esc(x.t)} pesa más">${ICO.arriba}</button>` : "") +
+        (i < e.n - 1 ? `<button class="mover" data-accion="bajar-sub" data-id="${r.id}" data-i="${i}" aria-label="Bajar: ${esc(x.t)} pesa menos">${ICO.abajo}</button>` : "") +
+        `<button class="quitar-sub" data-accion="quitar-sub" data-id="${r.id}" data-i="${i}" aria-label="Quitar ${esc(x.t)}">✕</button>` +
+      `</span></div>`).join("")}` +
       P.agregar("sub_" + r.id, e.n ? "Agregar otra…" : "¿Qué la compone hoy? Ej. enviar el reporte", "nueva-sub", ` data-rut="${r.id}"`) + `</div>` +
-    (e.n ? `<p class="campo-ayuda">${hecha ? "Hecha." : e.lista ? "Ya es suficiente." : e.hechas + " de " + e.n + "."} Lo que escribas aquí es de hoy; mañana la actividad vuelve limpia${r.pasos.length ? " con sus partes fijas" : ""}.</p>` : "") +
-    dos(bot("Hoy no aplica", "omitir-rutina", r.id), bot("Editar rutina", "editar-rutina", r.id, "llena")));
+    (e.n ? `<div class="peso-barra" role="img" aria-label="${e.pct}% del peso"><span style="width:${Math.min(100, e.pct)}%"></span></div>` +
+      `<p class="campo-ayuda">${hecha ? "Hecha." : e.lista ? e.pct + "% del peso: ya cuenta." : e.pct + "% del peso. Falta " + e.faltaPct + "%."} Lo que escribas aquí es de hoy; mañana la actividad vuelve limpia${r.pasos.length ? " con sus partes fijas" : ""}.</p>` : "") +
+    dos("", bot(hecha || e.lista ? "Listo" : "Guardar y cerrar", "cerrar-hoja", "", "llena")) +
+    `<div class="hoja-pie"><button class="leve" data-accion="omitir-rutina" data-id="${r.id}">Hoy no aplica</button><button class="leve" data-accion="editar-rutina" data-id="${r.id}">Editar rutina</button></div>`);
 }
 function hojaRutina(id){
   const r = E.rutinas.find(x => x.id === id) || (S.rutBorrador && S.rutBorrador.id === id ? S.rutBorrador : null); if(!r) return;
@@ -1261,6 +1647,7 @@ function hojaRutina(id){
   const ultimo = [["1", "Día 1"]].concat(Array.from({ length: 27 }, (_, i) => [String(i + 2), "Día " + (i + 2)]));
   hoja(r.nombre ? "Editar rutina" : "Nueva rutina", "Se repite sola. Cuando toca, aparece en Hoy.",
     P.inp("rNom", "Nombre", r.nombre, "Ej. Conciliaciones diarias") +
+    P.inp("rHora", "Hora (opcional)", r.hora, "Ej. 11:00", "time") +
     `<p class="campo-et">Área</p><div class="chips">${AREAS.map(a => `<button class="chip${a === r.area ? " on" : ""}" data-accion="rut-area" data-v="${a}">${a}</button>`).join("")}</div>` +
     `<p class="campo-et">¿En qué parte del día?</p><div class="chips">${E.franjas.map(fr => `<button class="chip${fr.id === (r.franja || "jornada") ? " on" : ""}" data-accion="rut-franja" data-v="${fr.id}">${esc(fr.nombre)}</button>`).join("")}</div>` +
     `<p class="campo-et">Se repite</p><div class="segmento">${[["semana", "Días de la semana"], ["mes", "Una vez al mes"]].map(o => `<button class="seg${o[0] === r.frecuencia ? " activo" : ""}" data-accion="rut-frec" data-v="${o[0]}">${o[1]}</button>`).join("")}</div>` +
@@ -1268,10 +1655,10 @@ function hojaRutina(id){
     `<div id="rutMes"${r.frecuencia === "mes" ? "" : " hidden"}>${P.sel("rDiaMes", "Día del mes", ultimo, String(r.diaMes || 1))}</div>` +
     `<div id="rutSemanal"${r.frecuencia === "mes" ? " hidden" : ""}>` +
       P.sel("rSemanal", "¿Cuántas veces por semana quieres?", [["0", "Las que estén programadas"]].concat(Array.from({ length: 7 }, (_, i) => [String(i + 1), (i + 1) + (i ? " veces" : " vez")])), String(r.semanal || 0)) +
-      `<p class="campo-ayuda" style="margin-top:-12px">Con 3 o más, el 80% ya cuenta como suficiente: 4 de 5 basta. Con 1 o 2 no hay holgura.</p></div>` +
+      `<p class="campo-ayuda" style="margin-top:-12px">Con 4 o más te puedes saltar una y la semana sigue contando: 4 de 5 basta. Con 3 o menos no hay holgura.</p></div>` +
     `<div class="fila"><div><div class="fila-txt">Cuenta para las 2 que mueven</div><div class="fila-ayuda">Aparece como candidata al planear el día, junto a las acciones de tus metas.</div></div><button class="switch${r.peso ? " on" : ""}" role="switch" aria-checked="${!!r.peso}" aria-label="Cuenta para las 2 que mueven" data-accion="rut-peso"></button></div>` +
     P.area("rPasos", "Partes fijas (opcional, una por línea)", r.pasos.join("\n"), "Ej. Conciliar deferred revenue") +
-    `<p class="campo-ayuda" style="margin-top:-12px">Son las que se repiten siempre, como los pasos de un cierre. Si lo dejas vacío, escribes las de cada día al entrar a la actividad. En ambos casos, con el 80% hechas la actividad queda hecha.</p>` + errH() +
+    `<p class="campo-ayuda" style="margin-top:-12px">Son las que se repiten siempre, como los pasos de un cierre. Si lo dejas vacío, escribes las de cada día al entrar a la actividad. <b>El orden es el peso</b>: pon arriba la que más pesa. Con el 80% del peso hecho, la actividad queda hecha.</p>` + errH() +
     dos(bot("Cancelar", "cerrar-hoja"), bot("Guardar", "guardar-rutina", r.id, "llena")) +
     `<div class="hoja-pie"><button class="leve" data-accion="borrar-rutina" data-id="${r.id}">Eliminar rutina</button><button class="leve" data-accion="pausar-rutina" data-id="${r.id}">${r.pausada ? "Reactivar" : "Pausar"}</button></div>`);
 }
@@ -1437,10 +1824,11 @@ function siguientePaso(valor){
   const p = F.pasos[F.i];
   if(p && p.leer){ const r = p.leer(F.ctx, valor); if(r === false) return; if(r === "fin") return terminarFlujo(); }
   guardar();
+  S.editando = null;
   if(F.i + 1 >= F.pasos.length) return terminarFlujo();
   F.i += 1; pintarPaso();
 }
-function pasoAtras(){ if(F.i > 0){ F.i -= 1; pintarPaso(); } }
+function pasoAtras(){ if(F.i > 0){ S.editando = null; F.i -= 1; pintarPaso(); } }
 function restantes(nuevos){ F.pasos = F.pasos.slice(0, F.i + 1).concat(nuevos); }
 function cerrarFlujo(){
   $("#flujo").classList.add("oculto"); $("#flujoCont").innerHTML = ""; F.activo = false;
@@ -1491,8 +1879,8 @@ function flujoPlanDia(){
       const lista = [...new Set(cand)].map(pieza).filter(x => x && !hechaPieza(x, d));
       return P.tit("¿Qué mueve hoy?") + P.txt("Dos, no cinco. Si solo salen estas dos, el día ya cuenta. " + esc(etapaTexto(p)) + ".") +
         `<div class="onb-opts">${lista.map(x => { if(esRutina(x)){ const w = Rg.semanaRutina(x, f);
-            return P.marca(esc(x.nombre), x.id, "mueven", c.mueven.includes(x.id), MAX_MUEVEN, esc(w.meta >= 3 ? "Rutina · " + w.hechas + " de " + w.meta + " esta semana" : "Rutina · " + x.area)); }
-          const mm = Rg.meta(x.metaId); return P.marca(esc(x.texto), x.id, "mueven", c.mueven.includes(x.id), MAX_MUEVEN, esc([mm && mm.rol !== "principal" ? mm.nombre : "", (Rg.etapaDe(x) || {}).nombre || ""].filter(Boolean).join(" · "))); }).join("")}</div>` +
+            return P.marca(esc(x.nombre), x.id, "mueven", c.mueven.includes(x.id), MAX_MUEVEN, esc(w.meta >= 3 ? "Rutina · " + w.hechas + " de " + w.meta + " esta semana" : "Rutina · " + x.area), true); }
+          const mm = Rg.meta(x.metaId); return P.marca(esc(x.texto), x.id, "mueven", c.mueven.includes(x.id), MAX_MUEVEN, esc([mm && mm.rol !== "principal" ? mm.nombre : "", (Rg.etapaDe(x) || {}).nombre || ""].filter(Boolean).join(" · ")), true); }).join("")}</div>` +
         `<div class="lista" style="margin:-6px 0 18px">${P.agregar("planNueva", "Escribir otra acción…", "plan-nueva", ` data-cual="mueven"`)}</div>` + P.err() + P.btn("Seguir"); },
     leer: c => { if(!c.mueven.length) return errorPaso("Elige al menos una. Si hoy no hay espacio para tu meta, activa «Semana difícil» en Ajustes.");
       c.mueven.forEach(id => { const a = accion(id); if(!a) return;
@@ -1502,7 +1890,7 @@ function flujoPlanDia(){
   pasos.push({
     html: c => P.tit(hayTurno ? "Turno de la tarde: " + esc(t.texto) : t.texto ? "Turno de hoy: " + esc(t.texto) : "La tarde está libre") +
       P.txt(hayTurno ? "Una sola cosa en la tarde, no tres. Esta es la de hoy." : t.texto ? "Hoy la tarde es para " + esc(t.texto) + ". No hay acción de meta que elegir." : "Sin turno asignado hoy. Puedes dejarla libre.") +
-      (hayTurno ? `<div class="onb-opts">${[...new Set(c.sec.concat(Rg.sugeridas(s, 4).map(a => a.id)))].map(accion).filter(a => a && !a.hecha).map(a => P.marca(esc(a.texto), a.id, "sec", !c.secNo && c.sec.includes(a.id), 1, esc((Rg.etapaDe(a) || {}).nombre || ""))).join("")}</div>` +
+      (hayTurno ? `<div class="onb-opts">${[...new Set(c.sec.concat(Rg.sugeridas(s, 4).map(a => a.id)))].map(accion).filter(a => a && !a.hecha).map(a => P.marca(esc(a.texto), a.id, "sec", !c.secNo && c.sec.includes(a.id), 1, esc((Rg.etapaDe(a) || {}).nombre || ""), true)).join("")}</div>` +
         `<div class="lista" style="margin:-6px 0 18px">${P.agregar("planNuevaS", "Escribir otra…", "plan-nueva", ` data-cual="sec"`)}</div>` + P.btn("Seguir", "si") + P.sec("Hoy no", "no")
         : P.btn("Seguir", "si")),
     leer: (c, v) => { if(v === "no"){ c.secNo = true; c.sec = c.sec.filter(id => c.mueven.includes(id)); } else c.secNo = !c.sec.length; }
@@ -1819,6 +2207,22 @@ const ACC = {
   "etapa-hecha": d => { const m = Rg.meta(d.id), e = Rg.etapaActual(m); if(!e) return; cambiar(() => A.etapaHecha(m, e)); refrescarRuta(); const sig = Rg.etapaActual(m); nota(sig ? "Siguiente etapa: " + sig.nombre + "." : "Ruta completa. Toca revisar esta meta."); },
   "reabrir-etapa": d => { const m = Rg.meta(d.id); if(!m) return; const hechas = m.etapas.filter(e => e.hecha); if(!hechas.length) return; cambiar(() => { hechas[hechas.length - 1].hecha = false; }); refrescarRuta(); nota("Regresaste a «" + hechas[hechas.length - 1].nombre + "»."); },
   "ruta": d => hojaRuta(d.id),
+  "mapear": () => hojaMapear(),
+  "map-rut": (d, b) => { const r = rutina(d.id); if(!r) return;
+    cambiar(() => { r.meta = d.v || null; });
+    const caja = b.closest(".map-c");
+    if(caja) Array.from(caja.querySelectorAll('[data-accion="map-rut"]')).forEach(x => x.classList.toggle("on", x === b)); },
+  "hitos": d => hojaHitos(d.id),
+  "nuevo-hito": d => { const m = Rg.meta(d.id); if(!m) return;
+    const txt = val("hTxt"), fecha = val("hFecha");
+    if(!txt || !fecha) return errorPaso("Escribe qué cierra y para cuándo. Un hito sin fecha no es un hito.");
+    cambiar(() => { m.hitos.push({ id: uid(), texto: txt, fecha, hecho: false, hechoEl: null }); });
+    hojaHitos(m.id); nota("Hito agregado."); },
+  "marcar-hito": d => { const m = Rg.meta(d.id); if(!m) return; const h = (m.hitos || []).find(x => x.id === d.h); if(!h) return;
+    cambiar(() => { h.hecho = !h.hecho; h.hechoEl = h.hecho ? hoyISO() : null; });
+    hojaHitos(m.id); if(h.hecho) nota("Hito cerrado. La flama arranca de aquí."); },
+  "quitar-hito": d => { const m = Rg.meta(d.id); if(!m) return;
+    cambiar(() => { m.hitos = (m.hitos || []).filter(x => x.id !== d.h); }); hojaHitos(m.id); },
   "editar-meta": d => hojaEditarMeta(d.id),
   "guardar-meta": d => { const m = Rg.meta(d.id); if(!m) return; const et = val("mEtapas").split("\n").map(x => x.trim()).filter(Boolean);
     cambiar(() => { m.nombre = val("mNom") || m.nombre; m.lane = S.lane || m.lane; m.resultado = val("mRes") || m.resultado; m.terminadoCuando = val("mFin"); m.abre = val("mAbre"); if(et.length) aplicarEtapas(m, et); }); cerrarHoja(); nota("Meta guardada."); },
@@ -1840,15 +2244,27 @@ const ACC = {
     if(d.hoja) hojaRutinaHoy(r.id);
     if(res && !res.antes && res.ahora){
       if(!antesDia && Rg.diaCuenta(diaDe(hoyISO()))) nota("El día cuenta. Lo demás es extra.");
-      else nota(r.nombre + ": " + res.e.hechas + " de " + res.e.n + ". Suficiente, queda hecha.");
+      else nota(r.nombre + ": " + res.e.pct + "% del peso. Ya cuenta, queda hecha.");
     } },
   "quitar-sub": d => { const r = rutina(d.id); if(!r) return; cambiar(() => A.quitarSub(r, +d.i, hoyISO())); hojaRutinaHoy(r.id); },
+  "subir-sub": d => { const r = rutina(d.id); if(!r) return; let ok; cambiar(() => { ok = A.moverSub(r, +d.i, -1, hoyISO()); }); if(ok) hojaRutinaHoy(r.id); },
+  "bajar-sub": d => { const r = rutina(d.id); if(!r) return; let ok; cambiar(() => { ok = A.moverSub(r, +d.i, 1, hoyISO()); }); if(ok) hojaRutinaHoy(r.id); },
+  /* Editar en línea el texto precargado de una opción del día */
+  "plan-editar": d => { S.editando = d.id; pintarPaso(); setTimeout(() => { const el = document.getElementById("optEdit"); if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }, 60); },
+  "plan-editar-no": () => { S.editando = null; pintarPaso(); },
+  "plan-editar-ok": d => { const el = document.getElementById("optEdit"), txt = el ? el.value.trim() : "";
+    const x = pieza(d.id); if(x && txt){ cambiar(() => { if(esRutina(x)) x.nombre = txt; else x.texto = txt; }); }
+    S.editando = null; pintarPaso(); },
   "plegar": d => { const i = S.abiertas.indexOf(d.id); if(i >= 0) S.abiertas.splice(i, 1); else S.abiertas.push(d.id); pintar(); },
   "ver-rutina-hoy": d => hojaRutinaHoy(d.id),
   "omitir-rutina": d => { cambiar(() => { const dd = diaMut(hoyISO()); if(!dd.omitidas.includes(d.id)) dd.omitidas.push(d.id); }); cerrarHoja(); nota("Hoy no. Mañana aparece como siempre."); },
   "recuperar-rutina": d => cambiar(() => { const dd = diaMut(hoyISO()); dd.omitidas = dd.omitidas.filter(x => x !== d.id); }),
+  "subir-rut": d => { const r = rutina(d.id); if(!r) return; let z; cambiar(() => { z = A.moverRutina(r, -1); });
+    if(z && z !== "dentro") nota(r.nombre + " pasó a " + z + ", a las " + r.hora + "."); },
+  "bajar-rut": d => { const r = rutina(d.id); if(!r) return; let z; cambiar(() => { z = A.moverRutina(r, 1); });
+    if(z && z !== "dentro") nota(r.nombre + " pasó a " + z + ", a las " + r.hora + "."); },
   "editar-rutina": d => hojaRutina(d.id),
-  "nueva-rutina": () => { S.rutBorrador = { id: uid(), nombre: "", area: "Trabajo", franja: "jornada", frecuencia: "semana", dias: [1,2,3,4,5], diaMes: 1, pasos: [] }; hojaRutina(S.rutBorrador.id); },
+  "nueva-rutina": () => { S.rutBorrador = { id: uid(), nombre: "", area: "Trabajo", franja: "jornada", frecuencia: "semana", dias: [1,2,3,4,5], diaMes: 1, pasos: [], semanal: 0, peso: false, hora: "" }; hojaRutina(S.rutBorrador.id); },
   "rut-franja": (d, b) => { S.rut.franja = d.v; $$('#hojas [data-accion="rut-franja"]').forEach(x => x.classList.toggle("on", x === b)); },
   "rut-area": (d, b) => { S.rut.area = d.v; $$('#hojas [data-accion="rut-area"]').forEach(x => x.classList.toggle("on", x === b)); },
   "rut-frec": (d, b) => { S.rut.frec = d.v; $$('#hojas [data-accion="rut-frec"]').forEach(x => x.classList.toggle("activo", x === b)); $("#rutDias").hidden = d.v === "mes"; $("#rutMes").hidden = d.v !== "mes"; const sm = $("#rutSemanal"); if(sm) sm.hidden = d.v === "mes"; },
@@ -1858,7 +2274,7 @@ const ACC = {
     let r = E.rutinas.find(x => x.id === d.id); const nuevo = !r; if(nuevo) r = S.rutBorrador; if(!r) return;
     const nombre = val("rNom"); if(!nombre) return errorPaso("Ponle un nombre a la rutina.");
     if(S.rut.frec !== "mes" && !S.rut.dias.length) return errorPaso("Elige al menos un día.");
-    cambiar(() => { Object.assign(r, { nombre, area: S.rut.area, franja: S.rut.franja, frecuencia: S.rut.frec, dias: S.rut.dias.slice().sort(), diaMes: +val("rDiaMes") || 1, semanal: +val("rSemanal") || 0, peso: !!S.rut.peso, pasos: val("rPasos").split("\n").map(x => x.trim()).filter(Boolean) }); if(nuevo){ delete r.nueva; E.rutinas.push(r); S.rutBorrador = null; } });
+    cambiar(() => { Object.assign(r, { nombre, area: S.rut.area, franja: S.rut.franja, frecuencia: S.rut.frec, dias: S.rut.dias.slice().sort(), diaMes: +val("rDiaMes") || 1, semanal: +val("rSemanal") || 0, peso: !!S.rut.peso, hora: val("rHora"), pasos: val("rPasos").split("\n").map(x => x.trim()).filter(Boolean) }); if(nuevo){ delete r.nueva; E.rutinas.push(r); S.rutBorrador = null; } });
     cerrarHoja(); nota(nuevo ? "Rutina creada. Aparece en Hoy los días que toca." : "Rutina guardada.");
   },
   "borrar-rutina": d => { cambiar(() => { E.rutinas = E.rutinas.filter(x => x.id !== d.id); }); S.rutBorrador = null; cerrarHoja(); nota("Rutina eliminada."); },
@@ -1887,7 +2303,7 @@ Object.assign(ACC, {
   "agregar-rapido": () => {
     const t = val("qTxt"); if(!t) return errorPaso("Escribe qué quieres agregar.");
     const p = Rg.principal(), s = Rg.secundaria();
-    if(S.destino === "rutina"){ S.rutBorrador = { id: uid(), nombre: t, area: "Trabajo", franja: "jornada", frecuencia: "semana", dias: [1,2,3,4,5], diaMes: 1, pasos: [] }; hojaRutina(S.rutBorrador.id); return; }
+    if(S.destino === "rutina"){ S.rutBorrador = { id: uid(), nombre: t, area: "Trabajo", franja: "jornada", frecuencia: "semana", dias: [1,2,3,4,5], diaMes: 1, pasos: [], semanal: 0, peso: false, hora: "" }; hojaRutina(S.rutBorrador.id); return; }
     let msg = "";
     cambiar(() => {
       if(S.destino === "p" && p){ A.nuevaAccion(p, t); msg = "Acción agregada a " + p.nombre + ", en su etapa actual."; }
@@ -1950,11 +2366,20 @@ const ENTER = {
     cerrarHoja(); nota(r === "lleno" ? "Agregada a tu ruta; hoy ya está lleno." : "Agregada a tu ruta y a tu día."); },
   "ruta-accion": t => { const m = Rg.meta(t.dataset.meta); if(!m) return; const id = t.id; cambiar(() => A.nuevaAccion(m, t.value.trim(), t.dataset.etapa)); hojaRuta(m.id); setTimeout(() => { const el = document.getElementById(id); if(el) el.focus(); }, 90); },
   "nueva-etapa": t => { const m = Rg.meta(t.dataset.meta); if(!m) return; cambiar(() => { m.etapas.push({ id: uid(), nombre: t.value.trim(), hecha: false }); }); hojaRuta(m.id); nota("Etapa agregada al final."); },
-  "plan-nueva": t => { const cual = t.dataset.cual, m = cual === "tres" ? Rg.principal() : Rg.secundaria(); if(!m) return; const a = A.nuevaAccion(m, t.value.trim()); guardar();
+  /* El paso de «¿qué mueve hoy?» pertenece a la meta principal; el del turno, a la
+     meta que el turno realmente tiene. Antes todo caía en la secundaria, así que
+     una acción escrita en un turno sin meta quedaba colgada de la meta equivocada. */
+  "plan-nueva": t => { const cual = t.dataset.cual, tn = Rg.turnoHoy(hoyISO());
+    const m = cual === "sec" ? (Rg.meta(tn.metaId) || Rg.secundaria()) : Rg.principal();
+    if(!m) return; const a = A.nuevaAccion(m, t.value.trim()); guardar();
     const lista = F.ctx[cual] = Array.isArray(F.ctx[cual]) ? F.ctx[cual] : [];
-    if(cual === "sec"){ F.ctx.sec = [a.id]; F.ctx.secNo = false; } else if(lista.length < MAX_TRES) lista.push(a.id); else nota("Agregada a tu ruta. Para sumarla hoy, quita una de tus tres.");
+    const tope = cual === "mueven" ? MAX_MUEVEN : MAX_TRES;
+    if(cual === "sec"){ F.ctx.sec = [a.id]; F.ctx.secNo = false; } else if(lista.length < tope) lista.push(a.id); else nota("Agregada a tu ruta. Para sumarla hoy, quita una de las dos.");
     const id = t.id; pintarPaso(); setTimeout(() => { const el = document.getElementById(id); if(el) el.focus(); }, 90); },
-  "plan-pend": t => { A.nuevoPend(t.value.trim()); guardar(); const id = t.id; pintarPaso(); setTimeout(() => { const el = document.getElementById(id); if(el) el.focus(); }, 90); }
+  "plan-pend": t => { A.nuevoPend(t.value.trim()); guardar(); const id = t.id; pintarPaso(); setTimeout(() => { const el = document.getElementById(id); if(el) el.focus(); }, 90); },
+  "plan-editar-ok": t => { const x = pieza(t.dataset.id), txt = t.value.trim();
+    if(x && txt) cambiar(() => { if(esRutina(x)) x.nombre = txt; else x.texto = txt; });
+    S.editando = null; pintarPaso(); }
 };
 function alEnter(t){ if(!t || !t.dataset.enter) return; if(t.dataset.enter !== "agregar-rapido" && !t.value.trim()) return; const fn = ENTER[t.dataset.enter]; if(fn) fn(t); }
 
@@ -1983,11 +2408,14 @@ try{ mqOscuro && mqOscuro.addEventListener("change", () => { if(!E || E.ajustes.
 /* ════════ ARRANQUE ════════ */
 async function arrancar(){
   let g = await Guardado.leer(CLAVE);
+  if(!g || !Array.isArray(g.metas)) g = await Guardado.leer(CLAVE_V6);
+  if(!g || !Array.isArray(g.metas)) g = await Guardado.leer(CLAVE_V5);
   if(!g || !Array.isArray(g.metas)) g = await Guardado.leer(CLAVE_V4);
   if(!g || !Array.isArray(g.metas)) g = await Guardado.leer(CLAVE_V3);
   if(!g || !Array.isArray(g.metas)) g = await Guardado.leer(CLAVE_V2);
   if(!g || !Array.isArray(g.metas)) g = semilla();
-  E = normalizar(migrar(g)); podar(E); aplicarTema();
+  /* El orden importa: la semana se guarda antes de que el podado borre sus días */
+  E = normalizar(migrar(g)); cerrarSemanas(E); podar(E); aplicarTema();
   E.marcas.ultimaVisita = hoyISO(); guardar(); pintar();
   if(!E.marcas.onboarding) flujoBienvenida();
 }
