@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF8F3">
+<script>try{ if(matchMedia("(prefers-color-scheme:dark)").matches){ document.documentElement.dataset.modo = "oscuro"; document.documentElement.style.background = "#0E0D0C"; } }catch(e){}</script>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cauce">
+<title>Cauce</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FAF8F3'/%3E%3Cpath d='M16 3c-5 5 5 10 0 13s5 8 0 13' fill='none' stroke='%23E0942A' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='2.6' fill='%23E0942A'/%3E%3C/svg%3E">
+<style>
+/* ══════════════════════════════════════════════
+   CAUCE v8 · estilos
+   Misma paleta y mismas familias que Práctica — la app no cambió de
+   material, cambió de forma. Lo que se fue: tarjetas, barras de avance,
+   porcentajes, acordeones. Lo que queda: una lista con renglones.
+   Regla heredada: --tinta-tenue y --llama no se usan para texto chico
+   (no pasan AA sobre el papel claro). Para texto chico, --tinta-baja.
+   ══════════════════════════════════════════════ */
+:root{
+  color-scheme:light;
+  --noche:#FAF8F3; --panel:#EFE9DF;
+  --tinta:#2B2621; --tinta-baja:#5E554B; --tinta-tenue:#877E73;
+  --cera:#C9B896; --llama:#E0942A; --brasa:#B4491C; --oro:#8A6A3E;
+  --linea:rgba(43,38,33,.10); --linea-fuerte:rgba(43,38,33,.20);
+  --serif:ui-serif,"New York",Georgia,"Iowan Old Style","Palatino Linotype",serif;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+html[data-modo="oscuro"]{
+  color-scheme:dark;
+  --noche:#0E0D0C; --panel:#171513;
+  --tinta:#ECE6DB; --tinta-baja:#A79C8D; --tinta-tenue:#726859;
+  --cera:#CFC0A0; --llama:#F0A63C; --brasa:#C56A3C; --oro:#B79366;
+  --linea:rgba(236,230,219,.08); --linea-fuerte:rgba(236,230,219,.16);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{background:var(--noche);color:var(--tinta);font-family:var(--sans);font-size:16px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;transition:background .4s ease,color .4s ease}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;padding:0;text-align:left}
+input,select,textarea{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+  outline:2px solid var(--llama);outline-offset:3px;border-radius:4px}
+.oculto{display:none !important}
+
+/* ── La línea de la hora ──
+   Hermana de la veladora de Práctica: el tiempo se siente, no se cuenta.
+   Aquí corre de la medianoche a la medianoche. No pide nada. */
+.cauce{position:fixed;left:18px;top:0;bottom:0;width:3px;z-index:5;pointer-events:none;
+  padding:calc(env(safe-area-inset-top) + 20px) 0 calc(env(safe-area-inset-bottom) + 76px)}
+.cauce-lecho{position:relative;height:100%;width:3px}
+.cauce-agua{position:absolute;inset:0;border-radius:2px;
+  background:linear-gradient(180deg,var(--cera),color-mix(in srgb,var(--cera) 35%,transparent));opacity:.3}
+.cauce-andado{position:absolute;left:0;top:0;width:3px;border-radius:2px;background:var(--cera);opacity:.75;
+  transition:height 1.2s linear}
+.cauce-luz{position:absolute;left:-3px;width:9px;height:9px;border-radius:50%;background:var(--llama);
+  box-shadow:0 0 10px 2px color-mix(in srgb,var(--llama) 55%,transparent);transition:top 1.2s linear}
+
+#appShell{height:100%;display:flex;flex-direction:column}
+.lienzo{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 112px) 42px}
+#appShell[inert]{filter:blur(2px);opacity:.5}
+
+/* ── Cabecera ── */
+.cab{display:flex;align-items:flex-start;gap:12px;margin-bottom:20px}
+.cab > div{flex:1;min-width:0}
+.dia{font-family:var(--serif);font-size:27px;line-height:1.18;font-weight:400;margin:0 0 4px;
+  letter-spacing:-.01em;outline:none}
+.dia::first-letter{text-transform:uppercase}
+.dia-s{font-size:13px;color:var(--tinta-baja);margin:0}
+.icono{flex:0 0 auto;width:38px;height:38px;display:grid;place-items:center;border-radius:11px;color:var(--tinta-baja)}
+.icono svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+.icono:hover{background:var(--panel);color:var(--tinta)}
+
+/* ── El interruptor de vista: la misma lista, dos lecturas ── */
+.segmento{display:flex;gap:2px;background:var(--panel);border-radius:11px;padding:3px;margin:0 0 18px}
+.seg{flex:1;text-align:center;padding:8px 10px;border-radius:9px;font-size:13px;color:var(--tinta-baja);
+  transition:background .18s ease,color .18s ease}
+.seg.activo{background:var(--noche);color:var(--tinta);box-shadow:0 1px 2px rgba(43,38,33,.07)}
+
+/* ══ LA NOTA ══
+   Un post-it: renglones separados por una línea, sin tarjetas ni sombras.
+   El número de la izquierda es el nivel, y es un botón: tocarlo cicla. */
+.nota{list-style:none;margin:0 0 4px;padding:0}
+.it{display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid var(--linea);min-height:52px}
+.it:first-child{border-top:1px solid var(--linea)}
+.it-n{flex:0 0 auto;width:26px;height:26px;margin-top:13px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;
+  background:var(--panel);color:var(--tinta-baja);transition:background .18s ease,color .18s ease,transform .1s ease}
+.it-n.n1{background:color-mix(in srgb,var(--llama) 20%,transparent);color:var(--oro);font-weight:600}
+.it-n.n2{background:var(--panel);color:var(--tinta-baja)}
+.it-n.n3{background:none;box-shadow:inset 0 0 0 1px var(--linea);color:var(--tinta-tenue)}
+button.it-n:active{transform:scale(.88)}
+button.it-n:hover{box-shadow:inset 0 0 0 1px var(--linea-fuerte)}
+.it-t{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px;padding:13px 0 12px;align-self:stretch}
+.it-x{font-size:15.5px;line-height:1.35;position:relative;display:inline-block}
+/* Tachar, no palomear: es lo que hace el papel */
+.it-x::after{content:"";position:absolute;left:0;top:52%;height:1.5px;width:0;background:var(--tinta-baja);
+  border-radius:1px;transition:width .3s cubic-bezier(.22,.61,.36,1)}
+.it.hecha .it-x::after{width:100%}
+.it.hecha .it-x,.it.hecha .it-s{color:var(--tinta-tenue)}
+.it-s{font-size:12px;color:var(--tinta-baja)}
+.it-mas{flex:0 0 auto;width:34px;align-self:stretch;display:grid;place-items:center;color:var(--tinta-tenue);
+  font-size:17px;letter-spacing:.06em}
+.it-mas:hover{color:var(--tinta)}
+.it.rut .it-x{font-weight:450}
+.nota-vacia{padding:18px 0;color:var(--tinta-baja);font-size:14px;border-bottom:1px solid var(--linea)}
+
+.franja{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tinta-baja);margin:22px 0 6px;display:flex;gap:8px;align-items:baseline}
+.franja span{text-transform:none;letter-spacing:.02em;color:var(--tinta-tenue)}
+.franja:first-of-type{margin-top:0}
+
+/* ── Agregar: siempre a la vista, siempre un solo campo ── */
+.agregar{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--linea);padding:4px 0}
+.agregar-mas{flex:0 0 auto;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;
+  color:var(--tinta-tenue);box-shadow:inset 0 0 0 1px var(--linea)}
+.agregar-mas svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.agregar-mas:hover{color:var(--llama);box-shadow:inset 0 0 0 1px var(--cera)}
+.agregar input{flex:1;border:0;background:none;padding:14px 0;font-size:15.5px;outline:none}
+.agregar input::placeholder{color:var(--tinta-tenue)}
+
+.aviso-tope,.senal{font-size:13px;color:var(--tinta-baja);margin:18px 0 0;padding-left:13px;
+  border-left:2px solid var(--cera);line-height:1.5}
+.senal{border-left-color:var(--brasa)}
+
+/* ══ SEMANA ══ */
+.sec{margin:30px 0 0}
+.sec-cab{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.sec-t{font-family:var(--serif);font-size:19px;font-weight:400;margin:0 0 3px}
+.sec-s{font-size:12.5px;color:var(--tinta-baja);margin:0 0 10px}
+.cuenta{font-family:var(--mono);font-size:12px;color:var(--tinta-baja);font-variant-numeric:tabular-nums}
+.vacio{font-size:13.5px;color:var(--tinta-baja);padding:12px 0;margin:0}
+
+.cad{list-style:none;margin:6px 0 0;padding:0}
+.cad-f{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--linea);min-height:54px}
+.cad-f:first-child{border-top:1px solid var(--linea)}
+.cad-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;padding:11px 0}
+.cad-n{font-size:15px;line-height:1.3}
+.cad-d{display:flex;gap:4px}
+.cad-d .d{width:19px;height:19px;border-radius:5px;display:grid;place-items:center;font-size:9.5px;
+  font-family:var(--mono);background:var(--panel);color:var(--tinta-tenue)}
+.cad-d .d.no{background:none;box-shadow:inset 0 0 0 1px var(--linea);opacity:.45}
+.cad-d .d.fut{opacity:.5}
+.cad-d .d.on{background:var(--llama);color:#fff;box-shadow:none;opacity:1}
+html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
+.cad-c{flex:0 0 auto;font-family:var(--mono);font-size:12px;color:var(--tinta-baja);font-variant-numeric:tabular-nums}
+.cad-f.cuenta .cad-c{color:var(--oro)}
+.cad-f.completo .cad-c{color:var(--llama);font-weight:600}
+
+/* ── Las metas: nombre y una flama que es estado, no barra ──
+   No se llena. Arde si las acciones están pasando; se apaga si no.
+   Llegar a la meta no es contable; que las acciones pasen, sí. */
+.metas{display:flex;flex-direction:column;gap:1px;margin:0 0 6px}
+.meta-c{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--linea)}
+.meta-c:first-child{border-top:1px solid var(--linea)}
+.meta-fl{flex:0 0 auto;width:26px;height:28px;display:grid;place-items:center}
+.meta-fl svg{width:22px;height:24px}
+.meta-c .meta-fl svg{fill:none;stroke:var(--linea-fuerte);stroke-width:1.5}
+.meta-c.apagada .meta-fl svg{stroke:var(--tinta-tenue)}
+.meta-c.tibia .meta-fl svg{fill:color-mix(in srgb,var(--cera) 55%,transparent);stroke:var(--cera)}
+.meta-c.viva .meta-fl svg{fill:var(--llama);stroke:none;
+  filter:drop-shadow(0 0 7px color-mix(in srgb,var(--llama) 45%,transparent))}
+.meta-n{flex:1;min-width:0;font-size:16px}
+.meta-s{flex:0 0 auto;font-size:12px;color:var(--tinta-baja)}
+.meta-grande{display:flex;align-items:center;gap:14px;background:var(--panel);border-radius:14px;
+  padding:16px;margin:0 0 18px}
+.meta-grande svg{width:34px;height:36px;flex:0 0 auto;fill:none;stroke:var(--tinta-tenue);stroke-width:1.4}
+.meta-grande.tibia svg{fill:color-mix(in srgb,var(--cera) 55%,transparent);stroke:var(--cera)}
+.meta-grande.viva svg{fill:var(--llama);stroke:none}
+.meta-grande p{margin:0;font-size:14px;color:var(--tinta-baja);line-height:1.45}
+
+.plegable{margin:26px 0 0;border-top:1px solid var(--linea);padding-top:14px}
+.plegable summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none}
+.plegable summary::-webkit-details-marker{display:none}
+.plegable .mas{color:var(--tinta-tenue);font-size:17px}
+.plegable[open] .mas{transform:rotate(45deg)}
+
+/* ══ HOJAS ══ */
+.velo{position:fixed;inset:0;background:rgba(14,13,12,.4);z-index:40;animation:ap .22s ease}
+.hoja{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--noche);
+  border-radius:20px 20px 0 0;padding:10px 20px calc(env(safe-area-inset-bottom) + 22px);
+  max-height:92vh;overflow-y:auto;animation:sube .28s cubic-bezier(.22,.61,.36,1);
+  box-shadow:0 -10px 34px rgba(14,13,12,.16)}
+@keyframes ap{from{opacity:0}}
+@keyframes sube{from{transform:translateY(14px);opacity:.6}}
+.asa{width:34px;height:4px;border-radius:2px;background:var(--linea-fuerte);margin:0 auto 14px}
+.hoja-t{font-family:var(--serif);font-size:21px;font-weight:400;margin:0 0 5px;outline:none}
+.hoja-s{font-size:13.5px;color:var(--tinta-baja);margin:0 0 18px;line-height:1.5}
+.campo{display:block;margin:0 0 16px}
+.campo-et{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--tinta-baja);margin:0 0 7px}
+.campo-i{width:100%;background:var(--panel);border:1px solid transparent;border-radius:11px;
+  padding:12px 14px;font-size:15.5px;outline:none;transition:border-color .18s ease}
+.campo-i:focus{border-color:var(--cera)}
+.campo-area{resize:vertical;line-height:1.5;font-family:inherit}
+.campo-area.mono{font-family:var(--mono);font-size:11px}
+.campo-ayuda{font-size:12.5px;color:var(--tinta-baja);margin:-8px 0 16px;line-height:1.45}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 16px}
+.chip{padding:8px 15px;border-radius:999px;font-size:13.5px;background:var(--panel);color:var(--tinta-baja);
+  transition:background .18s ease,color .18s ease}
+.chip.on{background:var(--tinta);color:var(--noche)}
+.dias{display:flex;gap:6px;margin:0 0 16px}
+.dia-b{flex:1;height:40px;border-radius:10px;background:var(--panel);color:var(--tinta-baja);
+  display:grid;place-items:center;font-size:13px}
+.dia-b.on{background:var(--tinta);color:var(--noche)}
+.acciones{display:flex;gap:10px;margin:22px 0 0}
+.accion{flex:1;padding:14px;border-radius:13px;text-align:center;font-size:15px;background:var(--panel);
+  color:var(--tinta);transition:transform .1s ease,opacity .18s ease}
+.accion.llena{background:var(--llama);color:#fff;font-weight:500}
+html[data-modo="oscuro"] .accion.llena{color:#1a1612}
+.accion:active{transform:scale(.985)}
+.acciones:has(> .accion:only-child) .accion{flex:1}
+.hoja-pie{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:18px 0 0;
+  padding-top:16px;border-top:1px solid var(--linea)}
+.accion.leve,.leve{flex:0 0 auto;background:none;padding:4px 2px;font-size:13px;color:var(--tinta-baja);text-align:center}
+.leve:hover{color:var(--brasa)}
+.lista-min{display:flex;flex-direction:column;margin:0 0 16px}
+.fila-min{padding:13px 0;border-bottom:1px solid var(--linea);font-size:14.5px}
+.fila-min:first-child{border-top:1px solid var(--linea)}
+.fila-min.nueva{color:var(--tinta-baja)}
+.paso-err{color:var(--brasa);font-size:13px;margin:0;min-height:18px}
+
+/* ══ EL PASE ══
+   Pantalla completa, una sola decisión por renglón. Es la versión digital
+   de volver a escribir la nota: lo que marcas, sigue; lo que no, se guarda. */
+.onb{position:fixed;inset:0;z-index:60;background:var(--noche);display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 28px) 22px calc(env(safe-area-inset-bottom) + 22px);
+  overflow-y:auto;animation:ap .24s ease}
+.paso-t{font-family:var(--serif);font-size:25px;font-weight:400;margin:0 0 6px;line-height:1.2}
+.paso-s{font-size:14px;color:var(--tinta-baja);margin:0 0 22px;line-height:1.5}
+.pase-l{display:flex;flex-direction:column;gap:8px;flex:1}
+.pase-i{display:flex;align-items:center;gap:12px;padding:14px;border-radius:13px;background:var(--panel);
+  border:1.5px solid transparent;transition:border-color .18s ease,background .18s ease}
+.pase-i.on{border-color:var(--cera);background:color-mix(in srgb,var(--llama) 9%,var(--panel))}
+.pase-c{flex:0 0 auto;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;
+  box-shadow:inset 0 0 0 1.5px var(--linea-fuerte);color:transparent}
+.pase-i.on .pase-c{background:var(--llama);box-shadow:none;color:#fff}
+.pase-c svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pase-x{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pase-t{font-size:15px;line-height:1.3}
+.pase-s{font-size:12px;color:var(--tinta-baja)}
+.paso-acc{margin:26px 0 0}
+.onb-top,.onb-dots,.onb-back,.flujo-x{display:none}
+
+/* ══ FAB Y PESTAÑAS ══ */
+/* Sin botón flotante: el campo de agregar vive al pie de la lista y nunca
+   tapa un renglón. Un lugar para escribir, no dos. */
+.tabbar{flex:0 0 auto;display:flex;border-top:1px solid var(--linea);background:var(--noche);
+  padding:7px 0 calc(env(safe-area-inset-bottom) + 7px);z-index:10}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;color:var(--tinta-tenue);
+  transition:color .18s ease}
+.tab.activo{color:var(--tinta)}
+.tab-ic svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tab-lb{font-size:10.5px;letter-spacing:.02em}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(10px);
+  bottom:calc(env(safe-area-inset-bottom) + 86px);z-index:70;background:var(--tinta);color:var(--noche);
+  padding:11px 18px;border-radius:999px;font-size:13.5px;max-width:calc(100vw - 40px);text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (min-width:720px){
+  .lienzo{padding-left:0;padding-right:0}
+  #vista{max-width:580px;margin:0 auto;padding:0 24px}
+  .cauce{left:calc(50vw - 330px)}
+  .hoja{left:50%;transform:translateX(-50%);width:min(560px,100%);border-radius:20px;bottom:24px;max-height:86vh}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+
+</style>
+</head>
+<body>
+<div class="cauce" id="cauce" aria-hidden="true"><div class="cauce-lecho"><div class="cauce-agua"></div><div class="cauce-andado" id="cauceAndado"></div><div class="cauce-luz" id="cauceLuz"></div></div></div>
+<div id="appShell">
+  <main class="lienzo" id="lienzo"><div id="vista"></div></main>
+  <nav class="tabbar" aria-label="Secciones">
+    <button class="tab activo" data-accion="tab" data-tab="hoy" aria-current="page"><span class="tab-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg></span><span class="tab-lb">Hoy</span></button>
+    <button class="tab" data-accion="tab" data-tab="semana"><span class="tab-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/></svg></span><span class="tab-lb">Semana</span></button>
+  </nav>
+</div>
+<div class="onb oculto" id="flujo" role="dialog" aria-modal="true" aria-label="El pase del día">
+  <div class="onb-cont" id="flujoCont"></div>
+</div>
+<div id="hojas"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ══════════════════════════════════════════════════════════════════════
+   CAUCE v8 · la nota
+
+   Rediseñado a partir de un sistema de papel que ya funcionaba. Lo que
+   enseñaba ese papel:
+
+   1) Es UNA lista. Ejercicio, un trámite, un pendiente del negocio y la
+      meditación viven en la misma columna. No hay secciones.
+   2) El número es un nivel, no un orden: varios renglones comparten el 1.
+   3) La lista se reescribe entera cada día, y al reescribirla se
+      reprioriza: un renglón baja de 1 a 2, otro sube de 3 a 2. Nadie
+      arrastra nada; se vuelve a escribir, y al escribirlo se decide.
+   4) Lo que se reescribe muchas veces sin tacharse es la señal: lleva
+      tres notas seguidas en nivel 1 y sigue sin tachar.
+   5) Cabe en un post-it: nueve renglones. El papel es el límite de WIP.
+
+   De ahí las reglas de esta versión:
+   — Una pantalla con la lista del día, y nada más que decidir.
+   — Tocar la fila la tacha. Tocar el número cicla 1→2→3.
+   — El pase diario reemplaza el arrastre automático: lo abierto se
+     confirma o se va, y se cuenta cuántas veces se ha confirmado.
+   — El oficio es un renglón. El detalle vive en su tracker de trabajo.
+   — La semana es la unidad de la rutina: la meta es el 100%, el 80% ya
+     cuenta. No hay flama que se llene, porque llegar a la meta no es
+     contable; lo contable es si las acciones están pasando.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ════════ 1 · BASE ════════ */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad2 = n => String(n).padStart(2, "0");
+const DIA_MS = 86400000;
+const aISO = d => d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+const deISO = s => { const p = String(s).split("-").map(Number); return new Date(p[0], (p[1] || 1) - 1, p[2] || 1); };
+const hoyISO = () => aISO(new Date());
+const sumarDias = (s, n) => { const d = deISO(s); d.setDate(d.getDate() + n); return aISO(d); };
+const diasEntre = (a, b) => Math.round((deISO(b) - deISO(a)) / DIA_MS);
+const lunesDe = s => { const d = deISO(s), n = (d.getDay() + 6) % 7; d.setDate(d.getDate() - n); return aISO(d); };
+const semanaDe = s => { const l = lunesDe(s); return Array.from({ length: 7 }, (_, i) => sumarDias(l, i)); };
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+const DIAS_NOM = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+const LETRAS = ["D", "L", "M", "M", "J", "V", "S"];
+const fechaLarga = f => { const d = deISO(f); return DIAS_NOM[d.getDay()] + " " + d.getDate() + " de " + MESES[d.getMonth()]; };
+const fechaCorta = f => { const d = deISO(f); return d.getDate() + " " + MESES[d.getMonth()].slice(0, 3); };
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+const ICO = {
+  check: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-7"/></svg>',
+  mas: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  ajustes: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>',
+  llama: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6c2.6 3.1 5.6 5.4 5.6 9.5a5.6 5.6 0 0 1-11.2 0c0-2 .9-3.4 2.1-4.9.5 1 1.1 1.7 1.9 2.1-.3-2.5.2-4.6 1.6-6.7z"/></svg>',
+  ciclo: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l3 3-3 3"/><path d="M4 11V9a3 3 0 0 1 3-3h13"/><path d="M7 21l-3-3 3-3"/><path d="M20 13v2a3 3 0 0 1-3 3H4"/></svg>'
+};
+
+/* ════════ 2 · GUARDADO ════════ */
+const Guardado = (() => {
+  const memoria = {};
+  const claude = () => typeof window !== "undefined" && !!window.storage && typeof window.storage.get === "function";
+  const local = (() => { try { const k = "cauce:probe"; window.localStorage.setItem(k, "1"); window.localStorage.removeItem(k); return true; } catch (e) { return false; } })();
+  async function leer(k) {
+    if (claude()) { try { const v = await window.storage.get(k); if (v) return typeof v === "string" ? JSON.parse(v) : v; } catch (e) {} }
+    if (local) { try { const v = window.localStorage.getItem(k); if (v) return JSON.parse(v); } catch (e) {} }
+    return memoria[k] || null;
+  }
+  function escribir(k, v) {
+    memoria[k] = v;
+    if (claude()) { try { window.storage.set(k, JSON.stringify(v)); } catch (e) {} }
+    if (local) { try { window.localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  }
+  return { leer, escribir, persistente: () => claude() || local };
+})();
+
+const VERSION = 8;
+const CLAVE = "cauce:estado:v8";
+const VIEJAS = ["cauce:estado:v7", "cauce:estado:v6", "cauce:estado:v5", "cauce:estado:v4", "cauce:estado:v3"];
+const TOPE = 9;   /* el post-it: nueve renglones */
+let E = null;
+
+/* ════════ 3 · ESQUEMA ════════
+   Dos tipos de ítem y una sola lista.
+   · rutina — se repite con cadencia semanal. La semana es su unidad.
+   · suelto — pasa una vez. Lleva cuenta de cuántos pases ha sobrevivido.
+   El nivel (1, 2, 3) vive en el ítem: tocarlo hoy lo deja así mañana,
+   igual que al reescribir la nota a mano.                                */
+function rutinaNueva(o) {
+  return Object.assign({ id: uid(), tipo: "rutina", texto: "", nivel: 2, hora: "",
+    dias: [1, 2, 3, 4, 5], semanal: 0, meta: null, pausada: false }, o || {});
+}
+function sueltoNuevo(o) {
+  return Object.assign({ id: uid(), tipo: "suelto", texto: "", nivel: 2, hora: "",
+    meta: null, creado: hoyISO(), pases: 0, hecha: false, hechaEl: null, archivada: false }, o || {});
+}
+function diaVacio() { return { hechas: {}, fuera: [], pase: false }; }
+function diaDe(f) { return Object.assign(diaVacio(), E.dias[f] || {}); }
+function diaMut(f) { const d = E.dias[f] = Object.assign(diaVacio(), E.dias[f] || {}); return d; }
+
+const FRANJAS = [
+  { id: "manana", nombre: "Mañana", desde: 5, hasta: 7 },
+  { id: "jornada", nombre: "Jornada", desde: 7, hasta: 18 },
+  { id: "tarde", nombre: "Tarde", desde: 18, hasta: 21 },
+  { id: "noche", nombre: "Noche", desde: 21, hasta: 24 }
+];
+
+/* Migración desde v7 y anteriores. Nada de lo capturado se pierde: lo que
+   no cabe en la lista de nueve entra archivado y se puede traer desde
+   «lo abierto». Mejor guardado y fuera de la vista que borrado. */
+function desdeViejo(g) {
+  const metas = (g.metas || []).map(m => ({ id: m.id, nombre: m.nombre, lane: m.lane || "oficio" }));
+  const oficio = (g.metas || []).find(m => m.rol === "principal");
+  /* El oficio es UN renglón. Las juntas y los 1:1 son calendario, no lista:
+     pasan igual estén o no aquí, y el detalle vive en su tracker de trabajo.
+     Se conservan en pausa —visibles en Semana— en vez de borrarse. */
+  const AREA_OFICIO = "Trabajo";
+  const esTrabajo = r => r.area === AREA_OFICIO;
+  const rutinas = (g.rutinas || []).filter(r => r.frecuencia !== "mes").map(r => rutinaNueva({
+    id: r.id, texto: r.nombre, hora: r.hora || "", dias: r.dias || [], semanal: r.semanal || 0,
+    meta: r.meta || null, pausada: !!r.pausada || esTrabajo(r),
+    nivel: r.peso ? 1 : (r.semanal >= 5 ? 1 : 2)
+  }));
+  if ((g.rutinas || []).some(esTrabajo)) rutinas.unshift(rutinaNueva({
+    texto: "Tareas del día · trabajo", nivel: 1, hora: "09:00",
+    dias: [1, 2, 3, 4, 5], semanal: 5, meta: oficio ? oficio.id : null
+  }));
+  /* Las mensuales conservan su día del mes */
+  (g.rutinas || []).filter(r => r.frecuencia === "mes").forEach(r => rutinas.push(rutinaNueva({
+    id: r.id, texto: r.nombre, hora: r.hora || "", dias: [], semanal: 0, mensual: r.diaMes || 1,
+    meta: r.meta || null, nivel: 2, pausada: esTrabajo(r)
+  })));
+  /* Solo lo de los próximos días entra a la lista; lo demás queda guardado y
+     se trae cuando toque. Una lista heredada de 50 renglones no es una lista. */
+  const pronto = sumarDias(hoyISO(), 7);
+  const sueltos = (g.pendientes || []).map(p => sueltoNuevo({
+    id: p.id, texto: p.texto, creado: p.creado || p.fecha || hoyISO(),
+    hecha: !!p.hecha, hechaEl: p.hechaEl || null, nivel: 1,
+    archivada: !p.hecha && !!p.fecha && p.fecha > pronto
+  }));
+  (g.ideas || []).forEach(i => sueltos.push(sueltoNuevo({ id: i.id, texto: i.texto, nivel: 3, archivada: true })));
+  /* Las acciones de la ruta vieja entran guardadas: estaban para una
+     estructura que ya no existe. Nada se pierde, pero nada inunda el día. */
+  (g.acciones || []).filter(a => !a.hecha).forEach(a => sueltos.push(sueltoNuevo({
+    id: a.id, texto: a.texto, meta: a.metaId || null,
+    nivel: (a.compromiso && a.compromiso.con) ? 1 : 3, archivada: true
+  })));
+  (g.metas || []).forEach(m => (m.hitos || []).filter(h => !h.hecho).forEach(h => sueltos.push(sueltoNuevo({
+    id: h.id, texto: h.texto + " · " + fechaCorta(h.fecha), meta: m.id, nivel: 1, archivada: true
+  }))));
+  return {
+    v: VERSION,
+    ajustes: { nombre: (g.ajustes || {}).nombre || "", tema: (g.ajustes || {}).tema || "sistema",
+      proposito: (g.ajustes || {}).proposito || "", vista: "nivel" },
+    metas, rutinas, sueltos, dias: {}, marcas: { onboarding: true, ultimoDia: null }
+  };
+}
+
+function normalizar(e) {
+  e.ajustes = Object.assign({ nombre: "", tema: "sistema", proposito: "", vista: "nivel" }, e.ajustes || {});
+  ["metas", "rutinas", "sueltos"].forEach(k => { if (!Array.isArray(e[k])) e[k] = []; });
+  e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
+  e.marcas = Object.assign({ onboarding: false, ultimoDia: null }, e.marcas || {});
+  e.rutinas.forEach(r => { r.tipo = "rutina"; if (!Array.isArray(r.dias)) r.dias = [];
+    if (typeof r.semanal !== "number") r.semanal = 0; if (![1, 2, 3].includes(r.nivel)) r.nivel = 2;
+    if (typeof r.hora !== "string") r.hora = ""; if (r.meta && !e.metas.some(m => m.id === r.meta)) r.meta = null; });
+  e.sueltos.forEach(s => { s.tipo = "suelto"; if (![1, 2, 3].includes(s.nivel)) s.nivel = 2;
+    if (typeof s.pases !== "number") s.pases = 0; if (typeof s.hora !== "string") s.hora = "";
+    if (s.meta && !e.metas.some(m => m.id === s.meta)) s.meta = null; });
+  e.v = VERSION;
+  return e;
+}
+/* Los días viejos se borran solos: esto no es un archivo histórico */
+function podar(e) {
+  const lim = sumarDias(hoyISO(), -70);
+  Object.keys(e.dias).forEach(k => { if (k < lim) delete e.dias[k]; });
+  e.sueltos = e.sueltos.filter(s => !(s.hecha && s.hechaEl && s.hechaEl < sumarDias(hoyISO(), -14)));
+}
+
+/* ════════ 4 · LECTURAS ════════ */
+const Rg = {
+  item: id => E.rutinas.find(r => r.id === id) || E.sueltos.find(s => s.id === id) || null,
+  meta: id => E.metas.find(m => m.id === id) || null,
+  tocaRutina: (r, f) => {
+    if (r.pausada) return false;
+    if (r.mensual) return deISO(f).getDate() === r.mensual;
+    return (r.dias || []).includes(deISO(f).getDay());
+  },
+  hecha: (x, f) => x.tipo === "rutina" ? !!diaDe(f).hechas[x.id] : !!x.hecha,
+  /* LA LISTA DEL DÍA — rutinas que tocan hoy + sueltos abiertos, en una sola
+     columna, como el papel. Ordena por nivel y, dentro del nivel, por hora. */
+  lista: f => {
+    const d = diaDe(f);
+    const rs = E.rutinas.filter(r => Rg.tocaRutina(r, f) && !d.fuera.includes(r.id));
+    const ss = E.sueltos.filter(s => !s.archivada && (!s.hecha || s.hechaEl === f));
+    return rs.concat(ss).sort((a, b) =>
+      (a.nivel - b.nivel) ||
+      ((a.hora || "99:99").localeCompare(b.hora || "99:99")) ||
+      (a.tipo === b.tipo ? 0 : a.tipo === "rutina" ? -1 : 1));
+  },
+  porHora: f => {
+    const l = Rg.lista(f);
+    return FRANJAS.map(fr => ({ fr, items: l.filter(x => {
+      const h = parseInt((x.hora || "").slice(0, 2), 10);
+      if (isNaN(h)) return fr.id === "jornada";
+      return h >= fr.desde && h < fr.hasta;
+    }).sort((a, b) => (a.hora || "99:99").localeCompare(b.hora || "99:99")) })).filter(g => g.items.length);
+  },
+  /* LA SEMANA — la unidad de la rutina. La meta es el 100%; el 80% ya cuenta,
+     pero se dice en días, no en porcentaje: con 5, cuatro bastan. */
+  objetivo: r => r.semanal > 0 ? r.semanal : (r.dias || []).length,
+  basta: r => { const m = Rg.objetivo(r); return m >= 4 ? m - 1 : m; },
+  semana: (r, f) => {
+    const hoy = hoyISO(), dias = semanaDe(f);
+    const hechos = dias.map(k => ({ fecha: k, hecha: k <= hoy && !!((E.dias[k] || {}).hechas || {})[r.id],
+      toca: Rg.tocaRutina(r, k), futuro: k > hoy }));
+    const n = hechos.filter(x => x.hecha).length, obj = Rg.objetivo(r), suf = Rg.basta(r);
+    return { dias: hechos, n, obj, suf, completo: obj > 0 && n >= obj, cuenta: obj > 0 && n >= suf };
+  },
+  seguidas: () => E.rutinas.filter(r => !r.pausada && !r.mensual && Rg.objetivo(r) > 0),
+  abiertos: () => E.sueltos.filter(s => !s.hecha && !s.archivada).sort((a, b) => (b.pases - a.pases) || a.nivel - b.nivel),
+  archivados: () => E.sueltos.filter(s => !s.hecha && s.archivada),
+  /* Los que quedaron abiertos de días pasados: lo que el pase diario revisa */
+  paraPase: f => E.sueltos.filter(s => !s.hecha && !s.archivada && s.creado < f),
+  /* LA FLAMA — un estado, no una barra. No mide qué tan cerca está la meta,
+     porque eso no es contable. Mide si las acciones están pasando: arde
+     cuando las rutinas de esa meta van en cadencia, y se apaga cuando no. */
+  flama: m => {
+    const rs = E.rutinas.filter(r => r.meta === m.id && !r.pausada && Rg.objetivo(r) > 0);
+    if (!rs.length) return { estado: "sin", rs: 0, n: 0, de: 0 };
+    const f = hoyISO();
+    let n = 0, de = 0;
+    rs.forEach(r => { const s = Rg.semana(r, f); n += Math.min(s.n, s.obj); de += s.obj; });
+    const hoyIdx = (deISO(f).getDay() + 6) % 7, parte = Math.max(1, hoyIdx + 1) / 7;
+    const esperado = Math.max(1, de * parte), r2 = n / esperado;
+    return { estado: r2 >= 0.8 ? "viva" : r2 >= 0.4 ? "tibia" : "apagada", rs: rs.length, n, de };
+  },
+  cuenta: f => { const l = Rg.lista(f); return { n: l.length, hechas: l.filter(x => Rg.hecha(x, f)).length,
+    uno: l.filter(x => x.nivel === 1).length, unoHechas: l.filter(x => x.nivel === 1 && Rg.hecha(x, f)).length }; }
+};
+
+/* ════════ 5 · ACCIONES ════════ */
+const A = {
+  marcar(x, f) {
+    if (x.tipo === "rutina") { const d = diaMut(f); if (d.hechas[x.id]) delete d.hechas[x.id]; else d.hechas[x.id] = true; }
+    else { x.hecha = !x.hecha; x.hechaEl = x.hecha ? f : null; }
+  },
+  /* Tocar el número cicla 1→2→3→1 y se queda así mañana, como al reescribir */
+  nivel(x) { x.nivel = x.nivel >= 3 ? 1 : x.nivel + 1; },
+  agregar(texto, nivel) {
+    const s = sueltoNuevo({ texto: texto.trim(), nivel: nivel || 2 });
+    E.sueltos.unshift(s); return s;
+  },
+  quitar(x, f) {
+    if (x.tipo === "rutina") { const d = diaMut(f); if (!d.fuera.includes(x.id)) d.fuera.push(x.id); }
+    else x.archivada = true;
+  },
+  traer(s) { s.archivada = false; s.creado = hoyISO(); },
+  borrar(x) {
+    if (x.tipo === "rutina") E.rutinas = E.rutinas.filter(r => r.id !== x.id);
+    else E.sueltos = E.sueltos.filter(s => s.id !== x.id);
+  },
+  /* EL PASE — la versión digital de volver a escribir la nota. Lo que
+     sobrevive suma un pase; eso es lo que después delata lo que lleva
+     semanas en la lista sin hacerse. */
+  pasar(ids, f) {
+    Rg.paraPase(f).forEach(s => { if (ids.includes(s.id)) { s.pases += 1; s.creado = f; } else s.archivada = true; });
+    diaMut(f).pase = true;
+  }
+};
+
+/* ════════ 6 · VISTAS ════════ */
+const S = { tab: "hoy", hoja: null };
+
+function pintar() {
+  if (!E) return;
+  $$(".tab").forEach(t => { const on = t.dataset.tab === S.tab;
+    t.classList.toggle("activo", on); if (on) t.setAttribute("aria-current", "page"); else t.removeAttribute("aria-current"); });
+  if (S.tab === "hoy") pintarHoy(); else pintarSemana();
+  lineaDia();
+}
+/* La línea de la izquierda es la hora del día. Se siente el tiempo sin contarlo. */
+function lineaDia() {
+  const n = new Date(), p = Math.max(0, Math.min(1, (n.getHours() * 60 + n.getMinutes()) / 1440));
+  const el = $("#cauceAndado"), lz = $("#cauceLuz");
+  if (el) el.style.height = (p * 100) + "%";
+  if (lz) lz.style.top = (p * 100) + "%";
+}
+
+function fila(x, f) {
+  const hecha = Rg.hecha(x, f), m = x.meta ? Rg.meta(x.meta) : null;
+  const sub = [];
+  if (x.hora) sub.push(x.hora);
+  if (x.tipo === "rutina") { const s = Rg.semana(x, f);
+    /* En lunes, «0 de 5» en cada renglón es ruido. Antes de empezar se dice
+       cuál es la cadencia; una vez empezada, cómo va. */
+    if (s.obj > 0) sub.push(s.n ? s.n + " de " + s.obj + " esta semana" : s.obj + " por semana"); }
+  else if (x.pases > 0) sub.push(x.pases === 1 ? "1 pase" : x.pases + " pases");
+  if (m) sub.push(m.nombre);
+  return `<li class="it${hecha ? " hecha" : ""}${x.tipo === "rutina" ? " rut" : ""}">` +
+    `<button class="it-n n${x.nivel}" data-accion="nivel" data-id="${x.id}" aria-label="Nivel ${x.nivel} de ${esc(x.texto)}. Tocar para cambiar.">${x.nivel}</button>` +
+    `<button class="it-t" data-accion="marcar" data-id="${x.id}" aria-pressed="${hecha}">` +
+      `<span class="it-x">${esc(x.texto)}</span>` +
+      (sub.length ? `<span class="it-s">${esc(sub.join(" · "))}</span>` : "") + `</button>` +
+    `<button class="it-mas" data-accion="ver-item" data-id="${x.id}" aria-label="Opciones de ${esc(x.texto)}">⋯</button></li>`;
+}
+
+function pintarHoy() {
+  const f = hoyISO(), c = Rg.cuenta(f), vista = E.ajustes.vista === "hora" ? "hora" : "nivel";
+  let h = `<header class="cab"><div><h1 class="dia" tabindex="-1">${esc(fechaLarga(f))}</h1>` +
+    `<p class="dia-s">${c.n ? c.hechas + " de " + c.n + (c.uno ? " · nivel 1: " + c.unoHechas + " de " + c.uno : "") : "La lista está vacía."}</p></div>` +
+    `<button class="icono" data-accion="ajustes" aria-label="Ajustes">${ICO.ajustes}</button></header>`;
+
+  h += `<div class="segmento vista"><button class="seg${vista === "nivel" ? " activo" : ""}" data-accion="vista" data-v="nivel">Prioridad</button>` +
+    `<button class="seg${vista === "hora" ? " activo" : ""}" data-accion="vista" data-v="hora">Horario</button></div>`;
+
+  if (vista === "nivel") {
+    const l = Rg.lista(f);
+    h += `<ul class="nota">${l.map(x => fila(x, f)).join("") ||
+      `<li class="nota-vacia">Nada todavía. Escribe el primer renglón.</li>`}</ul>`;
+  } else {
+    const g = Rg.porHora(f);
+    h += g.map(({ fr, items }) => `<p class="franja">${esc(fr.nombre)} <span>${fr.desde}:00–${fr.hasta === 24 ? "24" : fr.hasta}:00</span></p>` +
+      `<ul class="nota">${items.map(x => fila(x, f)).join("")}</ul>`).join("") ||
+      `<ul class="nota"><li class="nota-vacia">Nada todavía.</li></ul>`;
+  }
+
+  h += `<div class="agregar"><button class="agregar-mas" data-accion="enviar" aria-label="Agregar">${ICO.mas}</button>` +
+    `<input id="nuevo" data-enter="nuevo" placeholder="Agregar renglón…" enterkeyhint="done" autocomplete="off" aria-label="Agregar renglón"></div>`;
+
+  if (Rg.lista(f).length > TOPE) h += `<p class="aviso-tope">Son ${Rg.lista(f).length} renglones. En papel cabían nueve. Baja a nivel 3 lo que no sea de hoy.</p>`;
+
+  const ab = Rg.abiertos().filter(s => s.pases >= 3);
+  if (ab.length) h += `<p class="senal">${esc(ab[0].texto)} lleva ${ab[0].pases} pases sin hacerse. O es más chico de lo que parece, o no es de nivel ${ab[0].nivel}.</p>`;
+
+  $("#vista").innerHTML = h;
+}
+
+function pintarSemana() {
+  const f = hoyISO(), seg = Rg.seguidas(), ab = Rg.abiertos(), ar = Rg.archivados();
+  let h = `<header class="cab"><div><h1 class="dia" tabindex="-1">Semana</h1>` +
+    `<p class="dia-s">Del ${esc(fechaCorta(lunesDe(f)))} al ${esc(fechaCorta(sumarDias(lunesDe(f), 6)))}. La meta es la semana completa; con uno menos ya cuenta.</p></div></header>`;
+
+  if (E.metas.length) h += `<div class="metas">${E.metas.map(m => { const fl = Rg.flama(m);
+    return `<button class="meta-c ${fl.estado}" data-accion="ver-meta" data-id="${m.id}">` +
+      `<span class="meta-fl" aria-hidden="true">${ICO.llama}</span>` +
+      `<span class="meta-n">${esc(m.nombre)}</span>` +
+      `<span class="meta-s">${fl.estado === "sin" ? "sin rutinas" : fl.estado === "viva" ? "va en cadencia"
+        : fl.estado === "tibia" ? "va a medias" : fl.n ? "va atrás" : "sin movimiento"}</span></button>`; }).join("")}</div>`;
+
+  h += `<section class="sec"><h2 class="sec-t">Rutina</h2>`;
+  h += seg.length ? `<ul class="cad">${seg.map(r => { const s = Rg.semana(r, f);
+    return `<li class="cad-f${s.completo ? " completo" : s.cuenta ? " cuenta" : ""}">` +
+      `<button class="cad-b" data-accion="ver-item" data-id="${r.id}">` +
+      `<span class="cad-n">${esc(r.texto)}</span>` +
+      `<span class="cad-d" aria-hidden="true">${s.dias.map((d, i) => `<span class="d${d.hecha ? " on" : ""}${d.futuro ? " fut" : ""}${d.toca ? "" : " no"}">${LETRAS[(i + 1) % 7]}</span>`).join("")}</span>` +
+      `</button><span class="cad-c">${s.n} de ${s.obj}</span></li>`; }).join("")}</ul>`
+    : `<p class="vacio">Ninguna rutina lleva cadencia semanal todavía.</p>`;
+  h += `</section>`;
+
+  h += `<section class="sec"><div class="sec-cab"><h2 class="sec-t">Pendientes abiertos</h2><span class="cuenta">${ab.length}</span></div>` +
+    `<p class="sec-s">Ordenados por cuántos pases llevan. Lo de arriba es lo que más veces ha reescrito sin hacer.</p>`;
+  h += ab.length ? `<ul class="nota">${ab.map(s => `<li class="it"><span class="it-n n${s.nivel}">${s.nivel}</span>` +
+    `<button class="it-t" data-accion="ver-item" data-id="${s.id}"><span class="it-x">${esc(s.texto)}</span>` +
+    `<span class="it-s">${s.pases ? (s.pases === 1 ? "1 pase" : s.pases + " pases") : "nuevo"}${s.meta ? " · " + esc((Rg.meta(s.meta) || {}).nombre) : ""}</span></button></li>`).join("")}</ul>`
+    : `<p class="vacio">Nada abierto.</p>`;
+  h += `</section>`;
+
+  if (ar.length) h += `<details class="plegable"><summary><h2 class="sec-t">Guardado (${ar.length})</h2><span class="mas">+</span></summary>` +
+    `<p class="sec-s">Fuera de la lista del día, no borrado. Tráelo cuando toque.</p><ul class="nota">` +
+    ar.map(s => `<li class="it"><span class="it-n n${s.nivel}">${s.nivel}</span>` +
+      `<button class="it-t" data-accion="traer" data-id="${s.id}"><span class="it-x">${esc(s.texto)}</span><span class="it-s">traer al día</span></button></li>`).join("") +
+    `</ul></details>`;
+
+  $("#vista").innerHTML = h;
+}
+
+/* ════════ 7 · HOJAS ════════ */
+function hoja(tit, sub, cuerpo) {
+  $("#hojas").innerHTML = `<div class="velo" data-accion="cerrar-hoja"></div><div class="hoja" role="dialog" aria-modal="true" aria-labelledby="hojaTit">` +
+    `<div class="asa" aria-hidden="true"></div><h2 class="hoja-t" id="hojaTit" tabindex="-1">${tit}</h2>` +
+    (sub ? `<p class="hoja-s">${sub}</p>` : "") + cuerpo + `</div>`;
+  $("#appShell").setAttribute("inert", "");
+  setTimeout(() => { const t = $("#hojas [data-autofoco]") || $("#hojaTit"); if (t) try { t.focus({ preventScroll: true }); } catch (e) {} }, 50);
+}
+function cerrarHoja() { $("#hojas").innerHTML = ""; $("#appShell").removeAttribute("inert"); }
+const campo = (id, et, val, ph, tipo) => `<label class="campo"><span class="campo-et">${esc(et)}</span>` +
+  `<input id="${id}" class="campo-i" type="${tipo || "text"}" value="${esc(val || "")}" placeholder="${esc(ph || "")}"></label>`;
+const btn = (t, a, id, cl) => `<button class="accion${cl ? " " + cl : ""}" data-accion="${a}"${id ? ` data-id="${id}"` : ""}>${t}</button>`;
+const dos = (a, b) => `<div class="acciones">${a}${b || ""}</div>`;
+const val = id => { const e = document.getElementById(id); return e ? e.value.trim() : ""; };
+
+function hojaItem(id) {
+  const x = Rg.item(id); if (!x) return;
+  const esRut = x.tipo === "rutina";
+  const metas = [["", "Ninguna"]].concat(E.metas.map(m => [m.id, m.nombre]));
+  hoja(esc(x.texto) || "Renglón",
+    esRut ? "Se repite con cadencia. La semana es su unidad: la meta es completa, y con uno menos ya cuenta."
+      : "Pasa una vez. Cada pase que sobrevive queda contado.",
+    campo("iTxt", "Qué es", x.texto, "") +
+    `<p class="campo-et">Nivel</p><div class="chips">${[1, 2, 3].map(n =>
+      `<button class="chip${x.nivel === n ? " on" : ""}" data-accion="set-nivel" data-id="${x.id}" data-v="${n}">${n}</button>`).join("")}</div>` +
+    campo("iHora", "Hora (opcional)", x.hora, "", "time") +
+    (esRut ? `<p class="campo-et">Días</p><div class="dias">${[1, 2, 3, 4, 5, 6, 0].map(d =>
+        `<button class="dia-b${(x.dias || []).includes(d) ? " on" : ""}" data-accion="set-dia" data-id="${x.id}" data-v="${d}" aria-pressed="${(x.dias || []).includes(d)}" aria-label="${DIAS_NOM[d]}">${LETRAS[d]}</button>`).join("")}</div>` +
+      `<label class="campo"><span class="campo-et">¿Cuántas veces por semana quieres?</span>` +
+      `<select id="iSem" class="campo-i">${[0, 1, 2, 3, 4, 5, 6, 7].map(n =>
+        `<option value="${n}"${x.semanal === n ? " selected" : ""}>${n ? n + (n === 1 ? " vez" : " veces") : "Las que estén programadas"}</option>`).join("")}</select></label>` +
+      `<p class="campo-ayuda">Con 4 o más, saltarte una sigue contando. Pero la semana completa es la meta.</p>` : "") +
+    `<label class="campo"><span class="campo-et">Alimenta</span><select id="iMeta" class="campo-i">` +
+      metas.map(m => `<option value="${m[0]}"${(x.meta || "") === m[0] ? " selected" : ""}>${esc(m[1])}</option>`).join("") + `</select></label>` +
+    dos(btn("Cancelar", "cerrar-hoja"), btn("Guardar", "guardar-item", x.id, "llena")) +
+    `<div class="hoja-pie">` +
+      (esRut ? btn(x.pausada ? "Reactivar" : "Pausar", "pausar", x.id, "leve")
+             : btn("Guardar para después", "archivar", x.id, "leve")) +
+      btn("Eliminar", "borrar-item", x.id, "leve") + `</div>`);
+}
+
+function hojaMeta(id) {
+  const m = Rg.meta(id); if (!m) return;
+  const rs = E.rutinas.filter(r => r.meta === m.id);
+  const fl = Rg.flama(m);
+  hoja(esc(m.nombre),
+    "La flama no mide qué tan cerca está la meta: eso no es contable. Mide si las acciones están pasando.",
+    `<div class="meta-grande ${fl.estado}"><span aria-hidden="true">${ICO.llama}</span><p>${
+      fl.estado === "sin" ? "Ninguna rutina alimenta esta meta. Mientras no haya acciones recurrentes, no hay nada que seguir."
+      : fl.estado === "viva" ? "Va en cadencia esta semana."
+      : fl.estado === "tibia" ? "Va a medias esta semana."
+      : fl.n ? "Va atrás de la cadencia de esta semana." : "Esta semana no se ha movido."}</p></div>` +
+    campo("mNom", "Nombre", m.nombre, "") +
+    `<p class="campo-et">Lo que la alimenta</p>` +
+    (rs.length ? `<ul class="nota">${rs.map(r => { const s = Rg.semana(r, hoyISO());
+      return `<li class="it"><span class="it-n n${r.nivel}">${r.nivel}</span><button class="it-t" data-accion="ver-item" data-id="${r.id}">` +
+        `<span class="it-x">${esc(r.texto)}</span><span class="it-s">${s.obj ? s.n + " de " + s.obj + " esta semana" : "sin cadencia"}</span></button></li>`; }).join("")}</ul>`
+      : `<p class="vacio">Nada todavía. Abre un renglón de la lista y ponle esta meta en «Alimenta».</p>`) +
+    dos(btn("Cerrar", "cerrar-hoja"), btn("Guardar", "guardar-meta", m.id, "llena")) +
+    `<div class="hoja-pie">${btn("Eliminar meta", "borrar-meta", m.id, "leve")}</div>`);
+}
+
+function hojaAjustes() {
+  hoja("Ajustes", "",
+    campo("aNom", "Tu nombre", E.ajustes.nombre, "") +
+    `<label class="campo"><span class="campo-et">Propósito · ¿para qué?</span>` +
+    `<textarea id="aProp" class="campo-i campo-area" rows="3" placeholder="No es una meta. Se relee.">${esc(E.ajustes.proposito)}</textarea></label>` +
+    `<p class="campo-et">Tema</p><div class="chips">${[["sistema", "Sistema"], ["claro", "Claro"], ["oscuro", "Oscuro"]].map(t =>
+      `<button class="chip${E.ajustes.tema === t[0] ? " on" : ""}" data-accion="tema" data-v="${t[0]}">${t[1]}</button>`).join("")}</div>` +
+    `<p class="campo-et">Metas</p><div class="lista-min">${E.metas.map(m =>
+      `<button class="fila-min" data-accion="ver-meta" data-id="${m.id}">${esc(m.nombre)}</button>`).join("")}` +
+    `<button class="fila-min nueva" data-accion="nueva-meta">+ Nueva meta</button></div>` +
+    `<p class="campo-et">Datos</p><div class="lista-min">` +
+    `<button class="fila-min" data-accion="exportar">Exportar</button>` +
+    `<button class="fila-min" data-accion="importar">Importar</button></div>` +
+    dos("", btn("Listo", "guardar-ajustes", "", "llena")));
+}
+
+function hojaExportar() {
+  hoja("Exportar", "Cópialo y guárdalo donde quieras. Son tus datos; no salen de aquí solos.",
+    `<textarea class="campo-i campo-area mono" id="expJson" rows="8" readonly>${esc(JSON.stringify(E))}</textarea>` +
+    dos(btn("Cerrar", "cerrar-hoja"), btn("Copiar", "copiar-export", "", "llena")));
+}
+function hojaImportar() {
+  hoja("Importar", "Pega lo que exportaste. Reemplaza lo que haya aquí.",
+    `<textarea class="campo-i campo-area mono" id="impJson" rows="8" placeholder="{...}"></textarea>` +
+    `<p class="paso-err" id="hojaErr" role="alert"></p>` +
+    dos(btn("Cancelar", "cerrar-hoja"), btn("Importar", "confirmar-importar", "", "llena")));
+}
+
+/* ════════ 8 · EL PASE DIARIO ════════
+   Reemplaza el arrastre automático. En papel, lo que sobrevive se vuelve a
+   escribir — y esa fricción es el filtro: lo que no vale la pena reescribir,
+   no valía la pena. Aquí son dos toques por renglón, no una pluma, pero la
+   decisión es la misma y queda contada.                                      */
+function abrirPase() {
+  const f = hoyISO(), ps = Rg.paraPase(f);
+  if (!ps.length) { diaMut(f).pase = true; guardar(); return; }
+  S.pase = ps.map(s => s.id);
+  pintarPase();
+}
+function pintarPase() {
+  const f = hoyISO(), ps = Rg.paraPase(f);
+  const cuerpo = `<div class="pase-l">${ps.map(s => {
+    const on = S.pase.includes(s.id);
+    return `<button class="pase-i${on ? " on" : ""}" data-accion="pase-toggle" data-id="${s.id}" aria-pressed="${on}">` +
+      `<span class="pase-c" aria-hidden="true">${ICO.check}</span>` +
+      `<span class="pase-x"><span class="pase-t">${esc(s.texto)}</span>` +
+      `<span class="pase-s">${s.pases ? (s.pases === 1 ? "lo has pasado 1 vez" : "lo has pasado " + s.pases + " veces") : "de ayer"}</span></span></button>`;
+  }).join("")}</div>`;
+  $("#flujoCont").innerHTML = `<h1 class="paso-t">Lo que quedó abierto</h1>` +
+    `<p class="paso-s">Marca lo que sigue hoy. Lo que no, se guarda — no se borra.</p>` + cuerpo +
+    `<div class="paso-acc"><button class="accion llena" data-accion="pase-ok">Escribir la lista</button></div>`;
+  $("#flujo").classList.remove("oculto");
+  $("#appShell").setAttribute("inert", "");
+}
+function cerrarPase() { $("#flujo").classList.add("oculto"); $("#appShell").removeAttribute("inert"); }
+
+/* ════════ 9 · MANEJADORES ════════ */
+let guardarT = null;
+function guardar() { clearTimeout(guardarT); guardarT = setTimeout(() => Guardado.escribir(CLAVE, E), 200); }
+function cambiar(fn) { fn(); guardar(); pintar(); }
+function nota(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(nota.t); nota.t = setTimeout(() => t.classList.remove("on"), 2400); }
+function aplicarTema() {
+  const t = E.ajustes.tema;
+  const osc = t === "oscuro" || (t === "sistema" && matchMedia("(prefers-color-scheme:dark)").matches);
+  document.documentElement.dataset.modo = osc ? "oscuro" : "claro";
+  const mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute("content", osc ? "#0E0D0C" : "#FAF8F3");
+}
+
+const ACC = {
+  "tab": d => { S.tab = d.tab; pintar(); },
+  "vista": d => cambiar(() => { E.ajustes.vista = d.v; }),
+  "marcar": d => { const x = Rg.item(d.id); if (!x) return; const f = hoyISO();
+    const antes = Rg.cuenta(f);
+    cambiar(() => A.marcar(x, f));
+    const desp = Rg.cuenta(f);
+    if (antes.unoHechas < desp.unoHechas && desp.uno && desp.unoHechas === desp.uno) nota("Los de nivel 1, hechos. Lo demás es extra.");
+    else if (x.tipo === "rutina" && Rg.hecha(x, f)) { const s = Rg.semana(x, f);
+      if (s.obj && s.n === s.obj) nota(x.texto + ": semana completa.");
+      else if (s.obj && s.n === s.suf && s.suf < s.obj) nota(x.texto + ": " + s.n + " de " + s.obj + ". Ya cuenta; la completa sigue ahí."); } },
+  "nivel": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => A.nivel(x)); },
+  "set-nivel": (d, b) => { const x = Rg.item(d.id); if (!x) return; x.nivel = +d.v; guardar();
+    Array.from(b.parentNode.children).forEach(c => c.classList.toggle("on", c === b)); },
+  "set-dia": (d, b) => { const x = Rg.item(d.id); if (!x) return; const v = +d.v, i = x.dias.indexOf(v);
+    if (i >= 0) x.dias.splice(i, 1); else x.dias.push(v);
+    b.classList.toggle("on"); b.setAttribute("aria-pressed", x.dias.includes(v)); guardar(); },
+  "ver-item": d => hojaItem(d.id),
+  "guardar-item": d => { const x = Rg.item(d.id); if (!x) return;
+    cambiar(() => { x.texto = val("iTxt") || x.texto; x.hora = val("iHora");
+      const sm = document.getElementById("iSem"); if (sm) x.semanal = +sm.value;
+      const mt = document.getElementById("iMeta"); if (mt) x.meta = mt.value || null; });
+    cerrarHoja(); nota("Guardado."); },
+  "pausar": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => { x.pausada = !x.pausada; });
+    cerrarHoja(); nota(x.pausada ? "En pausa." : "De vuelta."); },
+  "archivar": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => { x.archivada = true; });
+    cerrarHoja(); nota("Guardado para después. Está en Semana."); },
+  "traer": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => A.traer(x)); nota("De vuelta en la lista de hoy."); },
+  "borrar-item": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => A.borrar(x)); cerrarHoja(); nota("Eliminado."); },
+  "ver-meta": d => hojaMeta(d.id),
+  "nueva-meta": () => { const m = { id: uid(), nombre: "Nueva meta", lane: "oficio" }; E.metas.push(m); guardar(); hojaMeta(m.id); },
+  "guardar-meta": d => { const m = Rg.meta(d.id); if (!m) return; cambiar(() => { m.nombre = val("mNom") || m.nombre; });
+    cerrarHoja(); nota("Meta guardada."); },
+  "borrar-meta": d => { cambiar(() => { E.metas = E.metas.filter(m => m.id !== d.id);
+    E.rutinas.forEach(r => { if (r.meta === d.id) r.meta = null; });
+    E.sueltos.forEach(s => { if (s.meta === d.id) s.meta = null; }); }); cerrarHoja(); nota("Meta eliminada."); },
+  "ajustes": () => hojaAjustes(),
+  "tema": (d, b) => { E.ajustes.tema = d.v; aplicarTema(); guardar();
+    Array.from(b.parentNode.children).forEach(c => c.classList.toggle("on", c === b)); },
+  "guardar-ajustes": () => { cambiar(() => { E.ajustes.nombre = val("aNom");
+    const p = document.getElementById("aProp"); if (p) E.ajustes.proposito = p.value.trim(); }); cerrarHoja(); },
+  "exportar": () => hojaExportar(),
+  "importar": () => hojaImportar(),
+  "copiar-export": () => { const t = document.getElementById("expJson"); if (!t) return;
+    t.select(); try { document.execCommand("copy"); nota("Copiado."); } catch (e) { nota("Selecciónalo y copia."); } },
+  "confirmar-importar": () => { const t = document.getElementById("impJson"), er = document.getElementById("hojaErr");
+    try { const g = JSON.parse(t.value);
+      const nuevo = (+g.v >= 8) ? g : desdeViejo(g);
+      E = normalizar(nuevo); podar(E); Guardado.escribir(CLAVE, E); cerrarHoja(); aplicarTema(); pintar(); nota("Importado.");
+    } catch (e) { if (er) er.textContent = "No se pudo leer. Revisa que esté completo."; } },
+  "cerrar-hoja": () => cerrarHoja(),
+  "enviar": () => { const el = document.getElementById("nuevo"); if (el) alEnter(el); },
+  "fab": () => { S.tab = "hoy"; pintar(); setTimeout(() => { const el = document.getElementById("nuevo"); if (el) el.focus(); }, 60); },
+  "pase-toggle": (d, b) => { const i = S.pase.indexOf(d.id);
+    if (i >= 0) S.pase.splice(i, 1); else S.pase.push(d.id);
+    b.classList.toggle("on"); b.setAttribute("aria-pressed", S.pase.includes(d.id)); },
+  "pase-ok": () => { cambiar(() => A.pasar(S.pase, hoyISO())); cerrarPase();
+    const n = S.pase.length; nota(n ? "Tu lista de hoy: " + Rg.lista(hoyISO()).length + " renglones." : "Lista limpia."); }
+};
+const ENTER = {
+  "nuevo": t => { const v = t.value.trim(); if (!v) return;
+    cambiar(() => A.agregar(v)); t.value = "";
+    setTimeout(() => { const el = document.getElementById("nuevo"); if (el) el.focus(); }, 40); }
+};
+function alEnter(t) { if (!t || !t.dataset.enter) return; const fn = ENTER[t.dataset.enter]; if (fn) fn(t); }
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-accion]");
+  if (!b) return;
+  const fn = ACC[b.dataset.accion];
+  if (fn) { e.preventDefault(); fn(b.dataset, b, e); }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey && e.target && e.target.dataset && e.target.dataset.enter) { e.preventDefault(); alEnter(e.target); }
+  if (e.key === "Escape") { if ($("#hojas").innerHTML) cerrarHoja(); }
+});
+try { matchMedia("(prefers-color-scheme:dark)").addEventListener("change", () => { if (E && E.ajustes.tema === "sistema") aplicarTema(); }); } catch (e) {}
+setInterval(lineaDia, 60000);
+
+/* ════════ 10 · SEMILLA ════════ */
+function semilla() {
+  const oficio = { id: uid(), nombre: "Mi oficio", lane: "oficio" };
+  const pasion = { id: uid(), nombre: "Mi pasión", lane: "pasion" };
+  const r = (texto, o) => rutinaNueva(Object.assign({ texto }, o));
+  return normalizar({
+    v: VERSION,
+    ajustes: { nombre: "", tema: "sistema", proposito: "", vista: "nivel" },
+    metas: [oficio, pasion],
+    rutinas: [
+      /* El trabajo es UN renglón: el detalle vive donde ya lo llevas */
+      r("Tareas del día · trabajo", { nivel: 1, hora: "09:00", dias: [1, 2, 3, 4, 5], semanal: 5, meta: oficio.id }),
+      r("Ejercicio", { nivel: 1, hora: "06:30", dias: [1, 2, 3, 4, 5], semanal: 5 }),
+      r("Silencio, oración o meditación", { nivel: 2, hora: "07:15", dias: [1, 2, 3, 4, 5, 6, 0], semanal: 7 }),
+      r("Sesión de mi pasión", { nivel: 2, hora: "19:30", dias: [2, 4, 6], semanal: 3, meta: pasion.id }),
+      r("Revisar mis finanzas", { nivel: 3, hora: "21:00", dias: [1], semanal: 1 })
+    ],
+    sueltos: [
+      sueltoNuevo({ texto: "Escribe aquí lo primero que tengas pendiente", nivel: 1 })
+    ],
+    dias: {}, marcas: { onboarding: true, ultimoDia: null }
+  });
+}
+
+/* ════════ 11 · ARRANQUE ════════ */
+async function arrancar() {
+  let g = await Guardado.leer(CLAVE);
+  if (!g) {
+    for (const k of VIEJAS) { const v = await Guardado.leer(k); if (v && Array.isArray(v.metas)) { g = desdeViejo(v); break; } }
+  }
+  if (!g) g = semilla();
+  E = normalizar(g); podar(E); aplicarTema(); pintar();
+  const f = hoyISO();
+  if (E.marcas.ultimoDia !== f) { E.marcas.ultimoDia = f; guardar(); if (!diaDe(f).pase) abrirPase(); }
+}
+arrancar();
+
+</script>
+</body>
+</html>
