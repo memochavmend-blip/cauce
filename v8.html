@@ -318,6 +318,42 @@ html[data-modo="oscuro"] .rt.hecha .rt-c{color:#1a1612}
 /* Un renglón de rutina que ya está en la nota se marca de los dos lados */
 .it.rut .it-s{color:var(--oro)}
 
+/* ── Las partes de una actividad, desplegadas en su sitio ── */
+.rt-ch{flex:0 0 auto;width:34px;height:34px;display:grid;place-items:center;border-radius:9px;
+  color:var(--tinta-tenue);transition:color .18s ease,background .18s ease,transform .22s ease}
+.rt-ch svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rt-ch:hover{color:var(--tinta);background:var(--panel)}
+.rt-ch.on{transform:rotate(180deg);color:var(--oro)}
+.rt-ch.vacio{pointer-events:none}
+.partes{padding:2px 0 12px 33px;border-bottom:1px solid var(--linea)}
+.pl{list-style:none;margin:0;padding:0}
+.pa{display:flex;align-items:center;gap:4px}
+.pa-t{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:9px;padding:9px 0}
+.pa-c{flex:0 0 auto;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;
+  box-shadow:inset 0 0 0 1.4px var(--linea-fuerte);color:transparent}
+.pa-c svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.pa.hecha .pa-c{background:var(--oro);box-shadow:none;color:#fff}
+html[data-modo="oscuro"] .pa.hecha .pa-c{color:#1a1612}
+.pa-x{flex:1 1 auto;min-width:0;font-size:13.5px;line-height:1.3;position:relative}
+.pa.hecha .pa-x{color:var(--tinta-tenue);text-decoration:line-through;text-decoration-thickness:1px}
+/* El peso de cada parte: presente, en segundo plano, alineado en columna */
+.pa-p{flex:0 0 auto;font-family:var(--mono);font-size:10.5px;color:var(--tinta-baja);
+  font-variant-numeric:tabular-nums;padding-left:8px}
+.pa.hecha .pa-p{color:var(--oro)}
+.pa-m{flex:0 0 auto;display:flex;gap:1px}
+.mover{width:26px;height:26px;display:grid;place-items:center;border-radius:7px;color:var(--tinta-tenue)}
+.mover svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mover:hover{color:var(--tinta);background:var(--panel)}
+.mover.x{font-size:12px}
+.agregar.chico{padding:2px 0 0;border-bottom:0}
+.agregar.chico input{padding:9px 0;font-size:13.5px}
+.agregar.chico .agregar-mas{width:18px;height:18px}
+.agregar.chico .agregar-mas svg{width:11px;height:11px}
+.nota-pie{margin:12px 0 0}
+.enlace{font-size:13px;color:var(--tinta-baja);text-decoration:underline;text-underline-offset:3px;
+  text-decoration-color:var(--linea-fuerte)}
+.enlace:hover{color:var(--tinta)}
+
 </style>
 </head>
 <body>
@@ -327,6 +363,7 @@ html[data-modo="oscuro"] .rt.hecha .rt-c{color:#1a1612}
   <nav class="tabbar" aria-label="Secciones">
     <button class="tab activo" data-accion="tab" data-tab="hoy" aria-current="page"><span class="tab-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg></span><span class="tab-lb">Hoy</span></button>
     <button class="tab" data-accion="tab" data-tab="semana"><span class="tab-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/></svg></span><span class="tab-lb">Semana</span></button>
+    <button class="tab" data-accion="tab" data-tab="hecho"><span class="tab-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 7L10 17l-5-5"/></svg></span><span class="tab-lb">Hecho</span></button>
   </nav>
 </div>
 <div class="onb oculto" id="flujo" role="dialog" aria-modal="true" aria-label="El pase del día">
@@ -387,8 +424,9 @@ const ICO = {
   mas: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   ajustes: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>',
   llama: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6c2.6 3.1 5.6 5.4 5.6 9.5a5.6 5.6 0 0 1-11.2 0c0-2 .9-3.4 2.1-4.9.5 1 1.1 1.7 1.9 2.1-.3-2.5.2-4.6 1.6-6.7z"/></svg>',
-  /* La flecha que sube un renglón de la rutina a la nota: el puente */
-  arriba: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V6"/><path d="M6 12l6-6 6 6"/></svg>'
+  /* Subir o bajar una parte cambia su peso; el galón las abre en su sitio */
+  arriba: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>',
+  abajo: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
 };
 
 /* ════════ 2 · GUARDADO ════════ */
@@ -422,14 +460,14 @@ let E = null;
    El nivel (1, 2, 3) vive en el ítem: tocarlo hoy lo deja así mañana,
    igual que al reescribir la nota a mano.                                */
 function rutinaNueva(o) {
-  return Object.assign({ id: uid(), tipo: "rutina", texto: "", nivel: 2, hora: "",
-    dias: [1, 2, 3, 4, 5], semanal: 0, meta: null, pausada: false }, o || {});
+  return Object.assign({ id: uid(), tipo: "rutina", texto: "", nivel: 2, hora: "", area: "",
+    dias: [1, 2, 3, 4, 5], semanal: 0, meta: null, pausada: false, pasos: [] }, o || {});
 }
 function sueltoNuevo(o) {
   return Object.assign({ id: uid(), tipo: "suelto", texto: "", nivel: 2, hora: "",
     meta: null, creado: hoyISO(), pases: 0, hecha: false, hechaEl: null, archivada: false }, o || {});
 }
-function diaVacio() { return { hechas: {}, fuera: [], nota: [], pase: false }; }
+function diaVacio() { return { hechas: {}, fuera: [], sub: {}, pase: false }; }
 function diaDe(f) { return Object.assign(diaVacio(), E.dias[f] || {}); }
 function diaMut(f) { const d = E.dias[f] = Object.assign(diaVacio(), E.dias[f] || {}); return d; }
 
@@ -452,7 +490,8 @@ function desdeViejo(g) {
   const AREA_OFICIO = "Trabajo";
   const esTrabajo = r => r.area === AREA_OFICIO;
   const rutinas = (g.rutinas || []).filter(r => r.frecuencia !== "mes").map(r => rutinaNueva({
-    id: r.id, texto: r.nombre, hora: r.hora || "", dias: r.dias || [], semanal: r.semanal || 0,
+    id: r.id, texto: r.nombre, hora: r.hora || "", area: r.area || "", dias: r.dias || [],
+    semanal: r.semanal || 0, pasos: (r.pasos || []).slice(),
     meta: r.meta || null, pausada: !!r.pausada || esTrabajo(r),
     nivel: r.peso ? 1 : (r.semanal >= 5 ? 1 : 2)
   }));
@@ -462,7 +501,8 @@ function desdeViejo(g) {
   }));
   /* Las mensuales conservan su día del mes */
   (g.rutinas || []).filter(r => r.frecuencia === "mes").forEach(r => rutinas.push(rutinaNueva({
-    id: r.id, texto: r.nombre, hora: r.hora || "", dias: [], semanal: 0, mensual: r.diaMes || 1,
+    id: r.id, texto: r.nombre, hora: r.hora || "", area: r.area || "", dias: [], semanal: 0,
+    mensual: r.diaMes || 1, pasos: (r.pasos || []).slice(),
     meta: r.meta || null, nivel: 2, pausada: esTrabajo(r)
   })));
   /* Solo lo de los próximos días entra a la lista; lo demás queda guardado y
@@ -497,6 +537,7 @@ function normalizar(e) {
   e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
   e.marcas = Object.assign({ onboarding: false, ultimoDia: null }, e.marcas || {});
   e.rutinas.forEach(r => { r.tipo = "rutina"; if (!Array.isArray(r.dias)) r.dias = [];
+    if (!Array.isArray(r.pasos)) r.pasos = []; if (typeof r.area !== "string") r.area = "";
     if (typeof r.semanal !== "number") r.semanal = 0; if (![1, 2, 3].includes(r.nivel)) r.nivel = 2;
     if (typeof r.hora !== "string") r.hora = ""; if (r.meta && !e.metas.some(m => m.id === r.meta)) r.meta = null; });
   e.sueltos.forEach(s => { s.tipo = "suelto"; if (![1, 2, 3].includes(s.nivel)) s.nivel = 2;
@@ -533,21 +574,31 @@ const Rg = {
       ((a.hora || "99:99").localeCompare(b.hora || "99:99")) ||
       (a.tipo === b.tipo ? 0 : a.tipo === "rutina" ? -1 : 1));
   },
-  /* ── LAS DOS MITADES DEL DÍA ──
-     No son dos vistas de lo mismo, y por eso no van detrás de un interruptor.
-     · LA NOTA  — lo que decidí que importa hoy. Es el papel: 3×3, se reescribe,
-       y cabe en un post-it. Lo que la app no puede hacer mejor que una pluma.
-     · TU DÍA   — la rutina en el orden en que ocurre, con su cadencia a la
-       vista. Esto sí lo hace mejor la app: el papel no lleva la semana.
-     Se tocan: cualquier renglón de Tu día sube a la nota con un toque, y
-     marcarlo en un lado lo marca en el otro, porque es el mismo renglón.     */
-  enNota: (x, f) => x.tipo === "suelto" || (diaDe(f).nota || []).includes(x.id),
-  nota: f => {
-    const d = diaDe(f);
-    const rs = E.rutinas.filter(r => (d.nota || []).includes(r.id) && Rg.tocaRutina(r, f) && !d.fuera.includes(r.id));
-    const ss = E.sueltos.filter(s => !s.archivada && (!s.hecha || s.hechaEl === f));
-    return rs.concat(ss).sort((a, b) => (a.nivel - b.nivel) ||
-      ((a.hora || "99:99").localeCompare(b.hora || "99:99")));
+  /* ── DOS COSAS SEPARADAS, UNA DEBAJO DE LA OTRA ──
+     · TU DÍA      — la rutina por franjas, con sus partes. Son las obligaciones:
+       lo que hay que hacer para que las metas avancen. Se repite.
+     · PENDIENTES  — el 3×3. Pasa una vez, y no tiene por qué llevar a una meta.
+     No se mezclan: una rutina nunca aparece entre los pendientes ni al revés.
+     Lo hecho sale de aquí y se va al repositorio, en su propio apartado.      */
+  pendientes: f => E.sueltos.filter(s => !s.archivada && !s.hecha)
+    .sort((a, b) => (a.nivel - b.nivel) || (a.creado || "").localeCompare(b.creado || "")),
+  /* ── Las partes de una actividad ──
+     El orden es el peso: la primera pesa más (n − i). Con cinco partes los
+     pesos son 5·4·3·2·1 y las tres de arriba ya valen el 80%. Eso es lo que
+     hace que exista un 20% que soltar; con pesos iguales, soltar una de
+     cuatro sería el 25% y no habría holgura ninguna. */
+  sub: (r, d) => (d.sub && d.sub[r.id]) ? d.sub[r.id] : (r.pasos || []).map(t => ({ t, h: false })),
+  pesoSub: (i, n) => n - i,
+  totalSub: n => n * (n + 1) / 2,
+  pctSub: (i, n) => n ? Math.round((n - i) * 100 / Rg.totalSub(n)) : 0,
+  bastanSub: n => { const t = Rg.totalSub(n); let a = 0;
+    for (let k = 0; k < n; k++) { a += Rg.pesoSub(k, n); if (a * 5 >= t * 4) return k + 1; } return n; },
+  estadoSub: (r, d) => {
+    const sub = Rg.sub(r, d), n = sub.length, total = Rg.totalSub(n);
+    const peso = sub.reduce((a, x, i) => a + (x.h ? Rg.pesoSub(i, n) : 0), 0);
+    return { sub, n, total, peso, hechas: sub.filter(x => x.h).length,
+      pct: total ? Math.round(peso * 100 / total) : 0,
+      basta: Rg.bastanSub(n), lista: n > 0 && peso * 5 >= total * 4 };
   },
   /* La rutina de hoy, por franja y por hora: su hoja de 24 horas */
   porHora: f => {
@@ -592,30 +643,63 @@ const Rg = {
     uno: l.filter(x => x.nivel === 1).length, unoHechas: l.filter(x => x.nivel === 1 && Rg.hecha(x, f)).length }; },
   /* El progreso del día, en dos cuentas separadas porque son dos cosas */
   marcador: f => {
-    const n = Rg.nota(f), r = E.rutinas.filter(x => Rg.tocaRutina(x, f) && !diaDe(f).fuera.includes(x.id));
-    return { nota: n.length, notaH: n.filter(x => Rg.hecha(x, f)).length,
-      rut: r.length, rutH: r.filter(x => Rg.hecha(x, f)).length,
-      uno: n.filter(x => x.nivel === 1).length, unoH: n.filter(x => x.nivel === 1 && Rg.hecha(x, f)).length };
+    const r = E.rutinas.filter(x => Rg.tocaRutina(x, f) && !diaDe(f).fuera.includes(x.id));
+    const abiertos = Rg.pendientes(f);
+    const hoyHechos = E.sueltos.filter(s => s.hecha && s.hechaEl === f).length;
+    return { rut: r.length, rutH: r.filter(x => Rg.hecha(x, f)).length,
+      pend: abiertos.length + hoyHechos, pendH: hoyHechos,
+      uno: abiertos.filter(x => x.nivel === 1).length };
+  },
+  /* El repositorio: lo hecho sale de la lista y se guarda por día */
+  hechos: () => {
+    const ss = E.sueltos.filter(s => s.hecha && s.hechaEl).sort((a, b) => b.hechaEl.localeCompare(a.hechaEl));
+    const porDia = [];
+    ss.forEach(s => { const g = porDia.find(x => x.f === s.hechaEl);
+      if (g) g.items.push(s); else porDia.push({ f: s.hechaEl, items: [s] }); });
+    return porDia;
   }
 };
 
 /* ════════ 5 · ACCIONES ════════ */
 const A = {
   marcar(x, f) {
-    if (x.tipo === "rutina") { const d = diaMut(f); if (d.hechas[x.id]) delete d.hechas[x.id]; else d.hechas[x.id] = true; }
-    else { x.hecha = !x.hecha; x.hechaEl = x.hecha ? f : null; }
+    if (x.tipo === "rutina") {
+      const d = diaMut(f), v = !d.hechas[x.id];
+      if (v) d.hechas[x.id] = true; else delete d.hechas[x.id];
+      const sub = Rg.sub(x, d);
+      if (sub.length) d.sub[x.id] = sub.map(y => ({ t: y.t, h: v }));
+    } else { x.hecha = !x.hecha; x.hechaEl = x.hecha ? f : null; }
+  },
+  /* Al llegar al 80% del peso, la actividad se da por hecha sola */
+  marcarSub(r, i, f) {
+    const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
+    if (!sub[i]) return null;
+    sub[i].h = !sub[i].h;
+    const antes = !!d.hechas[r.id], e = Rg.estadoSub(r, d);
+    if (e.lista) d.hechas[r.id] = true; else delete d.hechas[r.id];
+    return { antes, ahora: e.lista, e };
+  },
+  nuevaSub(r, texto, f) {
+    const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
+    sub.push({ t: texto, h: false });
+    if (!Rg.estadoSub(r, d).lista) delete d.hechas[r.id];
+  },
+  quitarSub(r, i, f) {
+    const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
+    sub.splice(i, 1);
+    const e = Rg.estadoSub(r, d);
+    if (sub.length && e.lista) d.hechas[r.id] = true; else delete d.hechas[r.id];
+  },
+  /* Mover una parte cambia su peso: subir es «esta pesa más» */
+  moverSub(r, i, paso, f) {
+    const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
+    const j = i + paso; if (!sub[i] || !sub[j]) return false;
+    const t = sub[i]; sub[i] = sub[j]; sub[j] = t;
+    if (Rg.estadoSub(r, d).lista) d.hechas[r.id] = true; else delete d.hechas[r.id];
+    return true;
   },
   /* Tocar el número cicla 1→2→3→1 y se queda así mañana, como al reescribir */
   nivel(x) { x.nivel = x.nivel >= 3 ? 1 : x.nivel + 1; },
-  /* Subir a la nota: decir «esto, hoy, importa». Es de hoy, no permanente:
-     mañana la rutina vuelve a su sitio y la nota vuelve a escribirse. */
-  promover(x, f) {
-    if (x.tipo !== "rutina") return false;
-    const d = diaMut(f); d.nota = d.nota || [];
-    const i = d.nota.indexOf(x.id);
-    if (i >= 0) { d.nota.splice(i, 1); return false; }
-    d.nota.push(x.id); return true;
-  },
   agregar(texto, nivel) {
     const s = sueltoNuevo({ texto: texto.trim(), nivel: nivel || 2 });
     E.sueltos.unshift(s); return s;
@@ -639,13 +723,13 @@ const A = {
 };
 
 /* ════════ 6 · VISTAS ════════ */
-const S = { tab: "hoy", hoja: null };
+const S = { tab: "hoy", hoja: null, abiertas: [], pase: [] };
 
 function pintar() {
   if (!E) return;
   $$(".tab").forEach(t => { const on = t.dataset.tab === S.tab;
     t.classList.toggle("activo", on); if (on) t.setAttribute("aria-current", "page"); else t.removeAttribute("aria-current"); });
-  if (S.tab === "hoy") pintarHoy(); else pintarSemana();
+  if (S.tab === "hoy") pintarHoy(); else if (S.tab === "hecho") pintarHecho(); else pintarSemana();
   lineaDia();
 }
 /* La línea de la izquierda es la hora del día. Se siente el tiempo sin contarlo. */
@@ -656,61 +740,68 @@ function lineaDia() {
   if (lz) lz.style.top = (p * 100) + "%";
 }
 
-/* Un renglón de la nota: nivel a la izquierda, se tacha al tocarlo */
-function filaNota(x, f) {
-  const hecha = Rg.hecha(x, f), m = x.meta ? Rg.meta(x.meta) : null;
+/* Un pendiente: nivel a la izquierda, se tacha al tocarlo, ⋯ para editarlo */
+function filaPend(x) {
+  const m = x.meta ? Rg.meta(x.meta) : null;
   const sub = [];
-  if (x.hora) sub.push(x.hora);
-  if (x.tipo === "rutina") sub.push("de tu rutina");
-  else if (x.pases > 0) sub.push(x.pases === 1 ? "1 pase" : x.pases + " pases");
+  if (x.pases > 0) sub.push(x.pases === 1 ? "1 pase" : x.pases + " pases");
   if (m) sub.push(m.nombre);
-  return `<li class="it${hecha ? " hecha" : ""}${x.tipo === "rutina" ? " rut" : ""}">` +
+  return `<li class="it">` +
     `<button class="it-n n${x.nivel}" data-accion="nivel" data-id="${x.id}" aria-label="Nivel ${x.nivel} de ${esc(x.texto)}. Tocar para cambiar.">${x.nivel}</button>` +
-    `<button class="it-t" data-accion="marcar" data-id="${x.id}" aria-pressed="${hecha}">` +
+    `<button class="it-t" data-accion="marcar" data-id="${x.id}" aria-pressed="false">` +
       `<span class="it-x">${esc(x.texto)}</span>` +
       (sub.length ? `<span class="it-s">${esc(sub.join(" · "))}</span>` : "") + `</button>` +
     `<button class="it-mas" data-accion="ver-item" data-id="${x.id}" aria-label="Opciones de ${esc(x.texto)}">⋯</button></li>`;
 }
-/* Un renglón de la rutina: hora, cadencia de la semana, y la flecha que lo
-   sube a la nota. Es el mismo renglón: marcarlo aquí lo marca allá. */
+
+/* Una obligación de la rutina. Si tiene partes, el galón las despliega aquí
+   mismo: sin hoja que abrir ni pantalla que cerrar. */
 function filaRutina(x, f) {
-  const hecha = Rg.hecha(x, f), s = Rg.semana(x, f), arriba = Rg.enNota(x, f);
-  const sub = [x.hora || "",
-    s.obj > 0 ? (s.n ? s.n + " de " + s.obj + " esta semana" : s.obj + " por semana") : ""].filter(Boolean);
-  return `<li class="rt${hecha ? " hecha" : ""}${arriba ? " arriba" : ""}">` +
+  const d = diaDe(f), hecha = Rg.hecha(x, f), sem = Rg.semana(x, f), e = Rg.estadoSub(x, d);
+  const abierta = S.abiertas.includes(x.id);
+  const partes = !e.n ? "" : e.hechas >= e.n ? "las " + e.n + ", hechas"
+    : e.lista ? e.pct + "% del peso · ya cuenta"
+    : e.hechas ? e.hechas + " de " + e.n + " · " + e.pct + "%"
+    : e.n + " partes · con " + e.basta + " de arriba basta";
+  const sub = [x.hora || "", x.area || "",
+    sem.obj > 0 ? (sem.n ? sem.n + " de " + sem.obj + " esta semana" : sem.obj + " por semana") : "",
+    partes].filter(Boolean);
+  let h = `<li class="rt${hecha ? " hecha" : ""}">` +
     `<button class="rt-c" data-accion="marcar" data-id="${x.id}" role="checkbox" aria-checked="${hecha}" aria-label="${hecha ? "Desmarcar" : "Marcar"}: ${esc(x.texto)}"><span>${ICO.check}</span></button>` +
     `<button class="rt-t" data-accion="ver-item" data-id="${x.id}">` +
       `<span class="rt-x">${esc(x.texto)}</span>` +
       (sub.length ? `<span class="rt-s">${esc(sub.join(" · "))}</span>` : "") + `</button>` +
-    `<button class="rt-up" data-accion="promover" data-id="${x.id}" aria-pressed="${arriba}" aria-label="${arriba ? "Quitar de la nota" : "Subir a la nota de hoy"}: ${esc(x.texto)}">${ICO.arriba}</button></li>`;
+    (e.n ? `<button class="rt-ch${abierta ? " on" : ""}" data-accion="plegar" data-id="${x.id}" aria-expanded="${abierta}" aria-label="${abierta ? "Ocultar" : "Ver"} las partes de ${esc(x.texto)}">${ICO.abajo}</button>` : `<span class="rt-ch vacio"></span>`) +
+    `</li>`;
+  if (e.n && abierta) {
+    h += `<li class="partes"><ul class="pl">` + e.sub.map((y, i) =>
+      `<li class="pa${y.h ? " hecha" : ""}">` +
+      `<button class="pa-t" data-accion="marcar-sub" data-id="${x.id}" data-i="${i}" role="checkbox" aria-checked="${y.h}">` +
+        `<span class="pa-c">${ICO.check}</span><span class="pa-x">${esc(y.t)}</span>` +
+        `<span class="pa-p">${Rg.pctSub(i, e.n)}%</span></button>` +
+      `<span class="pa-m">` +
+        (i > 0 ? `<button class="mover" data-accion="subir-sub" data-id="${x.id}" data-i="${i}" aria-label="Subir: ${esc(y.t)} pesa más">${ICO.arriba}</button>` : "") +
+        (i < e.n - 1 ? `<button class="mover" data-accion="bajar-sub" data-id="${x.id}" data-i="${i}" aria-label="Bajar: ${esc(y.t)} pesa menos">${ICO.abajo}</button>` : "") +
+        `<button class="mover x" data-accion="quitar-sub" data-id="${x.id}" data-i="${i}" aria-label="Quitar ${esc(y.t)}">✕</button>` +
+      `</span></li>`).join("") +
+      `</ul><div class="agregar chico"><button class="agregar-mas" data-accion="enviar" data-para="sub_${x.id}" aria-label="Agregar parte">${ICO.mas}</button>` +
+      `<input id="sub_${x.id}" data-enter="sub" data-rut="${x.id}" placeholder="Agregar parte de hoy…" enterkeyhint="done" autocomplete="off" aria-label="Agregar parte"></div></li>`;
+  }
+  return h;
 }
 
 function pintarHoy() {
-  const f = hoyISO(), mk = Rg.marcador(f), nota = Rg.nota(f), bloques = Rg.porHora(f);
+  const f = hoyISO(), mk = Rg.marcador(f), bloques = Rg.porHora(f), ps = Rg.pendientes(f);
   const ahora = new Date().getHours();
   let h = `<header class="cab"><div><h1 class="dia" tabindex="-1">${esc(fechaLarga(f))}</h1>` +
-    `<p class="dia-s">${[mk.nota ? "Nota " + mk.notaH + " de " + mk.nota : "",
-      mk.rut ? "Rutina " + mk.rutH + " de " + mk.rut : ""].filter(Boolean).join(" · ") || "El día está limpio."}</p></div>` +
+    `<p class="dia-s">${[mk.rut ? "Rutina " + mk.rutH + " de " + mk.rut : "",
+      mk.pend ? "Pendientes " + mk.pendH + " de " + mk.pend : ""].filter(Boolean).join(" · ") || "El día está limpio."}</p></div>` +
     `<button class="icono" data-accion="ajustes" aria-label="Ajustes">${ICO.ajustes}</button></header>`;
 
-  /* ── La nota va primero: es lo que decidió, no lo que está agendado ── */
-  h += `<section class="bloque"><div class="bloque-cab"><h2 class="bloque-t">La nota</h2>` +
-    `<span class="bloque-c">${mk.uno ? "nivel 1: " + mk.unoH + " de " + mk.uno : mk.nota ? mk.notaH + " de " + mk.nota : ""}</span></div>` +
-    `<p class="bloque-s">Lo que importa hoy. Tres niveles, nueve renglones, y se vuelve a escribir cada mañana.</p>`;
-  h += `<ul class="nota">${nota.map(x => filaNota(x, f)).join("") ||
-    `<li class="nota-vacia">Vacía. Escribe abajo, o sube algo de tu rutina con la flecha.</li>`}</ul>`;
-  h += `<div class="agregar"><button class="agregar-mas" data-accion="enviar" aria-label="Agregar">${ICO.mas}</button>` +
-    `<input id="nuevo" data-enter="nuevo" placeholder="Agregar renglón…" enterkeyhint="done" autocomplete="off" aria-label="Agregar renglón"></div>`;
-  if (nota.length > TOPE) h += `<p class="aviso-tope">Son ${nota.length} renglones. En papel cabían nueve. Baja a nivel 3 lo que no sea de hoy.</p>`;
-  const ab = Rg.abiertos().filter(s => s.pases >= 3);
-  if (ab.length) h += `<p class="senal">${esc(ab[0].texto)} lleva ${ab[0].pases} pases sin hacerse. O es más chico de lo que parece, o no es de nivel ${ab[0].nivel}.</p>`;
-  h += `</section>`;
-
-  /* ── Tu día: la rutina en el orden en que ocurre. Esto es lo que el papel
-     no puede llevar, y por eso la app existe. ── */
+  /* ── TU DÍA: las obligaciones, por franja y por hora ── */
   h += `<section class="bloque"><div class="bloque-cab"><h2 class="bloque-t">Tu día</h2>` +
     `<span class="bloque-c">${mk.rut ? mk.rutH + " de " + mk.rut : ""}</span></div>` +
-    `<p class="bloque-s">Tu rutina, en el orden en que ocurre. La flecha sube un renglón a la nota.</p>`;
+    `<p class="bloque-s">Tu rutina, en el orden en que ocurre. Si una actividad tiene partes, el galón las abre aquí mismo.</p>`;
   h += bloques.map(({ fr, items }) => {
     const hechos = items.filter(x => Rg.hecha(x, f)).length;
     const enCurso = ahora >= fr.desde && ahora < fr.hasta;
@@ -721,6 +812,34 @@ function pintarHoy() {
   }).join("") || `<p class="vacio">Hoy no toca ninguna rutina.</p>`;
   h += `</section>`;
 
+  /* ── PENDIENTES: el 3×3. No son la rutina y no tienen que llevar a una meta. ── */
+  h += `<section class="bloque"><div class="bloque-cab"><h2 class="bloque-t">Pendientes</h2>` +
+    `<span class="bloque-c">${mk.uno ? "nivel 1: " + mk.uno : ps.length ? ps.length + " abiertos" : ""}</span></div>` +
+    `<p class="bloque-s">Lo suelto: pasa una vez y no tiene por qué llevar a una meta. Tres niveles; toca el número para cambiarlo.</p>`;
+  h += `<ul class="nota">${ps.map(filaPend).join("") ||
+    `<li class="nota-vacia">Nada pendiente. Escribe abajo si aparece algo.</li>`}</ul>`;
+  h += `<div class="agregar"><button class="agregar-mas" data-accion="enviar" data-para="nuevo" aria-label="Agregar">${ICO.mas}</button>` +
+    `<input id="nuevo" data-enter="nuevo" placeholder="Agregar pendiente…" enterkeyhint="done" autocomplete="off" aria-label="Agregar pendiente"></div>`;
+  if (ps.length > TOPE) h += `<p class="aviso-tope">Son ${ps.length} pendientes. En papel cabían nueve. Baja a nivel 3 lo que no sea de esta semana.</p>`;
+  const viejo = ps.filter(x => x.pases >= 3)[0];
+  if (viejo) h += `<p class="senal">${esc(viejo.texto)} lleva ${viejo.pases} pases sin hacerse. O es más chico de lo que parece, o no es de nivel ${viejo.nivel}.</p>`;
+  if (mk.pendH) h += `<p class="nota-pie"><button class="enlace" data-accion="ir-hecho">${mk.pendH === 1 ? "1 pendiente hecho hoy" : mk.pendH + " pendientes hechos hoy"} · verlos</button></p>`;
+  h += `</section>`;
+
+  $("#vista").innerHTML = h;
+}
+
+/* ── El repositorio: lo hecho, por día. No se persigue, se consulta. ── */
+function pintarHecho() {
+  const dias = Rg.hechos(), n = dias.reduce((a, g) => a + g.items.length, 0);
+  let h = `<header class="cab"><div><h1 class="dia" tabindex="-1">Hecho</h1>` +
+    `<p class="dia-s">${n ? n + (n === 1 ? " pendiente cerrado" : " pendientes cerrados") + ", del más reciente al más viejo." : "Todavía no hay nada aquí."}</p></div></header>`;
+  h += dias.map(g => `<p class="franja">${esc(fechaLarga(g.f))}<em>${g.items.length}</em></p>` +
+    `<ul class="nota">${g.items.map(s => `<li class="it hecha">` +
+      `<span class="it-n n${s.nivel}">${s.nivel}</span>` +
+      `<button class="it-t" data-accion="reabrir" data-id="${s.id}" aria-label="Reabrir ${esc(s.texto)}">` +
+      `<span class="it-x">${esc(s.texto)}</span><span class="it-s">tocar para reabrir</span></button></li>`).join("")}</ul>`).join("")
+    || `<p class="vacio">Cuando marques un pendiente como hecho, se guarda aquí.</p>`;
   $("#vista").innerHTML = h;
 }
 
@@ -896,9 +1015,17 @@ function aplicarTema() {
 
 const ACC = {
   "tab": d => { S.tab = d.tab; pintar(); },
-  "promover": d => { const x = Rg.item(d.id); if (!x) return; let arriba;
-    cambiar(() => { arriba = A.promover(x, hoyISO()); });
-    nota(arriba ? "Subió a la nota de hoy." : "Fuera de la nota. Sigue en tu rutina."); },
+  "plegar": d => { const i = S.abiertas.indexOf(d.id);
+    if (i >= 0) S.abiertas.splice(i, 1); else S.abiertas.push(d.id); pintar(); },
+  "marcar-sub": d => { const r = Rg.item(d.id); if (!r) return; let res;
+    cambiar(() => { res = A.marcarSub(r, +d.i, hoyISO()); });
+    if (res && !res.antes && res.ahora) nota(r.texto + ": " + res.e.pct + "% del peso. Ya cuenta."); },
+  "quitar-sub": d => { const r = Rg.item(d.id); if (!r) return; cambiar(() => A.quitarSub(r, +d.i, hoyISO())); },
+  "subir-sub": d => { const r = Rg.item(d.id); if (!r) return; cambiar(() => A.moverSub(r, +d.i, -1, hoyISO())); },
+  "bajar-sub": d => { const r = Rg.item(d.id); if (!r) return; cambiar(() => A.moverSub(r, +d.i, 1, hoyISO())); },
+  "reabrir": d => { const x = Rg.item(d.id); if (!x) return;
+    cambiar(() => { x.hecha = false; x.hechaEl = null; x.archivada = false; });
+    nota("De vuelta en pendientes."); },
   "marcar": d => { const x = Rg.item(d.id); if (!x) return; const f = hoyISO();
     const antes = Rg.cuenta(f);
     cambiar(() => A.marcar(x, f));
@@ -947,7 +1074,8 @@ const ACC = {
       E = normalizar(nuevo); podar(E); Guardado.escribir(CLAVE, E); cerrarHoja(); aplicarTema(); pintar(); nota("Importado.");
     } catch (e) { if (er) er.textContent = "No se pudo leer. Revisa que esté completo."; } },
   "cerrar-hoja": () => cerrarHoja(),
-  "enviar": () => { const el = document.getElementById("nuevo"); if (el) alEnter(el); },
+  "enviar": d => { const el = document.getElementById(d.para || "nuevo"); if (el) alEnter(el); },
+  "ir-hecho": () => { S.tab = "hecho"; pintar(); },
   "fab": () => { S.tab = "hoy"; pintar(); setTimeout(() => { const el = document.getElementById("nuevo"); if (el) el.focus(); }, 60); },
   "pase-toggle": (d, b) => { const i = S.pase.indexOf(d.id);
     if (i >= 0) S.pase.splice(i, 1); else S.pase.push(d.id);
@@ -958,7 +1086,10 @@ const ACC = {
 const ENTER = {
   "nuevo": t => { const v = t.value.trim(); if (!v) return;
     cambiar(() => A.agregar(v)); t.value = "";
-    setTimeout(() => { const el = document.getElementById("nuevo"); if (el) el.focus(); }, 40); }
+    setTimeout(() => { const el = document.getElementById("nuevo"); if (el) el.focus(); }, 40); },
+  "sub": t => { const v = t.value.trim(), r = Rg.item(t.dataset.rut); if (!v || !r) return;
+    const id = t.id; cambiar(() => A.nuevaSub(r, v, hoyISO()));
+    setTimeout(() => { const el = document.getElementById(id); if (el) { el.value = ""; el.focus(); } }, 40); }
 };
 function alEnter(t) { if (!t || !t.dataset.enter) return; const fn = ENTER[t.dataset.enter]; if (fn) fn(t); }
 
@@ -987,9 +1118,11 @@ function semilla() {
     rutinas: [
       /* El trabajo es UN renglón: el detalle vive donde ya lo llevas */
       r("Tareas del día · trabajo", { nivel: 1, hora: "09:00", dias: [1, 2, 3, 4, 5], semanal: 5, meta: oficio.id }),
-      r("Ejercicio", { nivel: 1, hora: "06:30", dias: [1, 2, 3, 4, 5], semanal: 5 }),
+      r("Ejercicio", { nivel: 1, hora: "06:30", area: "Cuerpo", dias: [1, 2, 3, 4, 5], semanal: 5,
+        pasos: ["Lo que de verdad cuenta", "Calentar", "Lo segundo", "Estirar"] }),
       r("Silencio, oración o meditación", { nivel: 2, hora: "07:15", dias: [1, 2, 3, 4, 5, 6, 0], semanal: 7 }),
-      r("Sesión de mi pasión", { nivel: 2, hora: "19:30", dias: [2, 4, 6], semanal: 3, meta: pasion.id }),
+      r("Sesión de mi pasión", { nivel: 2, hora: "19:30", area: "Otro", dias: [2, 4, 6], semanal: 3, meta: pasion.id,
+        pasos: ["Lo que de verdad la mueve", "Lo segundo en importancia", "Preparar lo de la próxima vez", "Revisar lo hecho"] }),
       r("Revisar mis finanzas", { nivel: 3, hora: "21:00", dias: [1], semanal: 1 })
     ],
     sueltos: [
