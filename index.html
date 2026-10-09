@@ -15,7 +15,7 @@
 <style>
 /* ══════════════════════════════════════════════
    CAUCE v8 · estilos
-   Misma paleta y mismas familias que Práctica — la app no cambió de
+   Misma paleta y mismas familias que la app hermana — no cambió de
    material, cambió de forma. Lo que se fue: tarjetas, barras de avance,
    porcentajes, acordeones. Lo que queda: una lista con renglones.
    Regla heredada: --tinta-tenue y --llama no se usan para texto chico
@@ -49,7 +49,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .oculto{display:none !important}
 
 /* ── La línea de la hora ──
-   Hermana de la veladora de Práctica: el tiempo se siente, no se cuenta.
+   Hermana de la veladora de la app devocional: el tiempo se siente, no se cuenta.
    Aquí corre de la medianoche a la medianoche. No pide nada. */
 .cauce{position:fixed;left:18px;top:0;bottom:0;width:3px;z-index:5;pointer-events:none;
   padding:calc(env(safe-area-inset-top) + 20px) 0 calc(env(safe-area-inset-bottom) + 76px)}
@@ -409,14 +409,14 @@ body.arrastrando [data-arr]{cursor:grabbing}
   padding:1px 5px;border-radius:4px}
 
 /* ══ SONIDO Y ENFOQUE ══
-   La pantalla de enfoque y los chips vienen de Denha tal cual: mismos
+   La pantalla de enfoque y los chips vienen de la app devocional tal cual: mismos
    tamaños, mismo aro, misma animación. Encajan sin retocar porque las dos
    apps comparten la paleta y las familias tipográficas. */
 .concentra{position:fixed;top:0;left:0;right:0;height:100vh;height:100dvh;z-index:96;background:var(--noche);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
   padding:40px 26px calc(env(safe-area-inset-bottom) + 40px)}
 .concentra-fase{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-tenue);margin:0}
-/* Lo que Denha no necesitaba: aquí se enfoca EN algo, y el algo se ve */
+/* Lo que allá no hacía falta: aquí se enfoca EN algo, y el algo se ve */
 .concentra-que{font-family:var(--serif);font-size:1.05rem;line-height:1.35;color:var(--tinta-baja);
   text-align:center;max-width:22ch;margin:-10px 0 0}
 .concentra-aro{position:relative;width:158px;height:158px;display:flex;align-items:center;justify-content:center}
@@ -452,7 +452,7 @@ body.arrastrando [data-arr]{cursor:grabbing}
 .seg.activo em{color:var(--tinta-baja)}
 
 /* ══ LA FLAMA VIVA ══
-   De Denha: la llama respira sola con `llamaViva`, y `--fl` la hace arder
+   De la app devocional: la llama respira sola con `llamaViva`, y `--fl` la hace arder
    más alto conforme la cadencia se sostiene. No se llena como una barra:
    llegar a una meta no es contable, pero que las acciones estén pasando sí.
    `@property` deja animar el número; donde no exista, el salto es seco
@@ -499,7 +499,7 @@ body.arrastrando [data-arr]{cursor:grabbing}
 <div class="onb oculto" id="flujo" role="dialog" aria-modal="true" aria-label="El pase del día">
   <div class="onb-cont" id="flujoCont"></div>
 </div>
-<!-- Pantalla de enfoque, tomada de Denha: el aro que se cierra, el número
+<!-- Pantalla de enfoque, tomada de la app devocional: el aro que se cierra, el número
      y una frase que cambia sola. Aquí además lleva el nombre de la tarea. -->
 <div class="concentra oculto" id="concentra">
   <p class="concentra-fase" id="concentraFase">Enfoque</p>
@@ -1063,7 +1063,7 @@ function pintarHecho() {
 
 
 /* ── La flama viva ──
-   El dibujo viene de Denha tal cual: la elipse de brillo detrás, el cuerpo de
+   El dibujo viene tal cual de la app devocional: la elipse de brillo detrás, el cuerpo de
    la llama y el núcleo claro, respirando con `llamaViva`. Lo que cambia es qué
    la alimenta: allá una práctica, aquí las semanas del mes que llegaron al
    80/20. No se llena como una barra —arde más alto o más bajo— porque llegar
@@ -1520,7 +1520,7 @@ document.addEventListener("scroll", () => { if (!Arr.viva) Arr.cancelar(); }, tr
 
 
 /* ════════ SONIDO ════════
-   Motor de audio tomado tal cual de Denha, sin tocarle una línea: genera los
+   Motor de audio tomado tal cual de la app devocional, sin tocarle una línea: genera los
    paisajes con Web Audio en vez de cargar archivos, así que no pesa nada ni
    necesita red. Es autónomo —no depende de nada más de la app— y por eso se
    pudo copiar entero.                                                        */
@@ -1852,7 +1852,7 @@ document.addEventListener("visibilitychange", () => {
 
 
 /* ════════ LOS GESTOS ════════
-   De Denha viene la idea: una frase corta en los momentos que marcan el día,
+   La idea viene de la app devocional: una frase corta en los momentos que marcan el día,
    sin felicitar y sin regañar. No son logros ni rachas; es una voz que
    acompaña y se calla. La del día no se rifa en cada pintada —se queda la
    misma hasta mañana— para que no parpadee cada vez que marcas algo.        */
@@ -1875,7 +1875,7 @@ function fraseDelDia(k, f) {
 }
 
 /* ════════ PAISAJES Y ENFOQUE ════════
-   Los paisajes, los métodos y las frases vienen de Denha tal cual. Lo que
+   Los paisajes, los métodos y las frases vienen de la app devocional tal cual. Lo que
    cambió es a qué se engancha: allá acompañan una práctica, aquí acompañan
    una tarea. Por eso el enfoque se abre desde un renglón y lleva su nombre
    en la pantalla: no es «un pomodoro», es «esta cosa, ahora».               */
