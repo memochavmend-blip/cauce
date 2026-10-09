@@ -408,6 +408,82 @@ body.arrastrando [data-arr]{cursor:grabbing}
 .pasos-ayuda code,.campo-ayuda code{font-family:var(--mono);font-size:11.5px;background:var(--panel);
   padding:1px 5px;border-radius:4px}
 
+/* ══ SONIDO Y ENFOQUE ══
+   La pantalla de enfoque y los chips vienen de Denha tal cual: mismos
+   tamaños, mismo aro, misma animación. Encajan sin retocar porque las dos
+   apps comparten la paleta y las familias tipográficas. */
+.concentra{position:fixed;top:0;left:0;right:0;height:100vh;height:100dvh;z-index:96;background:var(--noche);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  padding:40px 26px calc(env(safe-area-inset-bottom) + 40px)}
+.concentra-fase{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-tenue);margin:0}
+/* Lo que Denha no necesitaba: aquí se enfoca EN algo, y el algo se ve */
+.concentra-que{font-family:var(--serif);font-size:1.05rem;line-height:1.35;color:var(--tinta-baja);
+  text-align:center;max-width:22ch;margin:-10px 0 0}
+.concentra-aro{position:relative;width:158px;height:158px;display:flex;align-items:center;justify-content:center}
+.concentra-svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.concentra-pista{fill:none;stroke:var(--linea);stroke-width:1}
+.concentra-prog{fill:none;stroke:var(--llama);stroke-width:1.4;stroke-linecap:round;
+  stroke-dasharray:289.03;stroke-dashoffset:289.03;transition:stroke-dashoffset 1s linear;opacity:.7}
+.concentra-num{font-family:var(--serif);font-size:1.7rem;color:var(--tinta-baja);letter-spacing:.02em;
+  font-variant-numeric:tabular-nums}
+.concentra-msg{font-family:var(--serif);font-size:1.15rem;line-height:1.5;color:var(--tinta-tenue);
+  text-align:center;max-width:24ch;min-height:3em;margin:0;transition:opacity .5s ease}
+.concentra-salir{margin-top:8px;padding:13px 40px;border:1px solid var(--linea-fuerte);border-radius:999px;
+  font-size:14px;letter-spacing:.02em;color:var(--tinta-baja);transition:border-color .2s,color .2s}
+.concentra-salir:hover,.concentra-salir:focus-visible{border-color:var(--llama);color:var(--tinta)}
+
+.son-now{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:color-mix(in srgb,var(--llama) 14%,transparent);border:1px solid var(--linea-fuerte);
+  border-radius:12px;padding:12px 15px;margin-bottom:20px;font-size:13.5px;color:var(--tinta)}
+.son-stop{font-size:12px;color:var(--brasa);white-space:nowrap;padding:4px 8px}
+.son-cat{margin-bottom:20px}
+.son-cat-t{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--tinta-baja);margin:0 0 11px}
+.son-chips{display:flex;flex-wrap:wrap;gap:8px}
+.son-chip{padding:11px 15px;border:1px solid var(--linea-fuerte);border-radius:999px;font-size:13.5px;
+  color:var(--tinta-baja);transition:border-color .2s,color .2s,background .2s}
+.son-chip.on{border-color:var(--llama);color:var(--tinta);background:color-mix(in srgb,var(--llama) 18%,transparent)}
+.son-pomo{margin-top:26px;padding-top:22px;border-top:1px solid var(--linea)}
+.son-tarea{font-size:13.5px;color:var(--tinta-baja);margin:-6px 0 18px;padding-left:11px;
+  border-left:2px solid var(--cera)}
+.son-tarea b{color:var(--tinta);font-weight:500}
+.segmento .seg em{display:block;font-style:normal;font-size:10.5px;font-family:var(--mono);
+  color:var(--tinta-tenue);margin-top:1px}
+.seg.activo em{color:var(--tinta-baja)}
+
+/* ══ LA FLAMA VIVA ══
+   De Denha: la llama respira sola con `llamaViva`, y `--fl` la hace arder
+   más alto conforme la cadencia se sostiene. No se llena como una barra:
+   llegar a una meta no es contable, pero que las acciones estén pasando sí.
+   `@property` deja animar el número; donde no exista, el salto es seco
+   pero el dibujo es el mismo. */
+@property --fl { syntax: "<number>"; inherits: false; initial-value: 0.6; }
+@property --go { syntax: "<number>"; inherits: false; initial-value: 0.3; }
+.flama-v{display:block;flex:0 0 auto;width:34px;height:37px}
+.flama-v.grande{width:54px;height:58px}
+.flama-v svg{width:100%;height:100%;display:block;overflow:visible}
+.nivel-glow{fill:var(--llama);opacity:var(--go,.3);filter:blur(13px);
+  animation:brilloVivo 4.2s ease-in-out infinite;transition:--go 1.2s ease}
+.nivel-flama{fill:var(--llama);transition:--fl 1.2s cubic-bezier(.3,.8,.3,1),fill 1.6s ease;
+  animation:llamaViva var(--fdur,2.6s) ease-in-out infinite}
+.nivel-nucleo{fill:#FFF3D4;opacity:.88;pointer-events:none;
+  transition:--fl 1.2s cubic-bezier(.3,.8,.3,1);animation:llamaViva var(--fdur,2.6s) ease-in-out infinite}
+@keyframes llamaViva{
+  0%,100%{transform:scale(var(--fl,.6))}
+  28%{transform:scale(calc(var(--fl,.6) * 1.09)) translateY(-.9px)}
+  52%{transform:scale(calc(var(--fl,.6) * .965)) translateX(.5px)}
+  76%{transform:scale(calc(var(--fl,.6) * 1.045)) translateX(-.4px) translateY(-.3px)}}
+@keyframes brilloVivo{0%,100%{opacity:var(--go,.3)}50%{opacity:calc(var(--go,.3) * 1.42)}}
+.meta-grande{align-items:center}
+@media (prefers-reduced-motion:reduce){
+  .nivel-flama,.nivel-nucleo,.nivel-glow,.concentra-prog{animation:none !important;transition:none !important}}
+
+/* ── Los gestos: una frase, sin adorno y sin exigir nada ── */
+.gesto{font-family:var(--serif);font-size:1.02rem;line-height:1.45;color:var(--tinta-tenue);
+  margin:-8px 0 24px;transition:color .6s ease}
+.gesto.cierra{color:var(--oro)}
+.onb .gesto{margin:-10px 0 20px}
+
 </style>
 </head>
 <body>
@@ -422,6 +498,21 @@ body.arrastrando [data-arr]{cursor:grabbing}
 </div>
 <div class="onb oculto" id="flujo" role="dialog" aria-modal="true" aria-label="El pase del día">
   <div class="onb-cont" id="flujoCont"></div>
+</div>
+<!-- Pantalla de enfoque, tomada de Denha: el aro que se cierra, el número
+     y una frase que cambia sola. Aquí además lleva el nombre de la tarea. -->
+<div class="concentra oculto" id="concentra">
+  <p class="concentra-fase" id="concentraFase">Enfoque</p>
+  <p class="concentra-que" id="concentraQue"></p>
+  <div class="concentra-aro">
+    <svg class="concentra-svg" viewBox="0 0 100 100" aria-hidden="true">
+      <circle class="concentra-pista" cx="50" cy="50" r="46"></circle>
+      <circle class="concentra-prog" id="concentraProg" cx="50" cy="50" r="46"></circle>
+    </svg>
+    <span class="concentra-num" id="concentraNum">25:00</span>
+  </div>
+  <p class="concentra-msg" id="concentraMsg"></p>
+  <button class="concentra-salir" data-accion="concentra-salir">Terminar</button>
 </div>
 <div id="hojas"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -598,7 +689,8 @@ function desdeViejo(g) {
 }
 
 function normalizar(e) {
-  e.ajustes = Object.assign({ nombre: "", tema: "sistema", proposito: "", vista: "nivel" }, e.ajustes || {});
+  e.ajustes = Object.assign({ nombre: "", tema: "sistema", proposito: "", vista: "nivel",
+    metodo: 0, dormir: 15, volumen: 0.5 }, e.ajustes || {});
   ["metas", "rutinas", "sueltos"].forEach(k => { if (!Array.isArray(e[k])) e[k] = []; });
   e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
   e.marcas = Object.assign({ onboarding: false, ultimoDia: null, tocado: false }, e.marcas || {});
@@ -717,13 +809,17 @@ const Rg = {
      cuando las rutinas de esa meta van en cadencia, y se apaga cuando no. */
   flama: m => {
     const rs = E.rutinas.filter(r => r.meta === m.id && !r.pausada && Rg.objetivo(r) > 0);
-    if (!rs.length) return { estado: "sin", rs: 0, n: 0, de: 0 };
+    if (!rs.length) return { estado: "sin", rs: 0, n: 0, de: 0, pct: 0 };
     const f = hoyISO();
     let n = 0, de = 0;
     rs.forEach(r => { const s = Rg.semana(r, f); n += Math.min(s.n, s.obj); de += s.obj; });
+    /* Se mide contra lo que tocaría a estas alturas de la semana, no contra el
+       total: un martes con 2 de 5 va bien, y un viernes con 2 de 5 no. */
     const hoyIdx = (deISO(f).getDay() + 6) % 7, parte = Math.max(1, hoyIdx + 1) / 7;
     const esperado = Math.max(1, de * parte), r2 = n / esperado;
-    return { estado: r2 >= 0.8 ? "viva" : r2 >= 0.4 ? "tibia" : "apagada", rs: rs.length, n, de };
+    return { estado: r2 >= 0.8 ? "viva" : r2 >= 0.4 ? "tibia" : "apagada", rs: rs.length, n, de,
+      /* Lo que necesita el dibujo: qué tan alto arde, de 0 a 100 */
+      pct: Math.max(0, Math.min(100, Math.round(r2 * 100))) };
   },
   cuenta: f => { const l = Rg.lista(f); return { n: l.length, hechas: l.filter(x => Rg.hecha(x, f)).length,
     uno: l.filter(x => x.nivel === 1).length, unoHechas: l.filter(x => x.nivel === 1 && Rg.hecha(x, f)).length }; },
@@ -734,7 +830,8 @@ const Rg = {
     const hoyHechos = E.sueltos.filter(s => s.hecha && s.hechaEl === f).length;
     return { rut: r.length, rutH: r.filter(x => Rg.hecha(x, f)).length,
       pend: abiertos.length + hoyHechos, pendH: hoyHechos,
-      uno: abiertos.filter(x => x.nivel === 1).length };
+      uno: abiertos.filter(x => x.nivel === 1).length + E.sueltos.filter(s => s.hecha && s.hechaEl === f && s.nivel === 1).length,
+      unoH: E.sueltos.filter(s => s.hecha && s.hechaEl === f && s.nivel === 1).length };
   },
   /* El repositorio: lo hecho sale de la lista y se guarda por día */
   hechos: () => {
@@ -909,6 +1006,10 @@ function pintarHoy() {
       mk.pend ? "Pendientes " + mk.pendH + " de " + mk.pend : ""].filter(Boolean).join(" · ") || "El día está limpio."}</p></div>` +
     `<button class="icono" data-accion="ajustes" aria-label="Ajustes">${ICO.ajustes}</button></header>`;
 
+  /* Una línea al abrir el día; cuando lo de nivel 1 ya salió, cambia sola. */
+  const cerrado = mk.uno > 0 && mk.unoH >= mk.uno;
+  h += `<p class="gesto${cerrado ? " cierra" : ""}">${esc(cerrado ? fraseDelDia("cierra", f) : fraseDelDia("abrir", f))}</p>`;
+
   /* ── TU DÍA: las obligaciones, por franja y por hora ── */
   h += `<section class="bloque"><div class="bloque-cab"><h2 class="bloque-t">Tu día</h2>` +
     `<span class="bloque-c">${mk.rut ? mk.rutH + " de " + mk.rut : ""}</span></div>` +
@@ -960,6 +1061,23 @@ function pintarHecho() {
   $("#vista").innerHTML = h;
 }
 
+
+/* ── La flama viva ──
+   El dibujo viene de Denha tal cual: la elipse de brillo detrás, el cuerpo de
+   la llama y el núcleo claro, respirando con `llamaViva`. Lo que cambia es qué
+   la alimenta: allá una práctica, aquí las semanas del mes que llegaron al
+   80/20. No se llena como una barra —arde más alto o más bajo— porque llegar
+   a una meta no es contable y fingir un porcentaje sería mentir. */
+function flamaSVG(pct, clase) {
+  const alto = (0.34 + 0.66 * (pct / 100)).toFixed(2);
+  const brillo = (0.08 + 0.34 * (pct / 100)).toFixed(2);
+  return `<span class="flama-v ${clase || ""}" aria-hidden="true"><svg viewBox="0 0 120 130">` +
+    `<ellipse class="nivel-glow" cx="60" cy="64" rx="44" ry="50" style="--go:${brillo}"></ellipse>` +
+    `<path class="nivel-flama" style="--fl:${alto};transform-origin:50% 98px" d="M60 18 C80 52 80 82 60 98 C40 82 40 52 60 18 Z"></path>` +
+    `<path class="nivel-nucleo" style="--fl:${alto};transform-origin:50% 96px" d="M60 51 C71 69 71 86 60 96 C49 86 49 69 60 51 Z"></path>` +
+    `</svg></span>`;
+}
+
 function pintarSemana() {
   const f = hoyISO(), seg = Rg.seguidas(), ab = Rg.abiertos(), ar = Rg.archivados();
   let h = `<header class="cab"><div><h1 class="dia" tabindex="-1">Semana</h1>` +
@@ -967,7 +1085,7 @@ function pintarSemana() {
 
   if (E.metas.length) h += `<div class="metas">${E.metas.map(m => { const fl = Rg.flama(m);
     return `<button class="meta-c ${fl.estado}" data-accion="ver-meta" data-id="${m.id}">` +
-      `<span class="meta-fl" aria-hidden="true">${ICO.llama}</span>` +
+      flamaSVG(fl.pct) +
       `<span class="meta-n">${esc(m.nombre)}</span>` +
       `<span class="meta-s">${fl.estado === "sin" ? "sin rutinas" : fl.estado === "viva" ? "va en cadencia"
         : fl.estado === "tibia" ? "va a medias" : fl.n ? "va atrás" : "sin movimiento"}</span></button>`; }).join("")}</div>`;
@@ -1033,6 +1151,7 @@ function hojaItem(id) {
       `<p class="campo-ayuda">Con 4 o más, saltarte una sigue contando. Pero la semana completa es la meta.</p>` : "") +
     `<label class="campo"><span class="campo-et">Alimenta</span><select id="iMeta" class="campo-i">` +
       metas.map(m => `<option value="${m[0]}"${(x.meta || "") === m[0] ? " selected" : ""}>${esc(m[1])}</option>`).join("") + `</select></label>` +
+    `<div class="acciones" style="margin-top:4px"><button class="accion" data-accion="enfocar" data-id="${x.id}">Enfocar ${METODOS[E.ajustes.metodo || 0].foco} min en esto</button></div>` +
     dos(btn("Cancelar", "cerrar-hoja"), btn("Guardar", "guardar-item", x.id, "llena")) +
     `<div class="hoja-pie">` +
       (esRut ? btn(x.pausada ? "Reactivar" : "Pausar", "pausar", x.id, "leve")
@@ -1046,7 +1165,7 @@ function hojaMeta(id) {
   const fl = Rg.flama(m);
   hoja(esc(m.nombre),
     "La flama no mide qué tan cerca está la meta: eso no es contable. Mide si las acciones están pasando.",
-    `<div class="meta-grande ${fl.estado}"><span aria-hidden="true">${ICO.llama}</span><p>${
+    `<div class="meta-grande ${fl.estado}">${flamaSVG(fl.pct, "grande")}<p>${
       fl.estado === "sin" ? "Ninguna rutina alimenta esta meta. Mientras no haya acciones recurrentes, no hay nada que seguir."
       : fl.estado === "viva" ? "Va en cadencia esta semana."
       : fl.estado === "tibia" ? "Va a medias esta semana."
@@ -1071,6 +1190,8 @@ function hojaAjustes() {
     `<p class="campo-et">Metas</p><div class="lista-min">${E.metas.map(m =>
       `<button class="fila-min" data-accion="ver-meta" data-id="${m.id}">${esc(m.nombre)}</button>`).join("")}` +
     `<button class="fila-min nueva" data-accion="nueva-meta">+ Nueva meta</button></div>` +
+    `<p class="campo-et">Sonido</p><div class="lista-min">` +
+    `<button class="fila-min" data-accion="sonido">Paisajes y enfoque<span class="fila-dato">${esc(sonidoManual ? (SONIDO_NOMBRE[sonidoManual] || "sonando") : "")}</span></button></div>` +
     `<p class="campo-et">Datos</p><div class="lista-min">` +
     `<button class="fila-min" data-accion="sync">Sincronizar entre dispositivos<span class="fila-dato">${esc(Sync.activo() ? "conectado" : "no")}</span></button>` +
     `<button class="fila-min" data-accion="exportar">Exportar</button>` +
@@ -1133,7 +1254,8 @@ function pintarPase() {
       `<span class="pase-s">${s.pases ? (s.pases === 1 ? "lo has pasado 1 vez" : "lo has pasado " + s.pases + " veces") : "de ayer"}</span></span></button>`;
   }).join("")}</div>`;
   $("#flujoCont").innerHTML = `<h1 class="paso-t">Lo que quedó abierto</h1>` +
-    `<p class="paso-s">Marca lo que sigue hoy. Lo que no, se guarda — no se borra.</p>` + cuerpo +
+    `<p class="paso-s">Marca lo que sigue hoy. Lo que no, se guarda — no se borra.</p>` +
+    `<p class="gesto">${esc(fraseDelDia("pase", f))}</p>` + cuerpo +
     `<div class="paso-acc"><button class="accion llena" data-accion="pase-ok">Escribir la lista</button></div>`;
   $("#flujo").classList.remove("oculto");
   $("#appShell").setAttribute("inert", "");
@@ -1168,10 +1290,12 @@ const ACC = {
     cambiar(() => { x.hecha = false; x.hechaEl = null; x.archivada = false; });
     nota("De vuelta en pendientes."); },
   "marcar": d => { const x = Rg.item(d.id); if (!x) return; const f = hoyISO();
-    const antes = Rg.cuenta(f);
+    const antes = Rg.marcador(f);
     cambiar(() => A.marcar(x, f));
-    const desp = Rg.cuenta(f);
-    if (antes.unoHechas < desp.unoHechas && desp.uno && desp.unoHechas === desp.uno) nota("Los de nivel 1, hechos. Lo demás es extra.");
+    const desp = Rg.marcador(f);
+    /* El gesto más pequeño: una palabra al cerrar algo, no una felicitación */
+    if (desp.uno && desp.unoH === desp.uno && antes.unoH < desp.unoH) nota(frase("cierra"));
+    else if (x.tipo === "suelto" && x.hecha) nota(frase("listo"));
     else if (x.tipo === "rutina" && Rg.hecha(x, f)) { const s = Rg.semana(x, f);
       if (s.obj && s.n === s.obj) nota(x.texto + ": semana completa.");
       else if (s.obj && s.n === s.suf && s.suf < s.obj) nota(x.texto + ": " + s.n + " de " + s.obj + ". Ya cuenta; la completa sigue ahí."); } },
@@ -1205,6 +1329,17 @@ const ACC = {
     Array.from(b.parentNode.children).forEach(c => c.classList.toggle("on", c === b)); },
   "guardar-ajustes": () => { cambiar(() => { E.ajustes.nombre = val("aNom");
     const p = document.getElementById("aProp"); if (p) E.ajustes.proposito = p.value.trim(); }); cerrarHoja(); },
+  "sonido": () => hojaSonido(),
+  "son-escena": d => { if (sonidoManual === d.v) detenerSonido(); else reproducirSonido(d.v); hojaSonido(); },
+  "son-parar": () => { detenerSonido(); hojaSonido(); },
+  "son-metodo": d => { E.ajustes.metodo = +d.v; guardar(); hojaSonido(); },
+  "son-dormir": d => { E.ajustes.dormir = +d.v; guardar(); hojaSonido(); },
+  "son-dormir-ya": () => iniciarDormir(),
+  "son-dormir-no": () => detenerDormir(true),
+  "son-enfocar": d => { const x = d.id ? Rg.item(d.id) : null; iniciarPomo(x ? x.texto : "", d.id || null); },
+  "concentra-salir": () => detenerPomo(),
+  /* Enfocar un renglón: el temporizador se abre con su nombre puesto */
+  "enfocar": d => { const x = Rg.item(d.id); if (!x) return; hojaSonido(x.texto, x.id); },
   "sync": () => hojaSync(),
   "sync-conectar": async () => {
     const tok = val("syTok"), gist = val("syGist"), er = document.getElementById("hojaErr");
@@ -1382,6 +1517,514 @@ document.addEventListener("pointerup", Arr.fin);
 document.addEventListener("pointercancel", () => Arr.limpiar());
 document.addEventListener("scroll", () => { if (!Arr.viva) Arr.cancelar(); }, true);
 
+
+
+/* ════════ SONIDO ════════
+   Motor de audio tomado tal cual de Denha, sin tocarle una línea: genera los
+   paisajes con Web Audio en vez de cargar archivos, así que no pesa nada ni
+   necesita red. Es autónomo —no depende de nada más de la app— y por eso se
+   pudo copiar entero.                                                        */
+const Pad = (() => {
+  let ctx=null, master=null, bus=null, fuentes=[], moduladores=[], vivo=false, desbloqueado=false;
+  let prog=null, marea=null, oyente=null, actual=null;
+  // Eventos del sonido (nota a la izquierda/derecha, golpe de cuenco) alineados al tiempo real del audio.
+  function evento(ev){ if(!oyente || !ctx) return; const d = Math.max(0, (ev.t - ctx.currentTime) * 1000); setTimeout(()=>{ try{ if(oyente) oyente(ev); }catch(e){} }, d); }
+  function lecho(c, raiz, arm, corte, vol, destino){
+    const filtro = c.createBiquadFilter(); filtro.type = "lowpass"; filtro.frequency.value = corte; filtro.Q.value = .5;
+    const g = c.createGain(); g.gain.value = vol; filtro.connect(g); g.connect(destino);
+    const lfo = c.createOscillator(); lfo.frequency.value = .035; const lg = c.createGain(); lg.gain.value = corte * .25;
+    lfo.connect(lg); lg.connect(filtro.frequency); lfo.start(); moduladores.push(lfo);
+    arm.forEach((m,i)=>{ const o = c.createOscillator(); o.type = "sine"; o.frequency.value = raiz*m; o.detune.value = (i%2?1:-1)*(4+i*3);
+      const og = c.createGain(); og.gain.value = .32/(i+1); o.connect(og); og.connect(filtro); o.start(); fuentes.push(o); });
+    return g;
+  }
+  function bufRuido(c, seg, tipo){
+    const sr = c.sampleRate, n = Math.floor(sr*seg), buf = c.createBuffer(1, n, sr), d = buf.getChannelData(0);
+    if(tipo === "rosa"){ let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+      for(let i=0;i<n;i++){ const w = Math.random()*2-1; b0=.99886*b0+w*.0555179; b1=.99332*b1+w*.0750759; b2=.969*b2+w*.153852; b3=.8665*b3+w*.3104856; b4=.55*b4+w*.5329522; b5=-.7616*b5-w*.016898; d[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.11; b6=w*.115926; } }
+    else if(tipo === "marron"){ let u = 0; for(let i=0;i<n;i++){ const w = Math.random()*2-1; u = (u + .02*w)/1.02; d[i] = u*3; } }
+    else for(let i=0;i<n;i++) d[i] = Math.random()*2-1;
+    const src = c.createBufferSource(); src.buffer = buf; src.loop = true; return src;
+  }
+  function reverbIR(c, seg, decae){
+    const sr = c.sampleRate, n = Math.floor(sr*seg), b = c.createBuffer(2, n, sr), ent = sr*.012;
+    for(let ch=0; ch<2; ch++){ const d = b.getChannelData(ch); let lpv = 0;
+      for(let i=0;i<n;i++){ const w = (Math.random()*2-1) * Math.exp(-i/sr*(6.9/decae)); lpv += .35*(w - lpv); d[i] = lpv * (i < ent ? i/ent : 1); } }
+    return b;
+  }
+  function panear(c, nodo, pan, destino){
+    if(c.createStereoPanner){ const p = c.createStereoPanner(); p.pan.value = pan; nodo.connect(p); p.connect(destino); } else nodo.connect(destino);
+  }
+  // Nota de marimba/campanita suave (parciales con caída exponencial).
+  function nota(c, t, f, pan, vol, destino){
+    const g = c.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .005); g.gain.setTargetAtTime(0, t + .005, .55);
+    panear(c, g, pan, destino);
+    [[1,1,.9],[3.99,.35,.12],[2,.12,.4]].forEach(([r,a,tc])=>{ const o = c.createOscillator(); o.type = "sine"; o.frequency.value = f*r;
+      const og = c.createGain(); og.gain.setValueAtTime(a, t); og.gain.setTargetAtTime(0, t, tc); o.connect(og); og.connect(g); o.start(t); o.stop(t + 2.4); });
+  }
+  // Cuenco: parciales inarmónicos, cada uno en pareja ligeramente desafinada (el batido que lo hace "cantar").
+  function cuenco(c, t, f0, pan, vol, destino){
+    const g = c.createGain(); g.gain.value = vol; panear(c, g, pan, destino);
+    [[1,1,7.5,.9],[2.76,.55,5,1.7],[5.4,.28,3.2,2.6],[8.93,.14,2,3.4]].forEach(([r,a,dec,beat])=>{
+      [0, beat].forEach((db,k)=>{ const o = c.createOscillator(); o.type = "sine"; o.frequency.value = f0*r + db;
+        const og = c.createGain(); const amp = a*(k ? .9 : 1)*.5;
+        og.gain.setValueAtTime(0, t); og.gain.linearRampToValueAtTime(amp, t + .006); og.gain.setTargetAtTime(0, t + .006, dec);
+        o.connect(og); og.connect(g); o.start(t); o.stop(t + Math.min(dec*4, 15)); });
+    });
+  }
+  const PRESETS = {
+    vela:   { tipo:"tono", raiz:110,    arm:[1,1.5,2,3],   corte:900,  Q:.6, lfoHz:.05,  lfoAmp:260,  forma:"triangle" },
+    dia:    { tipo:"tono", raiz:110,    arm:[1,1.5,2,3],   corte:900,  Q:.6, lfoHz:.05,  lfoAmp:260,  forma:"triangle" },
+    noche:  { tipo:"tono", raiz:65.41,  arm:[1,1.5,2],     corte:360,  Q:.6, lfoHz:.028, lfoAmp:90,   forma:"sine" },
+    eter:   { tipo:"tono", raiz:146.83, arm:[1,2,3,4.5],   corte:1500, Q:.5, lfoHz:.035, lfoAmp:420,  forma:"sine" },
+    lluvia: { tipo:"ruido", corte:5200, Q:.4, hp:900, lfoHz:.12, lfoAmp:1500, swell:false },
+    oceano: { tipo:"ruido", corte:680,  Q:.5, hp:110, lfoHz:.06, lfoAmp:220,  swell:true },
+    concentracion: { tipo:"tono", raiz:98, arm:[1,2,3], corte:680, Q:.5, lfoHz:.018, lfoAmp:110, forma:"sine" },
+    marron: { tipo:"ruido", marron:true, corte:1400, Q:.3, hp:20, lfoHz:.04, lfoAmp:180, swell:false },
+    blanco: { tipo:"ruido", corte:9000, Q:.2, hp:180, lfoHz:.06, lfoAmp:700, swell:false },
+    binaural: { tipo:"binaural", base:180, beat:12, vol:.5 },
+    // Sonidos con función (v8): se generan en vivo, sin archivos.
+    vaiven:  { tipo:"vaiven", bpm:66 },            // notas suaves que alternan izquierda/derecha
+    marea:   { tipo:"marea" },                     // respira: la guía de respiración la mueve con respirar()
+    pulso:   { tipo:"pulso", hz:16, prof:.42 },    // modulación rápida de amplitud para acompañar la atención
+    capilla: { tipo:"capilla", cada:16 },          // cuenco cada ~16 s en un espacio con eco, sobre un órgano lejano
+    amanecer:{ tipo:"amanecer" },                  // se abre y se ilumina a lo largo de la sesión (opts.dur)
+    descenso:{ tipo:"descenso" }                   // se oscurece, se hace más lento y termina en silencio (opts.dur)
+  };
+  // Un solo AudioContext, reutilizado y nunca cerrado: iOS limita a ~4 contextos.
+  function contexto(){
+    if(!ctx){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(!AC) return null;
+      try{ ctx = new AC(); }catch(e){ return null; }
+    }
+    return ctx;
+  }
+  // Desbloqueo iOS: resume + un buffer silencioso, dentro de un gesto del usuario.
+  function desbloquear(){
+    const c = contexto(); if(!c) return;
+    try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
+    try{ c.resume(); }catch(e){}
+    if(!desbloqueado){
+      try{
+        const b = c.createBuffer(1, 1, c.sampleRate);
+        const s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0);
+        desbloqueado = true;
+      }catch(e){}
+    }
+  }
+  function iniciar(escena, vol, opts){
+    try{
+      detener(0);
+      const c = contexto(); if(!c) return false;
+      try{ c.resume(); }catch(e){}
+      const p = PRESETS[escena] || PRESETS.vela; actual = PRESETS[escena] ? escena : "vela";
+      master = c.createGain(); master.gain.value = 0; master.connect(c.destination);
+      bus = c.createGain(); bus.gain.value = 1; bus.connect(master);
+      let arranque = null;
+
+      if(p.tipo === "ruido"){
+        const sr = c.sampleRate, buf = c.createBuffer(1, sr*3, sr), d = buf.getChannelData(0);
+        if(p.marron){
+          let ult = 0;
+          for(let i=0;i<d.length;i++){ const w = Math.random()*2-1; ult = (ult + 0.02*w)/1.02; d[i] = ult*3; }
+        } else {
+          for(let i=0;i<d.length;i++) d[i] = Math.random()*2 - 1;
+        }
+        const src = c.createBufferSource(); src.buffer = buf; src.loop = true;
+        const hp = c.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = p.hp;
+        const lp = c.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = p.corte; lp.Q.value = p.Q;
+        src.connect(hp); hp.connect(lp);
+        let salida = lp;
+        if(p.swell){
+          const swellG = c.createGain(); swellG.gain.value = .7;
+          lp.connect(swellG); salida = swellG;
+          const s = c.createOscillator(); s.frequency.value = .07;
+          const sg = c.createGain(); sg.gain.value = .3;
+          s.connect(sg); sg.connect(swellG.gain); s.start(); moduladores.push(s);
+        }
+        salida.connect(bus);
+        const lfo = c.createOscillator(); lfo.frequency.value = p.lfoHz;
+        const lg = c.createGain(); lg.gain.value = p.lfoAmp;
+        lfo.connect(lg); lg.connect(lp.frequency); lfo.start(); moduladores.push(lfo);
+        src.start(); fuentes.push(src);
+      } else if(p.tipo === "binaural"){
+        const mk = (freq, pan)=>{
+          const o = c.createOscillator(); o.type = "sine"; o.frequency.value = freq;
+          const g = c.createGain(); g.gain.value = (p.vol || .5);
+          o.connect(g);
+          if(c.createStereoPanner){ const pn = c.createStereoPanner(); pn.pan.value = pan; g.connect(pn); pn.connect(bus); }
+          else { g.connect(bus); }
+          o.start(); fuentes.push(o);
+        };
+        mk(p.base, -1);
+        mk(p.base + p.beat, 1);
+      } else if(p.tipo === "vaiven"){
+        const verb = c.createConvolver(); verb.buffer = reverbIR(c, 2.4, 1.8);
+        const vg = c.createGain(); vg.gain.value = .3; verb.connect(vg); vg.connect(bus);
+        const seco = c.createGain(); seco.gain.value = 1; seco.connect(bus); seco.connect(verb);
+        lecho(c, 110, [1,1.5,2], 700, .5, bus);
+        const agua = bufRuido(c, 4, "rosa"), af = c.createBiquadFilter(); af.type = "lowpass"; af.frequency.value = 900;
+        const ag = c.createGain(); ag.gain.value = .22; agua.connect(af); af.connect(ag); ag.connect(bus); agua.start(); fuentes.push(agua);
+        const ESC = [220,246.94,277.18,329.63,369.99,440], FR = [0,2,3,2,1,3,4,3,0,2,1,0], paso = 60/((opts && opts.bpm) || p.bpm || 66);
+        let tn = c.currentTime + 1.2, k = 0;
+        arranque = ()=>{
+          const programar = ()=>{ if(!vivo) return;
+            while(tn < c.currentTime + 1.6){
+              const f = ESC[FR[k % FR.length]] * ((Math.floor(k/24) % 2) ? .5 : 1), lado = (k % 2 === 0) ? -.92 : .92;
+              nota(c, tn, f, lado, .9*(.85 + .15*Math.sin(k)), seco);
+              evento({ tipo:"nota", lado, t:tn, paso }); tn += paso; k++;
+            } };
+          programar(); prog = setInterval(programar, 250);
+        };
+      } else if(p.tipo === "marea"){
+        const verb = c.createConvolver(); verb.buffer = reverbIR(c, 3, 2.4);
+        const vg = c.createGain(); vg.gain.value = .35; verb.connect(vg); vg.connect(bus);
+        const ola = bufRuido(c, 6, "rosa"), f = c.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 900; f.Q.value = .3;
+        const g = c.createGain(); g.gain.value = .6; ola.connect(f); f.connect(g);
+        if(c.createStereoPanner){ const pn = c.createStereoPanner(); g.connect(pn); pn.connect(bus); pn.connect(verb);
+          const pl = c.createOscillator(); pl.frequency.value = .02; const pg = c.createGain(); pg.gain.value = .3; pl.connect(pg); pg.connect(pn.pan); pl.start(); moduladores.push(pl); }
+        else { g.connect(bus); g.connect(verb); }
+        ola.start(); fuentes.push(ola);
+        const dr = lecho(c, 98, [1,1.5,2,3], 620, .5, bus);
+        marea = { filtro:f, ola:g, dron:dr, dentro:null };
+      } else if(p.tipo === "pulso"){
+        const am = c.createGain(), prof = p.prof || .42, t0 = c.currentTime;
+        am.gain.setValueAtTime(1, t0); am.gain.linearRampToValueAtTime(1 - prof/2, t0 + 8); am.connect(bus);
+        const r = bufRuido(c, 4, "marron"), rf = c.createBiquadFilter(); rf.type = "lowpass"; rf.frequency.value = 1100;
+        const rg = c.createGain(); rg.gain.value = .8; r.connect(rf); rf.connect(rg); rg.connect(am); r.start(); fuentes.push(r);
+        lecho(c, 98, [1,2,3], 680, .6, am);
+        const lfo = c.createOscillator(); lfo.frequency.value = p.hz || 16;
+        const pg = c.createGain(); pg.gain.setValueAtTime(0, t0); pg.gain.linearRampToValueAtTime(prof/2, t0 + 8);   // la modulación entra suave en 8 s
+        lfo.connect(pg); pg.connect(am.gain); lfo.start(); moduladores.push(lfo);
+      } else if(p.tipo === "capilla"){
+        const verb = c.createConvolver(); verb.buffer = reverbIR(c, 5, 4.2);
+        const vg = c.createGain(); vg.gain.value = .7; verb.connect(vg); vg.connect(bus);
+        const seco = c.createGain(); seco.gain.value = .7; seco.connect(bus); seco.connect(verb);
+        lecho(c, 73.42, [1,1.5,2,3,4], 1300, .6, seco);
+        const cada = p.cada || 16; let tg = c.currentTime + 1.0, k = 0;
+        arranque = ()=>{
+          const programar = ()=>{ if(!vivo) return;
+            while(tg < c.currentTime + 1.6){ cuenco(c, tg, (k % 2) ? 220 : 261.6, (k % 2) ? .25 : -.25, .85, seco); evento({ tipo:"golpe", t:tg }); tg += cada; k++; } };
+          programar(); prog = setInterval(programar, 400);
+        };
+      } else if(p.tipo === "amanecer"){
+        const dur = Math.max(60, (opts && opts.dur) || 300), t0 = c.currentTime, pocas = !!(opts && opts.notas === "pocas");
+        const verb = c.createConvolver(); verb.buffer = reverbIR(c, 3.2, 2.8);
+        const vg = c.createGain(); vg.gain.value = .35; verb.connect(vg); vg.connect(bus);
+        const seco = c.createGain(); seco.gain.value = 1; seco.connect(bus); seco.connect(verb);
+        // El dron se abre: el filtro sube de 280 Hz a 2400 Hz y los armónicos altos entran poco a poco.
+        const filtro = c.createBiquadFilter(); filtro.type = "lowpass"; filtro.Q.value = .6;
+        filtro.frequency.setValueAtTime(280, t0); filtro.frequency.exponentialRampToValueAtTime(2400, t0 + dur*.85);
+        const dg = c.createGain(); dg.gain.setValueAtTime(.4, t0); dg.gain.linearRampToValueAtTime(.8, t0 + dur*.85);
+        filtro.connect(dg); dg.connect(seco);
+        [1,1.5,2,3,4,5].forEach((m,i)=>{ const o = c.createOscillator(); o.type = i < 3 ? "sine" : "triangle"; o.frequency.value = 110*m; o.detune.value = (i%2?1:-1)*(3+i*2);
+          const og = c.createGain(), a = .32/(i+1); og.gain.setValueAtTime(i < 3 ? a : 0, t0); if(i >= 3) og.gain.linearRampToValueAtTime(a, t0 + dur*.6);
+          o.connect(og); og.connect(filtro); o.start(); fuentes.push(o); });
+        // Arpegio que sube de registro y se hace más frecuente (de ~4 s a ~1.4 s entre notas).
+        const ESC = [220,246.94,277.18,329.63,369.99,440,493.88,554.37,659.25,739.99,880];
+        let tn = t0 + 2, k = 0;
+        arranque = ()=>{
+          const programar = ()=>{ if(!vivo) return;
+            while(tn < c.currentTime + 1.6){
+              const av = Math.min(1, (tn - t0)/dur), idx = Math.min(ESC.length - 1, Math.floor(av*5) + [0,2,4,2,1,3][k % 6]);
+              nota(c, tn, ESC[idx], (k % 2) ? .3 : -.3, (pocas ? .3 : .55)*(.6 + .4*av), seco);
+              tn += (pocas ? 2.2 : 1) * (4.2 - 2.8*av); k++;
+            } };
+          programar(); prog = setInterval(programar, 300);
+        };
+      } else if(p.tipo === "descenso"){
+        const dur = Math.max(120, (opts && opts.dur) || 1800), t0 = c.currentTime;
+        const verb = c.createConvolver(); verb.buffer = reverbIR(c, 4, 3.6);
+        const vg = c.createGain(); vg.gain.value = .4; verb.connect(vg); vg.connect(bus);
+        const seco = c.createGain(); seco.gain.value = 1; seco.connect(bus); seco.connect(verb);
+        // Se oscurece: el filtro baja de 1300 Hz a 240 Hz durante el 80% de la sesión.
+        const filtro = c.createBiquadFilter(); filtro.type = "lowpass"; filtro.Q.value = .5;
+        filtro.frequency.setValueAtTime(1300, t0); filtro.frequency.exponentialRampToValueAtTime(240, t0 + dur*.8);
+        const dg = c.createGain(); dg.gain.value = .6; filtro.connect(dg); dg.connect(seco);
+        [1,1.5,2,3].forEach((m,i)=>{ const o = c.createOscillator(); o.type = "sine"; o.frequency.value = 98*m; o.detune.value = (i%2?1:-1)*(4+i*3);
+          const og = c.createGain(); og.gain.value = .32/(i+1); o.connect(og); og.connect(filtro); o.start(); fuentes.push(o); });
+        const ola = bufRuido(c, 6, "rosa"), of = c.createBiquadFilter(); of.type = "lowpass";
+        of.frequency.setValueAtTime(900, t0); of.frequency.exponentialRampToValueAtTime(260, t0 + dur*.8);
+        const og = c.createGain(); og.gain.value = .45; ola.connect(of); of.connect(og); og.connect(bus); ola.start(); fuentes.push(ola);
+        // Su respiración se alarga: de 6 a 3.5 ciclos por minuto.
+        const lfo = c.createOscillator(); lfo.frequency.setValueAtTime(.1, t0); lfo.frequency.linearRampToValueAtTime(.058, t0 + dur*.8);
+        const lg = c.createGain(); lg.gain.value = .18; lfo.connect(lg); lg.connect(og.gain); lfo.start(); moduladores.push(lfo);
+        // El último cuarto baja hasta el silencio.
+        bus.gain.setValueAtTime(1, t0 + dur*.75); bus.gain.linearRampToValueAtTime(.0001, t0 + dur);
+        const ESC = [329.63, 293.66, 261.63, 220, 196, 164.81, 146.83];
+        let tn = t0 + 3, k = 0;
+        arranque = ()=>{
+          const programar = ()=>{ if(!vivo) return;
+            while(tn < c.currentTime + 1.6 && tn < t0 + dur*.75){
+              const av = Math.min(1, (tn - t0)/dur), idx = Math.min(ESC.length - 1, Math.floor(av*ESC.length*1.1) + (k % 2));
+              nota(c, tn, ESC[idx], (k % 2) ? .2 : -.2, .45*(1 - av*.6), seco);
+              tn += 7 + 12*av; k++;
+            } };
+          programar(); prog = setInterval(programar, 500);
+        };
+      } else {
+        const filtro = c.createBiquadFilter(); filtro.type = "lowpass";
+        filtro.frequency.value = p.corte; filtro.Q.value = p.Q; filtro.connect(bus);
+        const lfo = c.createOscillator(); lfo.frequency.value = p.lfoHz;
+        const lg = c.createGain(); lg.gain.value = p.lfoAmp;
+        lfo.connect(lg); lg.connect(filtro.frequency); lfo.start(); moduladores.push(lfo);
+        // segunda modulación lenta para que respire (evolución tipo Endel)
+        const drift = c.createOscillator(); drift.frequency.value = p.lfoHz*0.37 + .011;
+        const dg = c.createGain(); dg.gain.value = p.lfoAmp*0.45;
+        drift.connect(dg); dg.connect(filtro.frequency); drift.start(); moduladores.push(drift);
+        p.arm.forEach((m,i)=>{
+          const o = c.createOscillator(); o.type = p.forma;
+          o.frequency.value = p.raiz*m; o.detune.value = (i%2?1:-1)*(4+i*3);
+          const g = c.createGain(); g.gain.value = .32/(i+1);
+          o.connect(g); g.connect(filtro); o.start(); fuentes.push(o);
+        });
+      }
+
+      // Entrada audible y rápida (antes: tope .09 subiendo en 8 s → casi inaudible).
+      master.gain.linearRampToValueAtTime(Math.max(.002, vol*.20), c.currentTime + 3);
+      vivo = true; if(arranque) arranque(); return true;
+    }catch(e){ return false; }
+  }
+  function volumen(v){ if(vivo&&master&&ctx) try{ master.gain.linearRampToValueAtTime(Math.max(.0001,v*.20), ctx.currentTime+.4); }catch(e){} }
+  function detener(seg){
+    if(!vivo||!ctx){ vivo=false; return; }
+    const s = (seg===undefined?4:seg);
+    try{
+      master.gain.cancelScheduledValues(ctx.currentTime);
+      master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
+      master.gain.linearRampToValueAtTime(.0001, ctx.currentTime + Math.max(.05,s));
+    }catch(e){}
+    clearInterval(prog); prog = null; marea = null;
+    const f = fuentes, m = moduladores, mst = master, bs = bus; vivo=false;
+    // Detenemos y desconectamos nodos, pero NO cerramos el contexto (se reutiliza).
+    setTimeout(()=>{
+      try{ f.forEach(x=>{ try{ x.stop(); x.disconnect(); }catch(_){} }); }catch(e){}
+      try{ m.forEach(x=>{ try{ x.stop(); x.disconnect(); }catch(_){} }); }catch(e){}
+      try{ if(mst) mst.disconnect(); }catch(e){}
+      try{ if(bs) bs.disconnect(); }catch(e){}
+    }, s*1000+400);
+    fuentes=[]; moduladores=[]; master=null; bus=null;
+  }
+  function campana(){
+    try{
+      const c = contexto(); if(!c) return; try{ c.resume(); }catch(e){}
+      const t = c.currentTime;
+      [880, 1318.5].forEach((f,i)=>{
+        const o = c.createOscillator(); o.type = "sine"; o.frequency.value = f;
+        const g = c.createGain();
+        g.gain.setValueAtTime(0, t + i*0.18);
+        g.gain.linearRampToValueAtTime(0.14, t + i*0.18 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + i*0.18 + 0.6);
+        o.connect(g); g.connect(c.destination);
+        o.start(t + i*0.18); o.stop(t + i*0.18 + 0.65);
+      });
+    }catch(e){}
+  }
+  function respirar(abierto, ms){
+    if(!vivo || !ctx) return;
+    const c = ctx, t = c.currentTime, tc = Math.max(.3, (ms || 4000)/1000) / 3;
+    try{
+      if(marea){
+        marea.filtro.frequency.setTargetAtTime(abierto ? 2600 : 380, t, tc);
+        marea.ola.gain.setTargetAtTime(abierto ? 1.0 : .14, t, tc);
+        marea.dron.gain.setTargetAtTime(abierto ? .7 : .3, t, tc);
+        if(abierto && marea.dentro !== true) nota(c, t + .02, 659.25, 0, .22, bus);   // campanita al empezar a inhalar
+        marea.dentro = !!abierto;
+      } else if(bus && actual !== "descenso"){
+        bus.gain.setTargetAtTime(abierto ? 1 : .8, t, tc);
+      }
+    }catch(e){}
+  }
+  function escuchar(fn){ oyente = fn || null; }
+  return { iniciar, detener, volumen, activo:()=>vivo, escena:()=>(vivo ? actual : null), desbloquear, campana, respirar, escuchar };
+})();
+
+/* Desbloqueo de audio para iOS: en el primer gesto y al volver a la app.
+   Safari no deja sonar nada hasta que el usuario toca algo. */
+["pointerdown", "touchend", "click", "keydown"].forEach(ev =>
+  window.addEventListener(ev, () => { try { Pad.desbloquear(); } catch (e) {} }, { passive: true }));
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) { try { Pad.desbloquear(); } catch (e) {}
+    if (typeof Pomo !== "undefined" && Pomo.activo) { try { tickPomo(); pintarConcentra(); } catch (e) {} } }
+});
+
+
+
+/* ════════ LOS GESTOS ════════
+   De Denha viene la idea: una frase corta en los momentos que marcan el día,
+   sin felicitar y sin regañar. No son logros ni rachas; es una voz que
+   acompaña y se calla. La del día no se rifa en cada pintada —se queda la
+   misma hasta mañana— para que no parpadee cada vez que marcas algo.        */
+const FRASES = {
+  abrir: ["Empieza por lo de arriba.", "Lo de hoy cabe en una lista.",
+    "No tienes que hacerlo todo. Tienes que empezar.", "El día es tuyo.",
+    "Una cosa a la vez, y la primera primero.", "Lo que importa hoy ya está escrito."],
+  cierra: ["Lo que importaba, salió. Lo demás es extra.", "El día cuenta.",
+    "Ya está lo que tenía que estar.", "Con esto basta. Lo que siga es de más."],
+  listo: ["Queda hecho.", "Una menos.", "Va.", "Hecho.", "Sigue."],
+  pase: ["Lo que no salió, vuelve a estar.", "Escribe la lista de nuevo.",
+    "Lo que no vale la pena volver a escribir, no valía la pena."]
+};
+const frase = k => { const p = FRASES[k] || []; return p[Math.floor(Math.random() * p.length)] || ""; };
+function fraseDelDia(k, f) {
+  const p = FRASES[k] || []; if (!p.length) return "";
+  let h = 0; const t = k + f;
+  for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0;
+  return p[h % p.length];
+}
+
+/* ════════ PAISAJES Y ENFOQUE ════════
+   Los paisajes, los métodos y las frases vienen de Denha tal cual. Lo que
+   cambió es a qué se engancha: allá acompañan una práctica, aquí acompañan
+   una tarea. Por eso el enfoque se abre desde un renglón y lleva su nombre
+   en la pantalla: no es «un pomodoro», es «esta cosa, ahora».               */
+const SONIDOS = [
+  { cat: "Relajación", escenas: [["vela", "Vela"], ["oceano", "Océano"], ["lluvia", "Lluvia"], ["eter", "Éter"]] },
+  { cat: "Concentración", escenas: [["concentracion", "Enfoque"], ["marron", "Ruido marrón"], ["blanco", "Ruido blanco"]] },
+  { cat: "Atención", escenas: [["binaural", "Ondas binaurales"], ["pulso", "Pulso"]], nota: "Las ondas binaurales funcionan mejor con audífonos." }
+];
+const SONIDO_NOMBRE = { vela: "Vela", oceano: "Océano", lluvia: "Lluvia", eter: "Éter", noche: "Noche",
+  concentracion: "Enfoque", marron: "Ruido marrón", blanco: "Ruido blanco", binaural: "Ondas binaurales",
+  pulso: "Pulso", vaiven: "Vaivén", marea: "Marea", capilla: "Capilla" };
+const METODOS = [
+  { foco: 25, descanso: 5,  nom: "Clásico",  desc: "25 / 5" },
+  { foco: 50, descanso: 10, nom: "Profundo", desc: "50 / 10" },
+  { foco: 15, descanso: 3,  nom: "Ligero",   desc: "15 / 3" }
+];
+const CONCENTRA_MSG = {
+  foco: ["Una cosa a la vez.", "Si te distraes, vuelve. Sin reproche.", "Respira, y sigue.",
+    "Esto es lo único que importa ahora.", "Tu atención es tuya; ponla aquí.", "Deja el teléfono lejos.",
+    "Vuelve al presente. Aquí. Ahora.", "No tienes que apurarte, solo continuar.",
+    "Un paso a la vez es suficiente."],
+  descanso: ["Suelta la pantalla. Descansa la vista.", "Estira el cuerpo.", "Respira hondo unas veces.",
+    "Toma agua.", "Camina un poco.", "Deja descansar la mente."]
+};
+
+let sonidoManual = null, sonDormirId = null, sonDormirFin = 0, sonDormirTick = null;
+const Pomo = { activo: false, modo: "foco", finMs: 0, foco: 25, descanso: 5, escena: "concentracion",
+  timer: null, msgTimer: null, tarea: "", id: null, vueltas: 0 };
+let pantallaViva = null;
+
+function pedirPantalla() {
+  try { if (navigator.wakeLock && !pantallaViva) navigator.wakeLock.request("screen").then(w => { pantallaViva = w; }).catch(() => {}); } catch (e) {}
+}
+function soltarPantalla() { try { if (pantallaViva) { pantallaViva.release(); pantallaViva = null; } } catch (e) {} }
+
+function reproducirSonido(escena) {
+  Pad.iniciar(escena, (E.ajustes.volumen == null ? 0.5 : E.ajustes.volumen));
+  sonidoManual = escena;
+}
+function detenerSonido() {
+  Pad.detener(1.5); sonidoManual = null;
+  clearTimeout(sonDormirId); sonDormirId = null;
+  clearInterval(sonDormirTick); sonDormirTick = null; sonDormirFin = 0;
+}
+function iniciarDormir() {
+  const min = E.ajustes.dormir || 15;
+  reproducirSonido(sonidoManual || "oceano");
+  sonDormirFin = Date.now() + min * 60000;
+  clearTimeout(sonDormirId); sonDormirId = setTimeout(() => detenerDormir(true), min * 60000 + 400);
+  clearInterval(sonDormirTick);
+  sonDormirTick = setInterval(() => { if (Date.now() >= sonDormirFin) detenerDormir(true); else hojaSonido(); }, 1000);
+  hojaSonido();
+}
+function detenerDormir(fade) {
+  clearTimeout(sonDormirId); sonDormirId = null;
+  clearInterval(sonDormirTick); sonDormirTick = null; sonDormirFin = 0;
+  Pad.detener(fade ? 30 : 1.5); sonidoManual = null;
+  try { if (document.getElementById("hojaTit")) hojaSonido(); } catch (e) {}
+}
+
+const pomoRestante = () => Pomo.activo ? Math.max(0, Math.ceil((Pomo.finMs - Date.now()) / 1000)) : 0;
+function concentraMensaje() {
+  const el = $("#concentraMsg"); if (!el) return;
+  const pool = CONCENTRA_MSG[Pomo.modo] || CONCENTRA_MSG.foco;
+  el.style.opacity = "0";
+  setTimeout(() => { el.textContent = pool[Math.floor(Math.random() * pool.length)]; el.style.opacity = "1"; }, 400);
+}
+function pintarConcentra() {
+  const ov = $("#concentra"); if (!ov || ov.classList.contains("oculto")) return;
+  const r = pomoRestante(), m = Math.floor(r / 60), sg = r % 60;
+  const num = $("#concentraNum"); if (num) num.textContent = m + ":" + String(sg).padStart(2, "0");
+  const fase = $("#concentraFase"); if (fase) fase.textContent = Pomo.modo === "foco" ? "Enfoque" : "Descanso";
+  const qu = $("#concentraQue"); if (qu) qu.textContent = Pomo.tarea || "";
+  const total = (Pomo.modo === "foco" ? Pomo.foco : Pomo.descanso) * 60;
+  const prog = total > 0 ? (total - r) / total : 0;
+  const ring = $("#concentraProg");
+  if (ring) ring.style.strokeDashoffset = String(289.03 * (1 - Math.min(1, Math.max(0, prog))));
+}
+function tickPomo() {
+  try {
+    if (!Pomo.activo) return;
+    if (Date.now() >= Pomo.finMs) {
+      try { Pad.campana(); } catch (e) {}
+      if (Pomo.modo === "foco") {
+        Pomo.vueltas += 1;
+        Pomo.modo = "descanso"; Pomo.finMs = Date.now() + Pomo.descanso * 60000;
+        detenerSonido();
+      } else {
+        Pomo.modo = "foco"; Pomo.finMs = Date.now() + Pomo.foco * 60000;
+        reproducirSonido(Pomo.escena);
+      }
+      concentraMensaje(); pintarConcentra();
+      return;
+    }
+    pintarConcentra();
+  } catch (e) {}
+}
+function iniciarPomo(tarea, id) {
+  const m = METODOS[E.ajustes.metodo || 0] || METODOS[0];
+  Pomo.foco = m.foco; Pomo.descanso = m.descanso;
+  Pomo.activo = true; Pomo.modo = "foco"; Pomo.finMs = Date.now() + Pomo.foco * 60000;
+  Pomo.tarea = tarea || ""; Pomo.id = id || null; Pomo.vueltas = 0;
+  reproducirSonido(Pomo.escena);
+  try { cerrarHoja(); } catch (e) {}
+  pedirPantalla();
+  const ov = $("#concentra"); if (ov) ov.classList.remove("oculto");
+  const ring = $("#concentraProg");
+  if (ring) { ring.style.transition = "none"; ring.style.strokeDashoffset = "289.03"; void ring.offsetWidth;
+    ring.style.transition = "stroke-dashoffset 1s linear"; }
+  concentraMensaje(); pintarConcentra();
+  clearInterval(Pomo.timer); Pomo.timer = setInterval(tickPomo, 1000);
+  clearInterval(Pomo.msgTimer); Pomo.msgTimer = setInterval(() => { if (Pomo.activo) concentraMensaje(); }, 34000);
+}
+function detenerPomo() {
+  const vueltas = Pomo.vueltas + (Pomo.modo === "foco" && pomoRestante() === 0 ? 1 : 0);
+  Pomo.activo = false;
+  clearInterval(Pomo.timer); Pomo.timer = null;
+  clearInterval(Pomo.msgTimer); Pomo.msgTimer = null;
+  const ov = $("#concentra"); if (ov) ov.classList.add("oculto");
+  soltarPantalla(); detenerSonido();
+  if (vueltas > 0) nota(vueltas === 1 ? "Un bloque de enfoque. Queda hecho." : vueltas + " bloques de enfoque.");
+}
+
+function hojaSonido(tarea, id) {
+  const sonando = sonidoManual
+    ? `<div class="son-now"><span>Ahora suena · ${esc(SONIDO_NOMBRE[sonidoManual] || sonidoManual)}</span>` +
+      `<button class="son-stop" data-accion="son-parar">Detener</button></div>` : "";
+  let c = sonando;
+  if (tarea) c += `<p class="son-tarea">Vas a enfocar: <b>${esc(tarea)}</b></p>`;
+  SONIDOS.forEach(cat => {
+    c += `<div class="son-cat"><p class="son-cat-t">${esc(cat.cat)}</p><div class="son-chips">` +
+      cat.escenas.map(e => `<button class="son-chip${sonidoManual === e[0] ? " on" : ""}" data-accion="son-escena" data-v="${e[0]}">${esc(e[1])}</button>`).join("") +
+      `</div>` + (cat.nota ? `<p class="campo-ayuda">${esc(cat.nota)}</p>` : "") + `</div>`;
+  });
+  c += `<div class="son-pomo"><p class="son-cat-t">Enfoque</p>` +
+    `<div class="segmento">${METODOS.map((m, i) =>
+      `<button class="seg${(E.ajustes.metodo || 0) === i ? " activo" : ""}" data-accion="son-metodo" data-v="${i}">${m.nom}<em>${m.desc}</em></button>`).join("")}</div>` +
+    `<p class="pomo-sub">Suena un paisaje mientras enfocas y una campana al terminar. En el descanso se calla solo.</p>` +
+    `<div class="acciones"><button class="accion llena" data-accion="son-enfocar"${id ? ` data-id="${id}"` : ""}>Empezar ${METODOS[E.ajustes.metodo || 0].foco} minutos</button></div></div>`;
+  const quedan = sonDormirFin > Date.now() ? Math.ceil((sonDormirFin - Date.now()) / 1000) : 0;
+  c += `<div class="son-cat" style="margin-top:26px"><p class="son-cat-t">Temporizador de sueño</p>` +
+    `<div class="segmento">${[15, 30, 45, 60].map(n =>
+      `<button class="seg${(E.ajustes.dormir || 15) === n ? " activo" : ""}" data-accion="son-dormir" data-v="${n}">${n} min</button>`).join("")}</div>` +
+    (quedan
+      ? `<div class="son-now" style="margin-top:12px"><span>Se apaga en ${Math.floor(quedan / 60)}:${String(quedan % 60).padStart(2, "0")}</span><button class="son-stop" data-accion="son-dormir-no">Detener</button></div>`
+      : `<div class="acciones"><button class="accion" data-accion="son-dormir-ya">Iniciar temporizador</button></div>`) +
+    `<p class="campo-ayuda">Reproduce un paisaje y se apaga solo tras ese tiempo, para no sonar toda la noche.</p></div>`;
+  hoja("Sonido y enfoque", "Paisajes para relajación, concentración y atención. Siguen sonando mientras usas la app.", c);
+}
 
 /* ════════ SINCRONIZAR ════════
    Dos dispositivos, un gist privado de GitHub. Sin servidor y sin cuenta
