@@ -354,6 +354,48 @@ html[data-modo="oscuro"] .pa.hecha .pa-c{color:#1a1612}
   text-decoration-color:var(--linea-fuerte)}
 .enlace:hover{color:var(--tinta)}
 
+/* ══ NIVELES CON COLOR ══
+   Tres colores de la misma familia, no un semáforo: el 1 es la llama, el 2
+   la cera, el 3 queda en tinta apagada. Ninguno es rojo de alarma — aquí no
+   se falla nada. El color nunca va solo: siempre lleva el número al lado,
+   para quien no distinga los tonos. */
+.niv{display:flex;align-items:baseline;gap:9px;margin:20px 0 4px;font-size:13.5px;color:var(--tinta)}
+.niv em{font-style:normal;font-size:11.5px;color:var(--tinta-tenue);margin-left:auto}
+.niv-b{width:21px;height:21px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
+  font-family:var(--mono);font-size:11px;align-self:center}
+.niv1 .niv-b{background:var(--llama);color:#fff}
+.niv2 .niv-b{background:var(--cera);color:#4a3f2e}
+.niv3 .niv-b{background:none;box-shadow:inset 0 0 0 1.5px var(--linea-fuerte);color:var(--tinta-baja)}
+html[data-modo="oscuro"] .niv1 .niv-b{color:#1a1612}
+/* El renglón lleva una cinta del color de su nivel: se lee de un vistazo */
+.it{position:relative;padding-left:9px}
+.it::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:2px}
+.it.n1::before{background:var(--llama)}
+.it.n2::before{background:var(--cera)}
+.it.n3::before{background:var(--linea-fuerte)}
+.it.hecha::before{opacity:.3}
+.it-n.n1{background:color-mix(in srgb,var(--llama) 22%,transparent);color:var(--oro);font-weight:600}
+.it-n.n2{background:color-mix(in srgb,var(--cera) 34%,transparent);color:var(--tinta-baja)}
+.it-n.n3{background:none;box-shadow:inset 0 0 0 1px var(--linea);color:var(--tinta-tenue)}
+
+/* ══ ARRASTRAR ══
+   Mantener presionado levanta el renglón. Antes de eso el gesto sigue
+   siendo un scroll, así que no hace falta un asa en cada fila. */
+.zona-vacia{list-style:none;padding:11px 0;font-size:13px;color:var(--tinta-tenue);
+  border-bottom:1px solid var(--linea)}
+[data-arr]{touch-action:pan-y;cursor:grab}
+body.arrastrando{user-select:none;-webkit-user-select:none}
+body.arrastrando [data-arr]{cursor:grabbing}
+.hueco{opacity:.26}
+.fantasma{box-shadow:0 10px 26px rgba(14,13,12,.22);background:var(--noche);border-radius:12px;
+  padding:0 10px !important;transform-origin:50% 50%;animation:levanta .16s ease}
+@keyframes levanta{from{transform-origin:50% 50%}}
+.fantasma .it,.fantasma .rt{border-bottom:0}
+[data-zona]{min-height:30px;border-radius:10px;transition:background .18s ease,box-shadow .18s ease}
+.zona-on{background:color-mix(in srgb,var(--cera) 15%,transparent);
+  box-shadow:0 0 0 1.5px var(--cera)}
+.hueco-antes{box-shadow:inset 0 2px 0 -0.5px var(--llama)}
+
 </style>
 </head>
 <body>
@@ -460,17 +502,26 @@ let E = null;
    El nivel (1, 2, 3) vive en el ítem: tocarlo hoy lo deja así mañana,
    igual que al reescribir la nota a mano.                                */
 function rutinaNueva(o) {
-  return Object.assign({ id: uid(), tipo: "rutina", texto: "", nivel: 2, hora: "", area: "",
-    dias: [1, 2, 3, 4, 5], semanal: 0, meta: null, pausada: false, pasos: [] }, o || {});
+  const base = Object.assign({ id: uid(), tipo: "rutina", texto: "", nivel: 2, hora: "", area: "",
+    orden: 0, dias: [1, 2, 3, 4, 5], semanal: 0,
+    meta: null, pausada: false, pasos: [] }, o || {});
+  /* Sin franja explícita, la hora decide dónde cae la primera vez. De ahí en
+     adelante manda el campo: arrastrar tiene que poder contradecir al reloj. */
+  if (!FRANJAS.some(x => x.id === base.franja)) base.franja = franjaDeHora(base.hora);
+  return base;
 }
 function sueltoNuevo(o) {
-  return Object.assign({ id: uid(), tipo: "suelto", texto: "", nivel: 2, hora: "",
+  return Object.assign({ id: uid(), tipo: "suelto", texto: "", nivel: 2, hora: "", orden: 0,
     meta: null, creado: hoyISO(), pases: 0, hecha: false, hechaEl: null, archivada: false }, o || {});
 }
 function diaVacio() { return { hechas: {}, fuera: [], sub: {}, pase: false }; }
 function diaDe(f) { return Object.assign(diaVacio(), E.dias[f] || {}); }
 function diaMut(f) { const d = E.dias[f] = Object.assign(diaVacio(), E.dias[f] || {}); return d; }
 
+const horaEnMin = h => { const p = String(h || "").split(":");
+  return p.length === 2 ? (+p[0] || 0) * 60 + (+p[1] || 0) : 9999; };
+const franjaDeHora = h => { const m = horaEnMin(h); if (m === 9999) return "jornada";
+  const f = FRANJAS.find(x => m >= x.desde * 60 && m < x.hasta * 60); return f ? f.id : "jornada"; };
 const FRANJAS = [
   { id: "manana", nombre: "Mañana", desde: 5, hasta: 7 },
   { id: "jornada", nombre: "Jornada", desde: 7, hasta: 18 },
@@ -491,6 +542,7 @@ function desdeViejo(g) {
   const esTrabajo = r => r.area === AREA_OFICIO;
   const rutinas = (g.rutinas || []).filter(r => r.frecuencia !== "mes").map(r => rutinaNueva({
     id: r.id, texto: r.nombre, hora: r.hora || "", area: r.area || "", dias: r.dias || [],
+    franja: FRANJAS.some(x => x.id === r.franja) ? r.franja : franjaDeHora(r.hora),
     semanal: r.semanal || 0, pasos: (r.pasos || []).slice(),
     meta: r.meta || null, pausada: !!r.pausada || esTrabajo(r),
     nivel: r.peso ? 1 : (r.semanal >= 5 ? 1 : 2)
@@ -523,6 +575,12 @@ function desdeViejo(g) {
   (g.metas || []).forEach(m => (m.hitos || []).filter(h => !h.hecho).forEach(h => sueltos.push(sueltoNuevo({
     id: h.id, texto: h.texto + " · " + fechaCorta(h.fecha), meta: m.id, nivel: 1, archivada: true
   }))));
+  /* Numerar al migrar: si todo queda en cero, arrastrar no tiene contra qué
+     ordenar y el primer movimiento barajaría la lista entera. */
+  FRANJAS.forEach(fr => rutinas.filter(r => r.franja === fr.id)
+    .sort((a, b) => horaEnMin(a.hora) - horaEnMin(b.hora))
+    .forEach((r, i) => { r.orden = (i + 1) * 10; }));
+  [1, 2, 3].forEach(n => sueltos.filter(x => x.nivel === n).forEach((x, i) => { x.orden = (i + 1) * 10; }));
   return {
     v: VERSION,
     ajustes: { nombre: (g.ajustes || {}).nombre || "", tema: (g.ajustes || {}).tema || "sistema",
@@ -536,13 +594,29 @@ function normalizar(e) {
   ["metas", "rutinas", "sueltos"].forEach(k => { if (!Array.isArray(e[k])) e[k] = []; });
   e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
   e.marcas = Object.assign({ onboarding: false, ultimoDia: null }, e.marcas || {});
+  /* Empates en el orden hacen que arrastrar baraje la lista: se desempatan aquí */
+  const desempatar = (lista, clave) => {
+    const grupos = {};
+    lista.forEach(x => { const k = x[clave]; (grupos[k] = grupos[k] || []).push(x); });
+    Object.values(grupos).forEach(g => {
+      const ords = g.map(x => x.orden);
+      if (new Set(ords).size !== g.length) g.forEach((x, i) => { x.orden = (i + 1) * 10; });
+    });
+  };
+  /* La franja se dedujo de la hora la primera vez; de ahí en adelante manda
+     el campo, porque arrastrar tiene que poder contradecir al reloj. */
   e.rutinas.forEach(r => { r.tipo = "rutina"; if (!Array.isArray(r.dias)) r.dias = [];
     if (!Array.isArray(r.pasos)) r.pasos = []; if (typeof r.area !== "string") r.area = "";
+    if (!FRANJAS.some(x => x.id === r.franja)) r.franja = franjaDeHora(r.hora);
+    if (typeof r.orden !== "number") r.orden = horaEnMin(r.hora);
     if (typeof r.semanal !== "number") r.semanal = 0; if (![1, 2, 3].includes(r.nivel)) r.nivel = 2;
     if (typeof r.hora !== "string") r.hora = ""; if (r.meta && !e.metas.some(m => m.id === r.meta)) r.meta = null; });
-  e.sueltos.forEach(s => { s.tipo = "suelto"; if (![1, 2, 3].includes(s.nivel)) s.nivel = 2;
+  e.sueltos.forEach((s, i) => { s.tipo = "suelto"; if (![1, 2, 3].includes(s.nivel)) s.nivel = 2;
+    if (typeof s.orden !== "number") s.orden = i;
     if (typeof s.pases !== "number") s.pases = 0; if (typeof s.hora !== "string") s.hora = "";
     if (s.meta && !e.metas.some(m => m.id === s.meta)) s.meta = null; });
+  desempatar(e.rutinas, "franja");
+  desempatar(e.sueltos.filter(x => !x.archivada && !x.hecha), "nivel");
   e.v = VERSION;
   return e;
 }
@@ -581,7 +655,7 @@ const Rg = {
      No se mezclan: una rutina nunca aparece entre los pendientes ni al revés.
      Lo hecho sale de aquí y se va al repositorio, en su propio apartado.      */
   pendientes: f => E.sueltos.filter(s => !s.archivada && !s.hecha)
-    .sort((a, b) => (a.nivel - b.nivel) || (a.creado || "").localeCompare(b.creado || "")),
+    .sort((a, b) => (a.nivel - b.nivel) || (a.orden - b.orden)),
   /* ── Las partes de una actividad ──
      El orden es el peso: la primera pesa más (n − i). Con cinco partes los
      pesos son 5·4·3·2·1 y las tres de arriba ya valen el 80%. Eso es lo que
@@ -600,16 +674,17 @@ const Rg = {
       pct: total ? Math.round(peso * 100 / total) : 0,
       basta: Rg.bastanSub(n), lista: n > 0 && peso * 5 >= total * 4 };
   },
-  /* La rutina de hoy, por franja y por hora: su hoja de 24 horas */
+  /* La rutina de hoy, por franja y en el orden que él puso. La hora es una
+     etiqueta, no el criterio: arrastrar manda sobre el reloj. */
   porHora: f => {
     const d = diaDe(f);
     const rs = E.rutinas.filter(r => Rg.tocaRutina(r, f) && !d.fuera.includes(r.id));
-    return FRANJAS.map(fr => ({ fr, items: rs.filter(x => {
-      const h = parseInt((x.hora || "").slice(0, 2), 10);
-      if (isNaN(h)) return fr.id === "jornada";
-      return h >= fr.desde && h < fr.hasta;
-    }).sort((a, b) => (a.hora || "99:99").localeCompare(b.hora || "99:99")) })).filter(g => g.items.length);
+    return FRANJAS.map(fr => ({ fr, items: rs.filter(x => x.franja === fr.id)
+      .sort((a, b) => (a.orden - b.orden) || horaEnMin(a.hora) - horaEnMin(b.hora)) }));
   },
+  /* Los pendientes en tres grupos: arrastrar de uno a otro cambia el nivel */
+  porNivel: f => [1, 2, 3].map(n => ({ n, items: Rg.pendientes(f).filter(x => x.nivel === n)
+    .sort((a, b) => a.orden - b.orden) })),
   /* LA SEMANA — la unidad de la rutina. La meta es el 100%; el 80% ya cuenta,
      pero se dice en días, no en porcentaje: con 5, cuatro bastan. */
   objetivo: r => r.semanal > 0 ? r.semanal : (r.dias || []).length,
@@ -690,6 +765,29 @@ const A = {
     const e = Rg.estadoSub(r, d);
     if (sub.length && e.lista) d.hechas[r.id] = true; else delete d.hechas[r.id];
   },
+  /* ── Mover un renglón ──
+     Soltar en otra franja la cambia de bloque; soltar en otro nivel cambia la
+     prioridad. El orden queda renumerado de 10 en 10 para que siempre quepa
+     uno nuevo en medio sin tener que tocar los demás. */
+  mover(x, destino, antesDe) {
+    const lista = x.tipo === "rutina"
+      ? (x.franja = destino, E.rutinas.filter(r => r.franja === destino && r.id !== x.id))
+      : (x.nivel = +destino, E.sueltos.filter(y => !y.archivada && !y.hecha && y.nivel === +destino && y.id !== x.id));
+    lista.sort((a, b) => a.orden - b.orden);
+    const i = antesDe ? lista.findIndex(y => y.id === antesDe) : -1;
+    const dentro = i >= 0 ? i : lista.length;
+    lista.splice(dentro, 0, x);
+    lista.forEach((y, k) => { y.orden = (k + 1) * 10; });
+    return true;
+  },
+  /* Agregar una obligación directo al bloque donde la quiere */
+  nuevaRutina(texto, franja) {
+    const fr = FRANJAS.find(x => x.id === franja) || FRANJAS[1];
+    const hermanas = E.rutinas.filter(r => r.franja === fr.id);
+    const r = rutinaNueva({ texto: texto.trim(), franja: fr.id, hora: pad2(fr.desde) + ":00",
+      orden: (hermanas.length + 1) * 10, dias: [1, 2, 3, 4, 5], semanal: 5 });
+    E.rutinas.push(r); return r;
+  },
   /* Mover una parte cambia su peso: subir es «esta pesa más» */
   moverSub(r, i, paso, f) {
     const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
@@ -701,8 +799,10 @@ const A = {
   /* Tocar el número cicla 1→2→3→1 y se queda así mañana, como al reescribir */
   nivel(x) { x.nivel = x.nivel >= 3 ? 1 : x.nivel + 1; },
   agregar(texto, nivel) {
-    const s = sueltoNuevo({ texto: texto.trim(), nivel: nivel || 2 });
-    E.sueltos.unshift(s); return s;
+    const n = nivel || 2;
+    const hermanos = E.sueltos.filter(x => !x.archivada && !x.hecha && x.nivel === n);
+    const s = sueltoNuevo({ texto: texto.trim(), nivel: n, orden: (hermanos.length + 1) * 10 });
+    E.sueltos.push(s); return s;
   },
   quitar(x, f) {
     if (x.tipo === "rutina") { const d = diaMut(f); if (!d.fuera.includes(x.id)) d.fuera.push(x.id); }
@@ -746,12 +846,12 @@ function filaPend(x) {
   const sub = [];
   if (x.pases > 0) sub.push(x.pases === 1 ? "1 pase" : x.pases + " pases");
   if (m) sub.push(m.nombre);
-  return `<li class="it">` +
+  return `<li class="it n${x.nivel}" data-arr="pen" data-id="${x.id}">` +
     `<button class="it-n n${x.nivel}" data-accion="nivel" data-id="${x.id}" aria-label="Nivel ${x.nivel} de ${esc(x.texto)}. Tocar para cambiar.">${x.nivel}</button>` +
     `<button class="it-t" data-accion="marcar" data-id="${x.id}" aria-pressed="false">` +
       `<span class="it-x">${esc(x.texto)}</span>` +
       (sub.length ? `<span class="it-s">${esc(sub.join(" · "))}</span>` : "") + `</button>` +
-    `<button class="it-mas" data-accion="ver-item" data-id="${x.id}" aria-label="Opciones de ${esc(x.texto)}">⋯</button></li>`;
+    `<button class="it-mas" data-nodrag data-accion="ver-item" data-id="${x.id}" aria-label="Opciones de ${esc(x.texto)}">⋯</button></li>`;
 }
 
 /* Una obligación de la rutina. Si tiene partes, el galón las despliega aquí
@@ -766,12 +866,12 @@ function filaRutina(x, f) {
   const sub = [x.hora || "", x.area || "",
     sem.obj > 0 ? (sem.n ? sem.n + " de " + sem.obj + " esta semana" : sem.obj + " por semana") : "",
     partes].filter(Boolean);
-  let h = `<li class="rt${hecha ? " hecha" : ""}">` +
+  let h = `<li class="rt${hecha ? " hecha" : ""}" data-arr="rut" data-id="${x.id}">` +
     `<button class="rt-c" data-accion="marcar" data-id="${x.id}" role="checkbox" aria-checked="${hecha}" aria-label="${hecha ? "Desmarcar" : "Marcar"}: ${esc(x.texto)}"><span>${ICO.check}</span></button>` +
     `<button class="rt-t" data-accion="ver-item" data-id="${x.id}">` +
       `<span class="rt-x">${esc(x.texto)}</span>` +
       (sub.length ? `<span class="rt-s">${esc(sub.join(" · "))}</span>` : "") + `</button>` +
-    (e.n ? `<button class="rt-ch${abierta ? " on" : ""}" data-accion="plegar" data-id="${x.id}" aria-expanded="${abierta}" aria-label="${abierta ? "Ocultar" : "Ver"} las partes de ${esc(x.texto)}">${ICO.abajo}</button>` : `<span class="rt-ch vacio"></span>`) +
+    (e.n ? `<button class="rt-ch${abierta ? " on" : ""}" data-nodrag data-accion="plegar" data-id="${x.id}" aria-expanded="${abierta}" aria-label="${abierta ? "Ocultar" : "Ver"} las partes de ${esc(x.texto)}">${ICO.abajo}</button>` : `<span class="rt-ch vacio"></span>`) +
     `</li>`;
   if (e.n && abierta) {
     h += `<li class="partes"><ul class="pl">` + e.sub.map((y, i) =>
@@ -807,17 +907,23 @@ function pintarHoy() {
     const enCurso = ahora >= fr.desde && ahora < fr.hasta;
     return `<div class="franja-g${enCurso ? " ahora" : ""}"><p class="franja">${esc(fr.nombre)}` +
       `<span>${fr.desde}:00–${fr.hasta === 24 ? "24" : fr.hasta}:00</span>` +
-      `<em>${hechos} de ${items.length}</em></p>` +
-      `<ul class="rutl">${items.map(x => filaRutina(x, f)).join("")}</ul></div>`;
-  }).join("") || `<p class="vacio">Hoy no toca ninguna rutina.</p>`;
+      `<em>${items.length ? hechos + " de " + items.length : "libre"}</em></p>` +
+      `<ul class="rutl" data-zona="${fr.id}">${items.map(x => filaRutina(x, f)).join("") ||
+        `<li class="zona-vacia">Suelta algo aquí, o escribe abajo.</li>`}</ul>` +
+      `<div class="agregar chico"><button class="agregar-mas" data-accion="enviar" data-para="rut_${fr.id}" aria-label="Agregar a ${esc(fr.nombre)}">${ICO.mas}</button>` +
+      `<input id="rut_${fr.id}" data-enter="rutina" data-franja="${fr.id}" placeholder="Agregar a ${esc(fr.nombre.toLowerCase())}…" enterkeyhint="done" autocomplete="off" aria-label="Agregar actividad a ${esc(fr.nombre)}"></div></div>`;
+  }).join("");
   h += `</section>`;
 
   /* ── PENDIENTES: el 3×3. No son la rutina y no tienen que llevar a una meta. ── */
   h += `<section class="bloque"><div class="bloque-cab"><h2 class="bloque-t">Pendientes</h2>` +
     `<span class="bloque-c">${mk.uno ? "nivel 1: " + mk.uno : ps.length ? ps.length + " abiertos" : ""}</span></div>` +
     `<p class="bloque-s">Lo suelto: pasa una vez y no tiene por qué llevar a una meta. Tres niveles; toca el número para cambiarlo.</p>`;
-  h += `<ul class="nota">${ps.map(filaPend).join("") ||
-    `<li class="nota-vacia">Nada pendiente. Escribe abajo si aparece algo.</li>`}</ul>`;
+  const NIV = [["Primero", "lo que sí o sí hoy"], ["Después", "si el día lo permite"], ["Si da tiempo", "sin prisa"]];
+  h += Rg.porNivel(f).map(({ n, items }) =>
+    `<p class="niv niv${n}"><span class="niv-b">${n}</span>${NIV[n - 1][0]}<em>${NIV[n - 1][1]}</em></p>` +
+    `<ul class="nota" data-zona="${n}">${items.map(filaPend).join("") ||
+      `<li class="zona-vacia">—</li>`}</ul>`).join("");
   h += `<div class="agregar"><button class="agregar-mas" data-accion="enviar" data-para="nuevo" aria-label="Agregar">${ICO.mas}</button>` +
     `<input id="nuevo" data-enter="nuevo" placeholder="Agregar pendiente…" enterkeyhint="done" autocomplete="off" aria-label="Agregar pendiente"></div>`;
   if (ps.length > TOPE) h += `<p class="aviso-tope">Son ${ps.length} pendientes. En papel cabían nueve. Baja a nivel 3 lo que no sea de esta semana.</p>`;
@@ -1087,6 +1193,10 @@ const ENTER = {
   "nuevo": t => { const v = t.value.trim(); if (!v) return;
     cambiar(() => A.agregar(v)); t.value = "";
     setTimeout(() => { const el = document.getElementById("nuevo"); if (el) el.focus(); }, 40); },
+  "rutina": t => { const v = t.value.trim(); if (!v) return;
+    const id = t.id; cambiar(() => A.nuevaRutina(v, t.dataset.franja));
+    setTimeout(() => { const el = document.getElementById(id); if (el) { el.value = ""; el.focus(); } }, 40);
+    nota("Agregada. Ya cuenta en el seguimiento semanal: 5 por semana."); },
   "sub": t => { const v = t.value.trim(), r = Rg.item(t.dataset.rut); if (!v || !r) return;
     const id = t.id; cambiar(() => A.nuevaSub(r, v, hoyISO()));
     setTimeout(() => { const el = document.getElementById(id); if (el) { el.value = ""; el.focus(); } }, 40); }
@@ -1105,6 +1215,124 @@ document.addEventListener("keydown", e => {
 });
 try { matchMedia("(prefers-color-scheme:dark)").addEventListener("change", () => { if (E && E.ajustes.tema === "sistema") aplicarTema(); }); } catch (e) {}
 setInterval(lineaDia, 60000);
+
+
+/* ════════ ARRASTRAR ════════
+   Mantener presionado un renglón lo levanta; moverlo lo reubica; soltarlo
+   lo deja donde esté. Pointer events, así que el dedo y el ratón corren por
+   el mismo camino. Antes de que el renglón se levante, el gesto sigue siendo
+   un scroll normal: si mueve el dedo antes de los 320 ms, la lista se
+   desplaza y no pasa nada más. Esa espera es lo que deja convivir
+   «desplazarme» con «mover esto» sin un control extra en cada fila.          */
+const Arr = {
+  t: null, el: null, fantasma: null, id: null, tipo: null, dx: 0, dy: 0, viva: false, y0: 0, x0: 0,
+
+  inicio(e) {
+    const fila = e.target.closest("[data-arr]");
+    if (!fila || e.button > 0) return;
+    /* El cuerpo del renglón es un botón —marcar de un toque— así que no se
+       puede descartar «todo botón»: solo los controles que no deben
+       secuestrarse (el ⋯, el galón, los campos). */
+    if (e.target.closest("input, select, textarea, a, [data-nodrag]")) return;
+    Arr.cancelar();
+    Arr.el = fila; Arr.id = fila.dataset.id; Arr.tipo = fila.dataset.arr;
+    Arr.x0 = e.clientX; Arr.y0 = e.clientY;
+    Arr.t = setTimeout(() => Arr.levantar(e), 320);
+  },
+
+  levantar(e) {
+    if (!Arr.el) return;
+    Arr.viva = true;
+    const r = Arr.el.getBoundingClientRect();
+    Arr.dx = Arr.x0 - r.left; Arr.dy = Arr.y0 - r.top;
+    const g = Arr.el.cloneNode(true);
+    g.className = (Arr.tipo === "rut" ? "rutl " : "nota ") + "fantasma";
+    g.style.cssText = `position:fixed;left:0;top:0;width:${r.width}px;z-index:90;pointer-events:none;margin:0;padding:0;list-style:none`;
+    g.style.transform = `translate(${r.left}px,${r.top}px)`;
+    document.body.appendChild(g);
+    Arr.fantasma = g;
+    Arr.el.classList.add("hueco");
+    document.body.classList.add("arrastrando");
+    try { navigator.vibrate && navigator.vibrate(12); } catch (err) {}
+  },
+
+  mueve(e) {
+    if (!Arr.el) return;
+    if (!Arr.viva) {
+      if (Math.abs(e.clientY - Arr.y0) > 8 || Math.abs(e.clientX - Arr.x0) > 8) Arr.cancelar();
+      return;
+    }
+    e.preventDefault();
+    Arr.fantasma.style.transform = `translate(${e.clientX - Arr.dx}px,${e.clientY - Arr.dy}px)`;
+    Arr.colocar(e.clientX, e.clientY);
+    /* Cerca de un borde la pantalla acompaña al dedo, pero con una banda
+       proporcional: fija, en una pantalla alta se comía media lista y
+       arrastraba la vista justo cuando el destino ya estaba a la vista. */
+    const h = window.innerHeight, banda = Math.min(80, h * 0.1);
+    if (e.clientY < banda) $("#lienzo").scrollBy(0, -8);
+    else if (e.clientY > h - banda) $("#lienzo").scrollBy(0, 8);
+  },
+
+  /* Dónde caería ahora mismo: qué zona y antes de qué renglón.
+     Si no cae dentro de ninguna, gana la más cercana: soltar un poco pasado
+     el último grupo debe funcionar igual, no perder el movimiento. */
+  colocar(x, y) {
+    const zonas = $$("[data-zona]");
+    let zona = null, mejor = Infinity;
+    zonas.forEach(z => { const r = z.getBoundingClientRect();
+      const d = y < r.top ? r.top - y : y > r.bottom ? y - r.bottom : 0;
+      if (d < mejor) { mejor = d; zona = z; } });
+    $$(".zona-on").forEach(z => z.classList.remove("zona-on"));
+    $$(".hueco-antes").forEach(z => z.classList.remove("hueco-antes"));
+    if (!zona || mejor > 160) { Arr.destino = null; return; }
+    zona.classList.add("zona-on");
+    const filas = Array.from(zona.querySelectorAll("[data-arr]")).filter(f => f !== Arr.el);
+    let antes = null;
+    for (const f of filas) {
+      const r = f.getBoundingClientRect();
+      if (y < r.top + r.height / 2) { antes = f.dataset.id; f.classList.add("hueco-antes"); break; }
+    }
+    Arr.destino = { zona: zona.dataset.zona, antes };
+  },
+
+  fin() {
+    if (Arr.t) { clearTimeout(Arr.t); Arr.t = null; }
+    if (!Arr.viva) { Arr.limpiar(); return; }
+    Arr.comer = true; setTimeout(() => { Arr.comer = false; }, 360);
+    const d = Arr.destino, id = Arr.id;
+    Arr.limpiar();
+    if (!d) { pintar(); return; }
+    const x = Rg.item(id); if (!x) return;
+    const antesNivel = x.tipo === "suelto" ? x.nivel : null;
+    const antesFranja = x.tipo === "rutina" ? x.franja : null;
+    cambiar(() => A.mover(x, d.zona, d.antes));
+    if (antesFranja && x.franja !== antesFranja) {
+      const fr = FRANJAS.find(f => f.id === x.franja);
+      nota(x.texto + " pasó a " + (fr ? fr.nombre.toLowerCase() : x.franja) + ".");
+    } else if (antesNivel && x.nivel !== antesNivel) {
+      nota(x.texto + ": ahora es nivel " + x.nivel + ".");
+    }
+  },
+
+  cancelar() { if (Arr.t) { clearTimeout(Arr.t); Arr.t = null; } if (!Arr.viva) Arr.limpiar(); },
+  /* Después de soltar viene un click: si no se traga, el renglón se marcaría */
+  comer: false,
+  limpiar() {
+    if (Arr.t) { clearTimeout(Arr.t); Arr.t = null; }
+    if (Arr.fantasma) Arr.fantasma.remove();
+    if (Arr.el) Arr.el.classList.remove("hueco");
+    $$(".zona-on").forEach(z => z.classList.remove("zona-on"));
+    $$(".hueco-antes").forEach(z => z.classList.remove("hueco-antes"));
+    document.body.classList.remove("arrastrando");
+    Arr.el = null; Arr.fantasma = null; Arr.id = null; Arr.viva = false; Arr.destino = null;
+  }
+};
+document.addEventListener("click", e => { if (Arr.comer) { e.preventDefault(); e.stopPropagation(); } }, true);
+document.addEventListener("pointerdown", Arr.inicio, { passive: true });
+document.addEventListener("pointermove", Arr.mueve, { passive: false });
+document.addEventListener("pointerup", Arr.fin);
+document.addEventListener("pointercancel", () => Arr.limpiar());
+document.addEventListener("scroll", () => { if (!Arr.viva) Arr.cancelar(); }, true);
 
 /* ════════ 10 · SEMILLA ════════ */
 function semilla() {
