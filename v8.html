@@ -435,7 +435,8 @@ body.arrastrando [data-arr]{cursor:grabbing}
    — Tocar la fila la tacha. Tocar el número cicla 1→2→3.
    — El pase diario reemplaza el arrastre automático: lo abierto se
      confirma o se va, y se cuenta cuántas veces se ha confirmado.
-   — El oficio es un renglón. El detalle vive en su tracker de trabajo.
+   — El trabajo no entra: tiene su propio tracker. Aquí van las acciones que
+     llevan al propósito, y los pendientes sueltos.
    — La semana es la unidad de la rutina: la meta es el 100%, el 80% ya
      cuenta. No hay flama que se llene, porque llegar a la meta no es
      contable; lo contable es si las acciones están pasando.
@@ -534,10 +535,10 @@ const FRANJAS = [
    «lo abierto». Mejor guardado y fuera de la vista que borrado. */
 function desdeViejo(g) {
   const metas = (g.metas || []).map(m => ({ id: m.id, nombre: m.nombre, lane: m.lane || "oficio" }));
-  const oficio = (g.metas || []).find(m => m.rol === "principal");
-  /* El oficio es UN renglón. Las juntas y los 1:1 son calendario, no lista:
-     pasan igual estén o no aquí, y el detalle vive en su tracker de trabajo.
-     Se conservan en pausa —visibles en Semana— en vez de borrarse. */
+  /* El trabajo no vive aquí. Este tracker sigue las acciones que llevan al
+     propósito; las tareas del día del oficio tienen su propio tracker, y las
+     juntas y los 1:1 son calendario, no lista. Se conservan en pausa
+     —visibles y recuperables— en vez de borrarse al importar. */
   const esTrabajo = r => r.area === "Trabajo";
   const rutinas = (g.rutinas || []).filter(r => r.frecuencia !== "mes").map(r => rutinaNueva({
     id: r.id, texto: r.nombre, hora: r.hora || "", area: r.area || "", dias: r.dias || [],
@@ -545,10 +546,6 @@ function desdeViejo(g) {
     semanal: r.semanal || 0, pasos: (r.pasos || []).slice(),
     meta: r.meta || null, pausada: !!r.pausada || esTrabajo(r),
     nivel: r.peso ? 1 : (r.semanal >= 5 ? 1 : 2)
-  }));
-  if ((g.rutinas || []).some(esTrabajo)) rutinas.unshift(rutinaNueva({
-    texto: "Tareas del día · trabajo", nivel: 1, hora: "09:00",
-    dias: [1, 2, 3, 4, 5], semanal: 5, meta: oficio ? oficio.id : null
   }));
   /* Las mensuales conservan su día del mes */
   (g.rutinas || []).filter(r => r.frecuencia === "mes").forEach(r => rutinas.push(rutinaNueva({
@@ -1335,7 +1332,6 @@ document.addEventListener("scroll", () => { if (!Arr.viva) Arr.cancelar(); }, tr
 
 /* ════════ 10 · SEMILLA ════════ */
 function semilla() {
-  const oficio = { id: uid(), nombre: "El hub de México", lane: "oficio" };
   const pasion = { id: uid(), nombre: "Xaman", lane: "pasion" };
   const r = (texto, o) => rutinaNueva(Object.assign({ texto }, o));
   return normalizar({
@@ -1343,10 +1339,8 @@ function semilla() {
     /* Sin nombre a propósito: la app no lo necesita y la página es pública.
        Se pone desde Ajustes, y eso vive solo en el navegador de cada quien. */
     ajustes: { nombre: "", tema: "sistema", proposito: "Llevar el volante de mi vida. Que avance por acciones mías y no por la corriente.", vista: "nivel" },
-    metas: [oficio, pasion],
+    metas: [pasion],
     rutinas: [
-      /* El oficio es UN renglón: el detalle vive en el tracker de trabajo */
-      r("Tareas del día · trabajo", { nivel: 1, hora: "09:00", dias: [1, 2, 3, 4, 5], semanal: 5, meta: oficio.id }),
       r("Gym", { nivel: 1, hora: "05:30", area: "Cuerpo", dias: [1, 2, 3, 4, 5], semanal: 5,
         pasos: ["Fuerza", "Calentar", "Cardio", "Estirar"] }),
       r("Trading · posiciones después del cierre", { nivel: 1, hora: "15:15", dias: [1, 2, 3, 4, 5], semanal: 5 }),
