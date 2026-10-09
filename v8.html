@@ -417,17 +417,17 @@ body.arrastrando [data-arr]{cursor:grabbing}
 /* ══════════════════════════════════════════════════════════════════════
    CAUCE v8 · la nota
 
-   Rediseñado a partir de un sistema de papel que ya funcionaba. Lo que
-   enseñaba ese papel:
+   Rediseñado desde tres post-its de un sistema de papel que ya funcionaba.
+   Lo que enseñaban:
 
-   1) Es UNA lista. Ejercicio, un trámite, un pendiente del negocio y la
-      meditación viven en la misma columna. No hay secciones.
+   1) Es UNA lista. Gym, Documentos MBA, Amazon, Meditación y Trading
+      Strategy viven en la misma columna. No hay secciones.
    2) El número es un nivel, no un orden: varios renglones comparten el 1.
    3) La lista se reescribe entera cada día, y al reescribirla se
-      reprioriza: un renglón baja de 1 a 2, otro sube de 3 a 2. Nadie
-      arrastra nada; se vuelve a escribir, y al escribirlo se decide.
-   4) Lo que se reescribe muchas veces sin tacharse es la señal: lleva
-      tres notas seguidas en nivel 1 y sigue sin tachar.
+      reprioriza. Entre el 6 y el 10 de marzo, Gym bajó de 1 a 2 y Job
+      opps subió de 3 a 2. Nadie arrastró nada: lo volvió a escribir.
+   4) Lo que se reescribe muchas veces sin tacharse es la señal. «Trading
+      Strategy» lleva tres notas en nivel 1, sin tachar.
    5) Cabe en un post-it: nueve renglones. El papel es el límite de WIP.
 
    De ahí las reglas de esta versión:
@@ -538,8 +538,7 @@ function desdeViejo(g) {
   /* El oficio es UN renglón. Las juntas y los 1:1 son calendario, no lista:
      pasan igual estén o no aquí, y el detalle vive en su tracker de trabajo.
      Se conservan en pausa —visibles en Semana— en vez de borrarse. */
-  const AREA_OFICIO = "Trabajo";
-  const esTrabajo = r => r.area === AREA_OFICIO;
+  const esTrabajo = r => r.area === "Trabajo";
   const rutinas = (g.rutinas || []).filter(r => r.frecuencia !== "mes").map(r => rutinaNueva({
     id: r.id, texto: r.nombre, hora: r.hora || "", area: r.area || "", dias: r.dias || [],
     franja: FRANJAS.some(x => x.id === r.franja) ? r.franja : franjaDeHora(r.hora),
@@ -1336,25 +1335,30 @@ document.addEventListener("scroll", () => { if (!Arr.viva) Arr.cancelar(); }, tr
 
 /* ════════ 10 · SEMILLA ════════ */
 function semilla() {
-  const oficio = { id: uid(), nombre: "Mi oficio", lane: "oficio" };
-  const pasion = { id: uid(), nombre: "Mi pasión", lane: "pasion" };
+  const oficio = { id: uid(), nombre: "El hub de México", lane: "oficio" };
+  const pasion = { id: uid(), nombre: "Xaman", lane: "pasion" };
   const r = (texto, o) => rutinaNueva(Object.assign({ texto }, o));
   return normalizar({
     v: VERSION,
-    ajustes: { nombre: "", tema: "sistema", proposito: "", vista: "nivel" },
+    /* Sin nombre a propósito: la app no lo necesita y la página es pública.
+       Se pone desde Ajustes, y eso vive solo en el navegador de cada quien. */
+    ajustes: { nombre: "", tema: "sistema", proposito: "Llevar el volante de mi vida. Que avance por acciones mías y no por la corriente.", vista: "nivel" },
     metas: [oficio, pasion],
     rutinas: [
-      /* El trabajo es UN renglón: el detalle vive donde ya lo llevas */
+      /* El oficio es UN renglón: el detalle vive en el tracker de trabajo */
       r("Tareas del día · trabajo", { nivel: 1, hora: "09:00", dias: [1, 2, 3, 4, 5], semanal: 5, meta: oficio.id }),
-      r("Ejercicio", { nivel: 1, hora: "06:30", area: "Cuerpo", dias: [1, 2, 3, 4, 5], semanal: 5,
-        pasos: ["Lo que de verdad cuenta", "Calentar", "Lo segundo", "Estirar"] }),
-      r("Silencio, oración o meditación", { nivel: 2, hora: "07:15", dias: [1, 2, 3, 4, 5, 6, 0], semanal: 7 }),
-      r("Sesión de mi pasión", { nivel: 2, hora: "19:30", area: "Otro", dias: [2, 4, 6], semanal: 3, meta: pasion.id,
-        pasos: ["Lo que de verdad la mueve", "Lo segundo en importancia", "Preparar lo de la próxima vez", "Revisar lo hecho"] }),
-      r("Revisar mis finanzas", { nivel: 3, hora: "21:00", dias: [1], semanal: 1 })
+      r("Gym", { nivel: 1, hora: "05:30", area: "Cuerpo", dias: [1, 2, 3, 4, 5], semanal: 5,
+        pasos: ["Fuerza", "Calentar", "Cardio", "Estirar"] }),
+      r("Trading · posiciones después del cierre", { nivel: 1, hora: "15:15", dias: [1, 2, 3, 4, 5], semanal: 5 }),
+      r("MBA · una hora, el envío al día", { nivel: 2, hora: "18:00", dias: [1, 2, 3, 4, 5], semanal: 5 }),
+      r("Oración y meditación", { nivel: 2, hora: "06:30", dias: [1, 2, 3, 4, 5, 6, 0], semanal: 7 }),
+      r("Xaman · sesión de música", { nivel: 2, hora: "19:30", area: "Otro", dias: [2, 4, 6], semanal: 3, meta: pasion.id,
+        pasos: ["Grabar o mezclar 60 minutos en una toma", "Elegir y preparar tracks nuevos", "Escuchar lo grabado y anotar tres cosas", "Mover una pieza de producción"] }),
+      r("Patitas · ventas e inventario", { nivel: 3, hora: "21:00", dias: [1], semanal: 1 })
     ],
     sueltos: [
-      sueltoNuevo({ texto: "Escribe aquí lo primero que tengas pendiente", nivel: 1 })
+      sueltoNuevo({ texto: "Enviar el reclamo del bono educativo · cierra el 15 nov", nivel: 1 }),
+      sueltoNuevo({ texto: "Amazon · producto nuevo", nivel: 2 })
     ],
     dias: {}, marcas: { onboarding: true, ultimoDia: null }
   });
