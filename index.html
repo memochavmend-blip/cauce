@@ -398,6 +398,16 @@ body.arrastrando [data-arr]{cursor:grabbing}
   box-shadow:0 0 0 1.5px var(--cera)}
 .hueco-antes{box-shadow:inset 0 2px 0 -0.5px var(--llama)}
 
+/* ── Sincronizar ── */
+.sync-e{font-size:13.5px;color:var(--tinta-baja);margin:0 0 16px;padding-left:11px;
+  border-left:2px solid var(--cera);line-height:1.45}
+.fila-dato{float:right;color:var(--tinta-tenue);font-size:12.5px}
+.mono-chico{font-family:var(--mono);font-size:11.5px;word-break:break-all}
+.pasos-ayuda{margin:10px 0 0;padding-left:20px;font-size:13px;color:var(--tinta-baja);line-height:1.6}
+.pasos-ayuda li{margin:0 0 7px}
+.pasos-ayuda code,.campo-ayuda code{font-family:var(--mono);font-size:11.5px;background:var(--panel);
+  padding:1px 5px;border-radius:4px}
+
 </style>
 </head>
 <body>
@@ -591,7 +601,10 @@ function normalizar(e) {
   e.ajustes = Object.assign({ nombre: "", tema: "sistema", proposito: "", vista: "nivel" }, e.ajustes || {});
   ["metas", "rutinas", "sueltos"].forEach(k => { if (!Array.isArray(e[k])) e[k] = []; });
   e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
-  e.marcas = Object.assign({ onboarding: false, ultimoDia: null }, e.marcas || {});
+  e.marcas = Object.assign({ onboarding: false, ultimoDia: null, tocado: false }, e.marcas || {});
+  /* Si ya hay días capturados, esto no es una instalación en blanco aunque
+     la marca falte: falla del lado de conservar, no del de pisar. */
+  if (Object.keys(e.dias || {}).length) e.marcas.tocado = true;
   /* Empates en el orden hacen que arrastrar baraje la lista: se desempatan aquí */
   const desempatar = (lista, clave) => {
     const grupos = {};
@@ -1059,11 +1072,34 @@ function hojaAjustes() {
       `<button class="fila-min" data-accion="ver-meta" data-id="${m.id}">${esc(m.nombre)}</button>`).join("")}` +
     `<button class="fila-min nueva" data-accion="nueva-meta">+ Nueva meta</button></div>` +
     `<p class="campo-et">Datos</p><div class="lista-min">` +
+    `<button class="fila-min" data-accion="sync">Sincronizar entre dispositivos<span class="fila-dato">${esc(Sync.activo() ? "conectado" : "no")}</span></button>` +
     `<button class="fila-min" data-accion="exportar">Exportar</button>` +
     `<button class="fila-min" data-accion="importar">Importar</button></div>` +
     dos("", btn("Listo", "guardar-ajustes", "", "llena")));
 }
 
+function hojaSync() {
+  const c = Sync.cfg || {};
+  const cola = c.token ? "•••• " + String(c.token).slice(-4) : "";
+  hoja("Sincronizar", "Tus datos viajan en un <b>gist privado</b> de tu propia cuenta de GitHub. Sin servidor y sin cuenta nueva: solo un token en cada dispositivo.",
+    `<p class="sync-e" id="syncEstado">${esc(Sync.linea())}</p>` +
+    (c.token
+      ? `<div class="lista-min"><div class="fila-min">Token: ${esc(cola)}</div>` +
+        `<div class="fila-min">Gist: ${c.gist ? `<span class="mono-chico">${esc(c.gist)}</span>` : "se crea al sincronizar"}</div></div>` +
+        dos(btn("Desconectar", "sync-fuera"), btn("Sincronizar ahora", "sync-ya", "", "llena"))
+      : campo("syTok", "Token de GitHub", "", "ghp_…") +
+        campo("syGist", "ID del gist (solo en el segundo dispositivo)", "", "déjalo vacío la primera vez") +
+        `<p class="paso-err" id="hojaErr" role="alert"></p>` +
+        dos(btn("Cancelar", "cerrar-hoja"), btn("Conectar", "sync-conectar", "", "llena"))) +
+    `<details class="plegable" style="margin-top:20px"><summary><span class="sec-t" style="font-size:15px">Cómo sacar el token</span><span class="mas">+</span></summary>` +
+    `<ol class="pasos-ayuda">` +
+    `<li>En GitHub: <b>Settings → Developer settings → Personal access tokens → Tokens (classic)</b>.</li>` +
+    `<li><b>Generate new token (classic)</b>. Marca <b>solo</b> la casilla <code>gist</code>. Ninguna más.</li>` +
+    `<li>Ponle caducidad —90 días está bien— y cópialo. GitHub solo lo enseña una vez.</li>` +
+    `<li>Pégalo aquí y toca Conectar. Se crea el gist y te doy su ID.</li>` +
+    `<li>En el otro dispositivo: el mismo token y ese ID.</li>` +
+    `</ol><p class="campo-ayuda">Con el ámbito <code>gist</code> ese token no puede tocar tus repositorios, solo gists. Si alguna vez quieres cortarlo, se revoca desde la misma pantalla de GitHub y listo.</p></details>`);
+}
 function hojaExportar() {
   hoja("Exportar", "Cópialo y guárdalo donde quieras. Son tus datos; no salen de aquí solos.",
     `<textarea class="campo-i campo-area mono" id="expJson" rows="8" readonly>${esc(JSON.stringify(E))}</textarea>` +
@@ -1106,8 +1142,9 @@ function cerrarPase() { $("#flujo").classList.add("oculto"); $("#appShell").remo
 
 /* ════════ 9 · MANEJADORES ════════ */
 let guardarT = null;
-function guardar() { clearTimeout(guardarT); guardarT = setTimeout(() => Guardado.escribir(CLAVE, E), 200); }
-function cambiar(fn) { fn(); guardar(); pintar(); }
+function guardar() { clearTimeout(guardarT);
+  guardarT = setTimeout(() => { Guardado.escribir(CLAVE, E); Sync.pendiente(); }, 200); }
+function cambiar(fn) { fn(); if (E && E.marcas) E.marcas.tocado = true; guardar(); pintar(); }
 function nota(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on");
   clearTimeout(nota.t); nota.t = setTimeout(() => t.classList.remove("on"), 2400); }
 function aplicarTema() {
@@ -1168,6 +1205,19 @@ const ACC = {
     Array.from(b.parentNode.children).forEach(c => c.classList.toggle("on", c === b)); },
   "guardar-ajustes": () => { cambiar(() => { E.ajustes.nombre = val("aNom");
     const p = document.getElementById("aProp"); if (p) E.ajustes.proposito = p.value.trim(); }); cerrarHoja(); },
+  "sync": () => hojaSync(),
+  "sync-conectar": async () => {
+    const tok = val("syTok"), gist = val("syGist"), er = document.getElementById("hojaErr");
+    if (!tok) { if (er) er.textContent = "Pega el token."; return; }
+    Sync.poner({ token: tok, gist: gist || null });
+    if (er) er.textContent = "Conectando…";
+    await Sync.ciclo();
+    if (Sync.estado.indexOf("sin sincronizar") === 0) { const m = Sync.estado; Sync.olvidar(); if (er) er.textContent = m; return; }
+    hojaSync();
+    nota(gist ? "Conectado. Tus datos se juntaron." : "Conectado. Copia el ID del gist para el otro dispositivo.");
+  },
+  "sync-ya": async () => { await Sync.ciclo(); Sync.repinta(); },
+  "sync-fuera": () => { Sync.olvidar(); hojaSync(); nota("Desconectado. Lo guardado aquí no se toca."); },
   "exportar": () => hojaExportar(),
   "importar": () => hojaImportar(),
   "copiar-export": () => { const t = document.getElementById("expJson"); if (!t) return;
@@ -1332,6 +1382,166 @@ document.addEventListener("pointerup", Arr.fin);
 document.addEventListener("pointercancel", () => Arr.limpiar());
 document.addEventListener("scroll", () => { if (!Arr.viva) Arr.cancelar(); }, true);
 
+
+/* ════════ SINCRONIZAR ════════
+   Dos dispositivos, un gist privado de GitHub. Sin servidor y sin cuenta
+   nueva: solo un token guardado en cada navegador.
+
+   Lo importante es cómo se juntan los cambios. «El último que guarda gana»
+   habría sido más corto, pero pierde trabajo de verdad: marcar el gimnasio
+   en el celular borraría la rutina que acaba de editar en la computadora.
+   En vez de eso se comparan tres versiones —la local, la remota y la última
+   que se sincronizó— y se acepta lo que cambió de un solo lado. Solo cuando
+   algo cambió en los dos hay que elegir, y ahí gana lo de este dispositivo,
+   avisando.                                                                */
+const idx = arr => { const o = {}; (arr || []).forEach(x => { o[x.id] = x; }); return o; };
+const mismo = (a, b) => JSON.stringify(a === undefined ? null : a) === JSON.stringify(b === undefined ? null : b);
+
+/* Un día tocado en los dos lados se une en vez de elegirse: una marca es un
+   hecho positivo, y perder «fui al gimnasio» sería peor que conservarlo. */
+function unirDia(a, b) {
+  const d = Object.assign({}, b, a);
+  d.hechas = Object.assign({}, b.hechas || {}, a.hechas || {});
+  d.sub = Object.assign({}, b.sub || {}, a.sub || {});
+  d.fuera = [...new Set([...(a.fuera || []), ...(b.fuera || [])])];
+  d.pase = !!(a.pase || b.pase);
+  return d;
+}
+
+function fusionar(base, local, remoto) {
+  const out = JSON.parse(JSON.stringify(local));
+  let choques = 0;
+
+  ["metas", "rutinas", "sueltos"].forEach(k => {
+    const B = idx(base && base[k]), L = idx(local[k]), R = idx(remoto[k]);
+    const res = [];
+    new Set([...Object.keys(L), ...Object.keys(R), ...Object.keys(B)]).forEach(id => {
+      const b = B[id], l = L[id], r = R[id];
+      let v = null;
+      if (l && r) {
+        const cl = !mismo(l, b), cr = !mismo(r, b);
+        if (cl && cr && !mismo(l, r)) { v = l; choques++; } else v = cl ? l : r;
+      } else if (l && !r) {
+        v = (b && mismo(l, b)) ? null : l;   /* borrado allá y sin tocar aquí */
+      } else if (!l && r) {
+        v = (b && mismo(r, b)) ? null : r;   /* borrado aquí y sin tocar allá */
+      }
+      if (v) res.push(v);
+    });
+    out[k] = res;
+  });
+
+  const bd = (base && base.dias) || {}, ld = local.dias || {}, rd = remoto.dias || {};
+  const dias = {};
+  new Set([...Object.keys(ld), ...Object.keys(rd)]).forEach(f => {
+    const b = bd[f], l = ld[f], r = rd[f];
+    if (l && r) {
+      const cl = !mismo(l, b), cr = !mismo(r, b);
+      if (cl && cr && !mismo(l, r)) { dias[f] = unirDia(l, r); choques++; }
+      else dias[f] = cl ? l : r;
+    } else dias[f] = l || r;
+  });
+  out.dias = dias;
+  /* Los ajustes son uno solo: si aquí no se tocaron, vale lo de allá */
+  if (base && mismo(local.ajustes, base.ajustes) && remoto.ajustes) out.ajustes = remoto.ajustes;
+  return { e: out, choques };
+}
+
+const Sync = {
+  CLAVE_CFG: "cauce:gh", CLAVE_BASE: "cauce:base:v8", ARCHIVO: "cauce.json",
+  cfg: null, estado: "apagado", cuando: null, t: null, yendo: false,
+
+  cargar() { try { Sync.cfg = JSON.parse(localStorage.getItem(Sync.CLAVE_CFG) || "null"); } catch (e) { Sync.cfg = null; } return Sync.cfg; },
+  poner(c) { Sync.cfg = c; try { localStorage.setItem(Sync.CLAVE_CFG, JSON.stringify(c)); } catch (e) {} },
+  olvidar() { Sync.cfg = null; Sync.estado = "apagado";
+    try { localStorage.removeItem(Sync.CLAVE_CFG); localStorage.removeItem(Sync.CLAVE_BASE); } catch (e) {} },
+  activo: () => !!(Sync.cfg && Sync.cfg.token),
+  base() { try { return JSON.parse(localStorage.getItem(Sync.CLAVE_BASE) || "null"); } catch (e) { return null; } },
+  ponBase(e) { try { localStorage.setItem(Sync.CLAVE_BASE, JSON.stringify(e)); } catch (err) {} },
+
+  async api(ruta, opts) {
+    const r = await fetch("https://api.github.com" + ruta, Object.assign({
+      headers: { Authorization: "Bearer " + Sync.cfg.token, Accept: "application/vnd.github+json" }
+    }, opts || {}));
+    if (r.status === 401) throw new Error("el token no sirve o caducó");
+    if (r.status === 404) throw new Error("no encuentro ese gist");
+    if (!r.ok) throw new Error("GitHub respondió " + r.status);
+    return r.json();
+  },
+
+  /* Al cambiar algo no se sube de inmediato: se espera a que pare de teclear */
+  pendiente() {
+    if (!Sync.activo()) return;
+    clearTimeout(Sync.t);
+    Sync.t = setTimeout(() => Sync.ciclo(), 6000);
+  },
+
+  async ciclo(callado) {
+    if (!Sync.activo() || Sync.yendo) return;
+    Sync.yendo = true; Sync.estado = "sincronizando"; Sync.repinta();
+    try {
+      if (Sync.cfg.gist) {
+        const g = await Sync.api("/gists/" + Sync.cfg.gist);
+        const f = g.files && g.files[Sync.ARCHIVO];
+        if (f) {
+          const txt = f.truncated ? await (await fetch(f.raw_url)).text() : f.content;
+          let remoto = JSON.parse(txt);
+          if (!(+remoto.v >= 8)) remoto = desdeViejo(remoto);
+          remoto = normalizar(remoto);
+          /* Un dispositivo recién estrenado trae su propia semilla, con ids
+             nuevos para las mismas cosas. Fusionarla duplicaría la rutina
+             entera, así que si aquí nunca se tocó nada se adopta lo de allá
+             tal cual. En cuanto hay algo capturado, se fusiona. */
+          if (!Sync.base() && !E.marcas.tocado) {
+            E = remoto; podar(E);
+            Guardado.escribir(CLAVE, E); pintar();
+            if (!callado) nota("Listo: este dispositivo quedó con tus datos.");
+          } else {
+            const { e: fus, choques } = fusionar(Sync.base(), E, remoto);
+            E = normalizar(fus); podar(E);
+            Guardado.escribir(CLAVE, E); pintar();
+            if (choques && !callado) nota(choques === 1
+              ? "Una cosa cambió en los dos dispositivos: se quedó la de aquí."
+              : choques + " cosas cambiaron en los dos dispositivos: se quedaron las de aquí.");
+          }
+        }
+      }
+      await Sync.subir();
+      Sync.estado = "al día"; Sync.cuando = Date.now();
+    } catch (err) {
+      Sync.estado = "sin sincronizar · " + err.message;
+    }
+    Sync.yendo = false; Sync.repinta();
+  },
+
+  async subir() {
+    const contenido = JSON.stringify(E);
+    if (!Sync.cfg.gist) {
+      const g = await Sync.api("/gists", { method: "POST", body: JSON.stringify({
+        description: "Cauce · estado", public: false, files: { [Sync.ARCHIVO]: { content: contenido } } }) });
+      Sync.poner(Object.assign({}, Sync.cfg, { gist: g.id }));
+    } else {
+      await Sync.api("/gists/" + Sync.cfg.gist, { method: "PATCH",
+        body: JSON.stringify({ files: { [Sync.ARCHIVO]: { content: contenido } } }) });
+    }
+    Sync.ponBase(E);
+  },
+
+  repinta() { const el = document.getElementById("syncEstado"); if (el) el.textContent = Sync.linea(); },
+  linea() {
+    if (!Sync.activo()) return "No está conectado. Este dispositivo guarda solo lo suyo.";
+    if (Sync.estado === "al día" && Sync.cuando) {
+      const m = Math.round((Date.now() - Sync.cuando) / 60000);
+      return "Al día · " + (m < 1 ? "hace un momento" : m < 60 ? "hace " + m + " min" : "hace " + Math.round(m / 60) + " h");
+    }
+    return Sync.estado.charAt(0).toUpperCase() + Sync.estado.slice(1);
+  }
+};
+/* Al cerrar o esconder la app, subir lo último antes de que se vaya */
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden" && Sync.activo()) { clearTimeout(Sync.t); Sync.ciclo(true); }
+});
+
 /* ════════ 10 · SEMILLA ════════ */
 function semilla() {
   const pasion = { id: uid(), nombre: "Xaman", lane: "pasion" };
@@ -1356,7 +1566,7 @@ function semilla() {
       sueltoNuevo({ texto: "Enviar el reclamo del bono educativo · cierra el 15 nov", nivel: 1 }),
       sueltoNuevo({ texto: "Amazon · producto nuevo", nivel: 2 })
     ],
-    dias: {}, marcas: { onboarding: true, ultimoDia: null }
+    dias: {}, marcas: { onboarding: true, ultimoDia: null, tocado: false }
   });
 }
 
@@ -1370,6 +1580,10 @@ async function arrancar() {
   E = normalizar(g); podar(E); aplicarTema(); pintar();
   const f = hoyISO();
   if (E.marcas.ultimoDia !== f) { E.marcas.ultimoDia = f; guardar(); if (!diaDe(f).pase) abrirPase(); }
+  /* Lo del otro dispositivo llega después de pintar: la app abre al instante
+     aunque la red esté lenta o no haya. */
+  Sync.cargar();
+  if (Sync.activo()) setTimeout(() => Sync.ciclo(true), 400);
 }
 arrancar();
 
