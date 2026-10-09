@@ -4,7 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FAF8F3">
-<script>try{ if(matchMedia("(prefers-color-scheme:dark)").matches){ document.documentElement.dataset.modo = "oscuro"; document.documentElement.style.background = "#0E0D0C"; } }catch(e){}</script>
+<!-- El tema se pinta antes del primer frame. Mira primero lo que se eligió
+     en Ajustes y solo si no hay nada, lo del sistema: quien eligió Claro con
+     el sistema en oscuro veía un parpadeo negro en cada apertura. -->
+<script>try{
+  var g = localStorage.getItem("cauce:estado:v8"), t = "sistema";
+  if (g) { try { t = (JSON.parse(g).ajustes || {}).tema || "sistema"; } catch (e) {} }
+  var osc = t === "oscuro" || (t === "sistema" && matchMedia("(prefers-color-scheme:dark)").matches);
+  document.documentElement.dataset.modo = osc ? "oscuro" : "claro";
+  document.documentElement.style.background = osc ? "#0E0D0C" : "#FAF8F3";
+  var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute("content", osc ? "#0E0D0C" : "#FAF8F3");
+}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cauce">
@@ -102,7 +112,9 @@ button.it-n:hover{box-shadow:inset 0 0 0 1px var(--linea-fuerte)}
    barra encima: la barra medía la caja, no las palabras, y en un renglón de
    dos líneas cruzaba por el hueco. El tachado sigue a las letras, línea por
    línea, y entra con el color en vez de dibujarse de izquierda a derecha. */
-.it-x{font-size:15.5px;line-height:1.35;
+/* overflow-wrap: una palabra larga o un enlace pegado ensancha el renglón
+   y descuadra la lista entera. Que parta donde haga falta. */
+.it-x{font-size:15.5px;line-height:1.35;overflow-wrap:anywhere;
   text-decoration:line-through 1.5px transparent;transition:text-decoration-color .3s ease,color .3s ease}
 .it.hecha .it-x{text-decoration-color:var(--tinta-baja)}
 .it.hecha .it-x,.it.hecha .it-s{color:var(--tinta-tenue)}
@@ -187,7 +199,10 @@ html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
 .velo{position:fixed;inset:0;background:rgba(14,13,12,.4);z-index:40;animation:ap .22s ease}
 .hoja{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--noche);
   border-radius:20px 20px 0 0;padding:10px 20px calc(env(safe-area-inset-bottom) + 22px);
-  max-height:92vh;overflow-y:auto;animation:sube .28s cubic-bezier(.22,.61,.36,1);
+  /* dvh mide la pantalla sin la barra del navegador; vh queda de respaldo.
+     Con vh en Safari sin instalar, el pie de la hoja queda tapado. */
+  max-height:92vh;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;
+  animation:sube .28s cubic-bezier(.22,.61,.36,1);
   box-shadow:0 -10px 34px rgba(14,13,12,.16)}
 @keyframes ap{from{opacity:0}}
 @keyframes sube{from{transform:translateY(14px);opacity:.6}}
@@ -305,7 +320,7 @@ html[data-modo="oscuro"] .accion.llena{color:#1a1612}
 .rt.hecha .rt-c{background:var(--llama);box-shadow:none;color:#fff}
 html[data-modo="oscuro"] .rt.hecha .rt-c{color:#1a1612}
 .rt-t{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px;padding:11px 0}
-.rt-x{font-size:15px;line-height:1.3;
+.rt-x{font-size:15px;line-height:1.3;overflow-wrap:anywhere;
   text-decoration:line-through 1.5px transparent;transition:text-decoration-color .3s ease,color .3s ease}
 .rt.hecha .rt-x{text-decoration-color:var(--tinta-baja)}
 .rt.hecha .rt-x,.rt.hecha .rt-s{color:var(--tinta-tenue)}
@@ -497,13 +512,16 @@ body.arrastrando [data-arr]{cursor:grabbing}
 input,select,textarea{font-size:16px}
 
 /* ══ LA PORTADA ══ */
-.port{margin:0 0 22px}
+.port{margin:0 0 28px}
 .port-alto{display:flex;align-items:flex-start;gap:12px}
 .port-alto > div{flex:1;min-width:0}
-.port-h{font-family:var(--serif);font-size:1.72rem;line-height:1.16;font-weight:400;margin:0 0 3px;
-  letter-spacing:-.015em;outline:none}
+.port-h{font-family:var(--serif);font-size:1.72rem;line-height:1.16;font-weight:400;margin:0 0 7px;
+  letter-spacing:-.015em;outline:none;text-wrap:balance}
 .port-f{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--tinta-baja);margin:0}
 .port-f::first-letter{text-transform:uppercase}
+/* La frase nace con margen negativo para pegarse a un subtítulo. Aquí va
+   después de la fecha y ese tirón la encimaba: en la portada baja. */
+.port .gesto{margin:14px 0 0;text-wrap:pretty}
 /* Tres cuentas y nada más: un tablero de seis deja de leerse de un vistazo */
 .resumen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0 0}
 .res{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 6px 12px;
@@ -515,13 +533,17 @@ input,select,textarea{font-size:16px}
 .res.r1 .res-prog{stroke:var(--llama)}
 .res.r2 .res-prog{stroke:var(--oro)}
 .res.porti .res-prog{stroke:var(--cera)}
+/* Dentro del aro, solo el número y centrado de verdad. El total baja a la
+   etiqueta: con «1/4» adentro, el grupo quedaba centrado pero el número no. */
 .res-n{position:relative;z-index:1;height:46px;display:grid;place-items:center;font-family:var(--mono);
-  font-size:15px;color:var(--tinta);font-variant-numeric:tabular-nums}
-.res-n i{font-style:normal;font-size:11px;color:var(--tinta-tenue)}
-.res-et{font-size:11px;color:var(--tinta-baja);text-align:center;line-height:1.2}
+  font-size:19px;color:var(--tinta);font-variant-numeric:tabular-nums;line-height:1}
+.res-et{font-size:11.5px;color:var(--tinta-baja);text-align:center;line-height:1.25;margin-top:2px}
+.res-et i{display:block;font-style:normal;font-family:var(--mono);font-size:10.5px;
+  color:var(--tinta-tenue);letter-spacing:.03em;margin-top:2px}
 .res.porti.si .res-n{color:var(--oro)}
-.port-meta{display:flex;align-items:center;gap:12px;width:100%;margin:14px 0 0;padding:12px 14px;
+.port-meta{display:flex;align-items:center;gap:13px;width:100%;margin:14px 0 0;padding:13px 15px;
   border-radius:14px;background:var(--panel);text-align:left}
+.port-meta .flama-v{width:42px;height:46px}
 .port-meta-x{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .port-meta-n{font-size:15px;color:var(--tinta)}
 .port-meta-s{font-size:12px;color:var(--tinta-baja)}
@@ -530,8 +552,8 @@ input,select,textarea{font-size:16px}
    Una al lado de otra con scroll-snap: el navegador hace el gesto, sin
    librería y sin código que persiga el dedo. El indicador se actualiza al
    terminar el desplazamiento. */
-.caras-nav{display:flex;gap:20px;align-items:baseline;margin:0 0 14px;
-  position:sticky;top:0;z-index:4;padding:6px 0 8px;background:var(--noche)}
+.caras-nav{display:flex;gap:20px;align-items:baseline;margin:0 0 16px;
+  position:sticky;top:0;z-index:4;padding:10px 0 10px;background:var(--noche)}
 .cara-b{font-family:var(--serif);font-size:1.22rem;color:var(--tinta-tenue);line-height:1;
   transition:color .25s ease}
 .cara-b.on{color:var(--tinta)}
@@ -1116,21 +1138,28 @@ function filaPend(x) {
 
 /* Una obligación de la rutina. Si tiene partes, el galón las despliega aquí
    mismo: sin hoja que abrir ni pantalla que cerrar. */
-function filaRutina(x, f) {
-  const d = diaDe(f), hecha = Rg.hecha(x, f), sem = Rg.semana(x, f), e = Rg.estadoSub(x, d);
-  const abierta = S.abiertas.includes(x.id);
+/* El renglón de abajo de una rutina: hora, área, cadencia y partes. Sale
+   aparte porque al marcar se vuelve a escribir solo él, sin repintar nada. */
+function subRutina(x, f) {
+  const d = diaDe(f), sem = Rg.semana(x, f), e = Rg.estadoSub(x, d);
   const partes = !e.n ? "" : e.hechas >= e.n ? "las " + e.n + ", hechas"
     : e.lista ? e.pct + "% del peso · ya cuenta"
     : e.hechas ? e.hechas + " de " + e.n + " · " + e.pct + "%"
     : e.n + " partes · con " + e.basta + " de arriba basta";
-  const sub = [x.hora || "", x.area || "",
+  return [x.hora || "", x.area || "",
     sem.obj > 0 ? (sem.n ? sem.n + " de " + sem.obj + " esta semana" : sem.obj + " por semana") : "",
-    partes].filter(Boolean);
+    partes].filter(Boolean).join(" · ");
+}
+
+function filaRutina(x, f) {
+  const d = diaDe(f), hecha = Rg.hecha(x, f), e = Rg.estadoSub(x, d);
+  const abierta = S.abiertas.includes(x.id);
+  const sub = subRutina(x, f);
   let h = `<li class="rt${hecha ? " hecha" : ""}" data-arr="rut" data-id="${x.id}">` +
     `<button class="rt-c" data-accion="marcar" data-id="${x.id}" role="checkbox" aria-checked="${hecha}" aria-label="${hecha ? "Desmarcar" : "Marcar"}: ${esc(x.texto)}"><span>${ICO.check}</span></button>` +
     `<button class="rt-t" data-accion="ver-item" data-id="${x.id}">` +
       `<span class="rt-x">${esc(x.texto)}</span>` +
-      (sub.length ? `<span class="rt-s">${esc(sub.join(" · "))}</span>` : "") + `</button>` +
+      `<span class="rt-s">${esc(sub)}</span></button>` +
     (e.n ? `<button class="rt-ch${abierta ? " on" : ""}" data-nodrag data-accion="plegar" data-id="${x.id}" aria-expanded="${abierta}" aria-label="${abierta ? "Ocultar" : "Ver"} las partes de ${esc(x.texto)}">${ICO.abajo}</button>` : `<span class="rt-ch vacio"></span>`) +
     `</li>`;
   if (e.n && abierta) {
@@ -1163,13 +1192,16 @@ function saludo() {
 function portada(f, mk) {
   const nom = (E.ajustes.nombre || "").trim();
   const meta = E.metas[0] || null, fl = meta ? Rg.flama(meta) : null;
+  /* Un aro por cuenta. Dentro del círculo va solo el número hecho, centrado;
+     el total baja a la etiqueta. Con «1/4» dentro, el grupo quedaba centrado
+     pero el número no, y el aro se veía chueco. */
   const anillo = (hechas, total, et, clase) => {
     const pct = total ? hechas / total : 0, C = 100.5;   /* 2πr con r=16 */
     return `<div class="res ${clase}">` +
       `<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="res-pista" cx="20" cy="20" r="16"></circle>` +
       `<circle class="res-prog" cx="20" cy="20" r="16" style="stroke-dasharray:${C};stroke-dashoffset:${(C * (1 - pct)).toFixed(1)}"></circle></svg>` +
-      `<span class="res-n">${total ? hechas + "<i>/" + total + "</i>" : "—"}</span>` +
-      `<span class="res-et">${et}</span></div>`;
+      `<span class="res-n">${total ? hechas : "—"}</span>` +
+      `<span class="res-et">${et}<i>${total ? "de " + total : "nada hoy"}</i></span></div>`;
   };
   return `<header class="port">` +
     `<div class="port-alto"><div><h1 class="port-h" tabindex="-1">${esc(saludo())}${nom ? ", " + esc(nom) : ""}</h1>` +
@@ -1182,7 +1214,8 @@ function portada(f, mk) {
       `<div class="res porti${Rg.portiHubo(f) ? " si" : ""}">` +
         `<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="res-pista" cx="20" cy="20" r="16"></circle>` +
         (Rg.portiHubo(f) ? `<circle class="res-prog" cx="20" cy="20" r="16" style="stroke-dasharray:100.5;stroke-dashoffset:0"></circle>` : "") +
-        `</svg><span class="res-n">${Rg.portiHubo(f) ? "sí" : "—"}</span><span class="res-et">Por ti</span></div>` +
+        `</svg><span class="res-n">${Rg.portiHubo(f) ? "sí" : "—"}</span>` +
+        `<span class="res-et">Por ti<i>${Rg.portiHubo(f) ? "hoy sí" : "aún no"}</i></span></div>` +
     `</div>` +
     (meta && fl ? `<button class="port-meta" data-accion="ver-meta" data-id="${meta.id}">` +
       flamaSVG(fl.pct) + `<span class="port-meta-x"><span class="port-meta-n">${esc(meta.nombre)}</span>` +
@@ -1231,7 +1264,7 @@ function pintarHoy() {
   h += bloques.map(({ fr, items }) => {
     const hechos = items.filter(x => Rg.hecha(x, f)).length;
     const enCurso = ahora >= fr.desde && ahora < fr.hasta;
-    return `<div class="franja-g${enCurso ? " ahora" : ""}"><p class="franja">${esc(fr.nombre)}` +
+    return `<div class="franja-g${enCurso ? " ahora" : ""}" data-fr="${fr.id}"><p class="franja">${esc(fr.nombre)}` +
       `<span>${fr.desde}:00–${fr.hasta === 24 ? "24" : fr.hasta}:00</span>` +
       `<em>${items.length ? hechos + " de " + items.length : "libre"}</em></p>` +
       `<ul class="rutl" data-zona="${fr.id}">${items.map(x => filaRutina(x, f)).join("") ||
@@ -1328,9 +1361,12 @@ function pintarHecho() {
    la alimenta: allá una práctica, aquí las semanas del mes que llegaron al
    80/20. No se llena como una barra —arde más alto o más bajo— porque llegar
    a una meta no es contable y fingir un porcentaje sería mentir. */
+/* La flama baja no es una flama apagada: al mínimo se quedaba en un tercio
+   del alto y a 34px se leía como un punto, no como una flama chica. El piso
+   sube a la mitad; lo que cambia sigue siendo el alto, no si se ve o no. */
 function flamaSVG(pct, clase) {
-  const alto = (0.34 + 0.66 * (pct / 100)).toFixed(2);
-  const brillo = (0.08 + 0.34 * (pct / 100)).toFixed(2);
+  const alto = (0.5 + 0.5 * (pct / 100)).toFixed(2);
+  const brillo = (0.14 + 0.3 * (pct / 100)).toFixed(2);
   return `<span class="flama-v ${clase || ""}" aria-hidden="true"><svg viewBox="0 0 120 130">` +
     `<ellipse class="nivel-glow" cx="60" cy="64" rx="44" ry="50" style="--go:${brillo}"></ellipse>` +
     `<path class="nivel-flama" style="--fl:${alto};transform-origin:50% 98px" d="M60 18 C80 52 80 82 60 98 C40 82 40 52 60 18 Z"></path>` +
@@ -1379,13 +1415,22 @@ function pintarSemana() {
 
 /* ════════ 7 · HOJAS ════════ */
 function hoja(tit, sub, cuerpo) {
+  const a = document.activeElement;
+  hoja.volver = a && a !== document.body ? a : null;
   $("#hojas").innerHTML = `<div class="velo" data-accion="cerrar-hoja"></div><div class="hoja" role="dialog" aria-modal="true" aria-labelledby="hojaTit">` +
     `<div class="asa" aria-hidden="true"></div><h2 class="hoja-t" id="hojaTit" tabindex="-1">${tit}</h2>` +
     (sub ? `<p class="hoja-s">${sub}</p>` : "") + cuerpo + `</div>`;
   $("#appShell").setAttribute("inert", "");
   setTimeout(() => { const t = $("#hojas [data-autofoco]") || $("#hojaTit"); if (t) try { t.focus({ preventScroll: true }); } catch (e) {} }, 50);
 }
-function cerrarHoja() { $("#hojas").innerHTML = ""; $("#appShell").removeAttribute("inert"); }
+/* Al cerrar, el foco vuelve al botón que la abrió. Si no, cae al body y
+   quien navega con teclado o lector de pantalla pierde el lugar. */
+function cerrarHoja() {
+  const v = hoja.volver;
+  $("#hojas").innerHTML = ""; $("#appShell").removeAttribute("inert");
+  hoja.volver = null;
+  if (v && document.contains(v)) { try { v.focus({ preventScroll: true }); } catch (e) {} }
+}
 const campo = (id, et, val, ph, tipo) => `<label class="campo"><span class="campo-et">${esc(et)}</span>` +
   `<input id="${id}" class="campo-i" type="${tipo || "text"}" value="${esc(val || "")}" placeholder="${esc(ph || "")}"></label>`;
 const btn = (t, a, id, cl) => `<button class="accion${cl ? " " + cl : ""}" data-accion="${a}"${id ? ` data-id="${id}"` : ""}>${t}</button>`;
@@ -1523,10 +1568,79 @@ function pintarPase() {
 function cerrarPase() { $("#flujo").classList.add("oculto"); $("#appShell").removeAttribute("inert"); }
 
 /* ════════ 9 · MANEJADORES ════════ */
+/* El guardado espera 200 ms para no escribir en cada tecla. En el teléfono
+   la app puede morir dentro de esa espera —cambiar de app, bloquear la
+   pantalla—, así que al ocultarse se escribe de inmediato. */
 let guardarT = null;
-function guardar() { clearTimeout(guardarT);
-  guardarT = setTimeout(() => { Guardado.escribir(CLAVE, E); Sync.pendiente(); }, 200); }
+function guardarYa() { clearTimeout(guardarT); guardarT = null;
+  if (E) { Guardado.escribir(CLAVE, E); Sync.pendiente(); } }
+function guardar() { clearTimeout(guardarT); guardarT = setTimeout(guardarYa, 200); }
 function cambiar(fn) { fn(); if (E && E.marcas) E.marcas.tocado = true; guardar(); pintar(); }
+
+/* ── Marcar sin repintar ──
+   Volver a escribir toda la vista en cada toque tiene dos costos que no se
+   ven en una captura: el renglón nuevo nace ya tachado, así que la línea
+   nunca se dibuja, y el botón que se tocó deja de existir, así que el foco
+   cae al body y un lector de pantalla pierde el lugar. Aquí se cambia la
+   clase del nodo que ya está y se reescriben solo las cifras. */
+function refrescarCifras(f) {
+  if (!E) return;
+  const mk = Rg.marcador(f), C = 100.5;
+  const aro = (sel, hechas, total, pie) => {
+    const e = $(sel); if (!e) return;
+    const p = e.querySelector(".res-prog"), n = e.querySelector(".res-n"), i = e.querySelector(".res-et i");
+    if (p) p.style.strokeDashoffset = (C * (1 - (total ? hechas / total : 0))).toFixed(1);
+    if (n) n.textContent = total ? hechas : "—";
+    if (i) i.textContent = total ? "de " + total : "nada hoy";
+  };
+  aro(".res.r1", mk.rutH, mk.rut);
+  aro(".res.r2", mk.pendH, mk.pend);
+  const pt = $(".res.porti"), hubo = Rg.portiHubo(f);
+  if (pt) {
+    pt.classList.toggle("si", hubo);
+    const p = pt.querySelector(".res-prog"), n = pt.querySelector(".res-n"), i = pt.querySelector(".res-et i");
+    if (p) p.style.strokeDashoffset = hubo ? "0" : String(C);
+    if (n) n.textContent = hubo ? "sí" : "—";
+    if (i) i.textContent = hubo ? "hoy sí" : "aún no";
+  }
+  /* La flama: se mueven las variables del nodo que ya está, para que la
+     transición de --fl corra. Si se reemplazara el SVG, nacería en su sitio
+     final y el cambio no se vería. */
+  const meta = E.metas[0];
+  if (meta) {
+    const fl = Rg.flama(meta), alto = (0.5 + 0.5 * (fl.pct / 100)).toFixed(2);
+    $$(".port-meta .nivel-flama, .port-meta .nivel-nucleo").forEach(e => e.style.setProperty("--fl", alto));
+    const g = $(".port-meta .nivel-glow");
+    if (g) g.style.setProperty("--go", (0.14 + 0.3 * (fl.pct / 100)).toFixed(2));
+    const s = $(".port-meta-s");
+    if (s) s.textContent = fl.estado === "sin" ? "sin rutinas que la alimenten"
+      : fl.estado === "viva" ? "va en cadencia esta semana"
+      : fl.estado === "tibia" ? "va a medias esta semana"
+      : fl.n ? "va atrás esta semana" : "esta semana no se ha movido";
+  }
+  /* La cuenta de cada franja */
+  Rg.porHora(f).forEach(({ fr, items }) => {
+    const e = $(`.franja-g[data-fr="${fr.id}"] .franja em`); if (!e) return;
+    const h = items.filter(x => Rg.hecha(x, f)).length;
+    e.textContent = items.length ? h + " de " + items.length : "libre";
+  });
+  lineaDia();
+}
+
+/* Devuelve false si no pudo hacerlo en su sitio: entonces toca repintar. */
+function marcarEnSitio(x, f) {
+  if (x.tipo !== "rutina" || S.abiertas.includes(x.id)) return false;
+  const li = $(`.rt[data-id="${x.id}"]`); if (!li) return false;
+  const hecha = Rg.hecha(x, f);
+  li.classList.toggle("hecha", hecha);
+  const c = li.querySelector(".rt-c");
+  if (c) { c.setAttribute("aria-checked", String(hecha));
+    c.setAttribute("aria-label", (hecha ? "Desmarcar" : "Marcar") + ": " + x.texto); }
+  const s = li.querySelector(".rt-s");
+  if (s) s.textContent = subRutina(x, f);
+  refrescarCifras(f);
+  return true;
+}
 function nota(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on");
   clearTimeout(nota.t); nota.t = setTimeout(() => t.classList.remove("on"), 2400); }
 function aplicarTema() {
@@ -1537,7 +1651,9 @@ function aplicarTema() {
 }
 
 const ACC = {
-  "tab": d => { S.tab = d.tab; pintar(); },
+  /* Al cambiar de pestaña la vista vuelve arriba. Sin esto, Semana abría a
+     la altura donde se dejó Hoy, que no es la misma página. */
+  "tab": d => { S.tab = d.tab; pintar(); const l = $("#lienzo"); if (l) l.scrollTop = 0; },
   "plegar": d => { const i = S.abiertas.indexOf(d.id);
     if (i >= 0) S.abiertas.splice(i, 1); else S.abiertas.push(d.id); pintar(); },
   "marcar-sub": d => { const r = Rg.item(d.id); if (!r) return; let res;
@@ -1551,7 +1667,13 @@ const ACC = {
     nota("De vuelta en pendientes."); },
   "marcar": d => { const x = Rg.item(d.id); if (!x) return; const f = hoyISO();
     const antes = Rg.marcador(f);
-    cambiar(() => A.marcar(x, f));
+    /* Una rutina plegada se marca en su sitio: así se ve el tachado y el
+       foco se queda en el botón. Un pendiente se va de la lista, y lo que
+       está desplegado cambia de forma: ahí sí hay que volver a pintar. */
+    A.marcar(x, f);
+    if (E.marcas) E.marcas.tocado = true;
+    guardar();
+    if (!marcarEnSitio(x, f)) pintar();
     const desp = Rg.marcador(f);
     /* El gesto más pequeño: una palabra al cerrar algo, no una felicitación */
     if (desp.uno && desp.unoH === desp.uno && antes.unoH < desp.unoH) nota(frase("cierra"));
@@ -2533,6 +2655,22 @@ function semilla() {
    permiso no existe y tira error—, así que si falla no importa: queda el
    aviso de girar el teléfono, que es la misma idea sin permisos. */
 try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(() => {}); } catch (e) {}
+
+/* El día cambia a medianoche, no al abrir la app. Instalada como PWA puede
+   seguir viva de un día para otro: sin revisar esto al volver, a la mañana
+   siguiente muestra la lista de ayer, ya tachada. */
+function revisarDia() {
+  if (!E) return;
+  const f = hoyISO();
+  if (E.marcas.ultimoDia === f) return;
+  E.marcas.ultimoDia = f; guardarYa(); pintar();
+  if (!diaDe(f).pase) abrirPase();
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") { guardarYa(); return; }
+  revisarDia();
+});
+addEventListener("pagehide", guardarYa);
 
 async function arrancar() {
   let g = await Guardado.leer(CLAVE);
