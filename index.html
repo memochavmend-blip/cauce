@@ -122,6 +122,16 @@ button.it-n:hover{box-shadow:inset 0 0 0 1px var(--linea-fuerte)}
 .it-mas{flex:0 0 auto;width:34px;align-self:stretch;display:grid;place-items:center;color:var(--tinta-tenue);
   font-size:17px;letter-spacing:.06em}
 .it-mas:hover{color:var(--tinta)}
+/* Las dos flechas, apiladas: suben y bajan el renglón un lugar y cruzan de
+   nivel cuando ya está en el borde. Van en columna para no comerse el
+   ancho del texto; el bloque entero mide 44 px de alto. */
+.it-m{flex:0 0 auto;width:40px;display:flex;flex-direction:column;justify-content:center;
+  align-self:stretch;padding:6px 0}
+.it-mv{width:40px;height:26px;display:grid;place-items:center;border-radius:7px;
+  color:var(--tinta-baja);transition:color .15s ease,background .15s ease}
+.it-mv svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.it-mv:active{background:var(--panel);color:var(--tinta)}
+@media (hover:hover){ .it-mv:hover{color:var(--tinta)} }
 .it.rut .it-x{font-weight:450}
 .nota-vacia{padding:18px 0;color:var(--tinta-baja);font-size:14px;border-bottom:1px solid var(--linea)}
 
@@ -511,17 +521,25 @@ body.arrastrando [data-arr]{cursor:grabbing}
    zoom en el viewport — eso dejaría sin acercar a quien lo necesita. */
 input,select,textarea{font-size:16px}
 
-/* ══ LA PORTADA ══ */
-.port{margin:0 0 28px}
-.port-alto{display:flex;align-items:flex-start;gap:12px}
-.port-alto > div{flex:1;min-width:0}
-.port-h{font-family:var(--serif);font-size:1.72rem;line-height:1.16;font-weight:400;margin:0 0 7px;
-  letter-spacing:-.015em;outline:none;text-wrap:balance}
-.port-f{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--tinta-baja);margin:0}
+/* ══ LA PORTADA ══
+   La forma viene de la app hermana: el momento del día arriba, el saludo
+   grande, la fecha en mono y la palabra del día apartada por una línea.
+   Centrada, porque es portada y no lista: lo que sigue abajo sí va alineado
+   a la izquierda, y ese corte es justo lo que separa una cosa de la otra. */
+.port{position:relative;margin:0 0 30px;text-align:center}
+.port-aj{position:absolute;top:-4px;right:-6px;z-index:2}
+.port-mom{font-family:var(--mono);font-size:10.5px;letter-spacing:.17em;text-transform:uppercase;
+  color:var(--brasa);margin:0 0 10px}
+.port-h{font-family:var(--serif);font-size:1.95rem;line-height:1.1;font-weight:400;margin:0 0 9px;
+  letter-spacing:-.02em;outline:none;text-wrap:balance}
+.port-f{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;color:var(--tinta-baja);margin:0}
 .port-f::first-letter{text-transform:uppercase}
-/* La frase nace con margen negativo para pegarse a un subtítulo. Aquí va
-   después de la fecha y ese tirón la encimaba: en la portada baja. */
-.port .gesto{margin:14px 0 0;text-wrap:pretty}
+/* La línea con el rótulo en medio: dos reglas que crecen a los lados */
+.port-sep{display:flex;align-items:center;gap:12px;margin:24px 0 14px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--tinta-baja)}
+.port-sep::before,.port-sep::after{content:"";flex:1;height:1px;background:var(--linea-fuerte)}
+.port-palabra{font-family:var(--serif);font-size:1.34rem;line-height:1.4;color:var(--tinta);
+  margin:0;text-wrap:pretty;letter-spacing:-.008em}
 /* Tres cuentas y nada más: un tablero de seis deja de leerse de un vistazo */
 .resumen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0 0}
 .res{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 6px 12px;
@@ -1060,6 +1078,27 @@ const A = {
   },
   /* Tocar el número cicla 1→2→3→1 y se queda así mañana, como al reescribir */
   nivel(x) { x.nivel = x.nivel >= 3 ? 1 : x.nivel + 1; },
+  /* Subir y bajar un pendiente un lugar en el orden visible, cruzando de
+     nivel cuando ya está en el borde. Con el dedo no se puede arrastrar: el
+     navegador entiende el movimiento vertical como scroll y cancela el
+     gesto antes de que empiece. Dos flechas sí funcionan en todas partes. */
+  pendsDe(n) { return E.sueltos.filter(y => !y.archivada && !y.hecha && y.nivel === n)
+    .sort((a, b) => a.orden - b.orden); },
+  subirPend(x) {
+    const l = A.pendsDe(x.nivel), i = l.findIndex(y => y.id === x.id);
+    if (i > 0) { A.mover(x, x.nivel, l[i - 1].id); return true; }
+    if (x.nivel > 1) { A.mover(x, x.nivel - 1, null); return true; }  /* al final del de arriba */
+    return false;
+  },
+  bajarPend(x) {
+    const l = A.pendsDe(x.nivel), i = l.findIndex(y => y.id === x.id);
+    if (i >= 0 && i < l.length - 1) { A.mover(x, x.nivel, l[i + 2] ? l[i + 2].id : null); return true; }
+    if (x.nivel < 3) {
+      const sig = A.pendsDe(x.nivel + 1)[0];
+      A.mover(x, x.nivel + 1, sig ? sig.id : null); return true;      /* al principio del de abajo */
+    }
+    return false;
+  },
   agregar(texto, nivel) {
     const n = nivel || 2;
     const hermanos = E.sueltos.filter(x => !x.archivada && !x.hecha && x.nivel === n);
@@ -1133,6 +1172,10 @@ function filaPend(x) {
     `<button class="it-t" data-accion="marcar" data-id="${x.id}" aria-pressed="false">` +
       `<span class="it-x">${esc(x.texto)}</span>` +
       (sub.length ? `<span class="it-s">${esc(sub.join(" · "))}</span>` : "") + `</button>` +
+    `<span class="it-m" data-nodrag>` +
+      `<button class="it-mv" data-nodrag data-accion="subir-pend" data-id="${x.id}" aria-label="Subir ${esc(x.texto)}: más prioridad">${ICO.arriba}</button>` +
+      `<button class="it-mv" data-nodrag data-accion="bajar-pend" data-id="${x.id}" aria-label="Bajar ${esc(x.texto)}: menos prioridad">${ICO.abajo}</button>` +
+    `</span>` +
     `<button class="it-mas" data-nodrag data-accion="ver-item" data-id="${x.id}" aria-label="Opciones de ${esc(x.texto)}">⋯</button></li>`;
 }
 
@@ -1173,8 +1216,7 @@ function filaRutina(x, f) {
         (i < e.n - 1 ? `<button class="mover" data-accion="bajar-sub" data-id="${x.id}" data-i="${i}" aria-label="Bajar: ${esc(y.t)} pesa menos">${ICO.abajo}</button>` : "") +
         `<button class="mover x" data-accion="quitar-sub" data-id="${x.id}" data-i="${i}" aria-label="Quitar ${esc(y.t)}">✕</button>` +
       `</span></li>`).join("") +
-      `</ul><div class="agregar chico"><button class="agregar-mas" data-accion="enviar" data-para="sub_${x.id}" aria-label="Agregar parte">${ICO.mas}</button>` +
-      `<input id="sub_${x.id}" data-enter="sub" data-rut="${x.id}" placeholder="Agregar parte de hoy…" enterkeyhint="done" autocomplete="off" aria-label="Agregar parte"></div></li>`;
+      `</ul>` + filaAgregar(`sub_${x.id}`, "sub", "Agregar parte de hoy", true, ` data-rut="${x.id}"`) + `</li>`;
   }
   return h;
 }
@@ -1183,6 +1225,8 @@ function saludo() {
   const h = new Date().getHours();
   return h < 6 ? "Buena madrugada" : h < 12 ? "Buenos días" : h < 20 ? "Buenas tardes" : "Buenas noches";
 }
+const reloj = () => { const d = new Date();
+  return d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0"); };
 
 /* ── La portada ──
    Lo primero al abrir: quién eres, qué día es, una frase, y cómo vas. El
@@ -1203,11 +1247,14 @@ function portada(f, mk) {
       `<span class="res-n">${total ? hechas : "—"}</span>` +
       `<span class="res-et">${et}<i>${total ? "de " + total : "nada hoy"}</i></span></div>`;
   };
+  const m = momento(new Date().getHours());
   return `<header class="port">` +
-    `<div class="port-alto"><div><h1 class="port-h" tabindex="-1">${esc(saludo())}${nom ? ", " + esc(nom) : ""}</h1>` +
-    `<p class="port-f">${esc(fechaLarga(f))}</p></div>` +
-    `<button class="icono" data-accion="ajustes" aria-label="Ajustes">${ICO.ajustes}</button></div>` +
-    `<p class="gesto">${esc(mk.uno > 0 && mk.unoH >= mk.uno ? fraseDelDia("cierra", f) : fraseDelDia("abrir", f))}</p>` +
+    `<button class="icono port-aj" data-accion="ajustes" aria-label="Ajustes">${ICO.ajustes}</button>` +
+    `<p class="port-mom">${MOMENTO_ET[m]}</p>` +
+    `<h1 class="port-h" tabindex="-1">${esc(saludo())}${nom ? ", " + esc(nom) : ""}</h1>` +
+    `<p class="port-f">${esc(fechaLarga(f))} · <span id="portReloj">${reloj()}</span></p>` +
+    `<p class="port-sep"><span>La palabra de hoy</span></p>` +
+    `<p class="port-palabra">${esc(palabraDelDia(f, m))}</p>` +
     `<div class="resumen">` +
       anillo(mk.rutH, mk.rut, "Rutina", "r1") +
       anillo(mk.pendH, mk.pend, "Pendientes", "r2") +
@@ -1269,8 +1316,7 @@ function pintarHoy() {
       `<em>${items.length ? hechos + " de " + items.length : "libre"}</em></p>` +
       `<ul class="rutl" data-zona="${fr.id}">${items.map(x => filaRutina(x, f)).join("") ||
         `<li class="zona-vacia">Suelta algo aquí, o escribe abajo.</li>`}</ul>` +
-      `<div class="agregar chico"><button class="agregar-mas" data-accion="enviar" data-para="rut_${fr.id}" aria-label="Agregar a ${esc(fr.nombre)}">${ICO.mas}</button>` +
-      `<input id="rut_${fr.id}" data-enter="rutina" data-franja="${fr.id}" placeholder="Agregar a ${esc(fr.nombre.toLowerCase())}…" enterkeyhint="done" autocomplete="off" aria-label="Agregar actividad a ${esc(fr.nombre)}"></div></div>`;
+      filaAgregar(`rut_${fr.id}`, "rutina", `Agregar a ${fr.nombre.toLowerCase()}`, true, ` data-franja="${fr.id}"`) + `</div>`;
   }).join("");
   h += `</section>`;
 
@@ -1281,8 +1327,7 @@ function pintarHoy() {
   h += Rg.porNivel(f).map(({ n, items }) =>
     `<p class="niv niv${n}"><span class="niv-b">${n}</span>${NIV[n - 1][0]}<em>${NIV[n - 1][1]}</em></p>` +
     `<ul class="nota" data-zona="${n}">${items.map(filaPend).join("") || `<li class="zona-vacia">—</li>`}</ul>`).join("");
-  h += `<div class="agregar"><button class="agregar-mas" data-accion="enviar" data-para="nuevo" aria-label="Agregar">${ICO.mas}</button>` +
-    `<input id="nuevo" data-enter="nuevo" placeholder="Agregar pendiente…" enterkeyhint="done" autocomplete="off" aria-label="Agregar pendiente"></div>`;
+  h += filaAgregar("nuevo", "nuevo", "Agregar pendiente");
   if (ps.length > TOPE) h += `<p class="aviso-tope">Son ${ps.length} pendientes. En papel cabían nueve. Baja a nivel 3 lo que no sea de esta semana.</p>`;
   const viejo = ps.filter(x => x.pases >= 3)[0];
   if (viejo) h += `<p class="senal">${esc(viejo.texto)} lleva ${viejo.pases} pases sin hacerse. O es más chico de lo que parece, o no es de nivel ${viejo.nivel}.</p>`;
@@ -1311,8 +1356,7 @@ function pintarHoy() {
       `<span class="pt-c">${ICO.check}</span><span class="pt-x">${esc(x.texto)}</span></button>` +
       `<button class="pt-x2" data-nodrag data-accion="porti-quitar" data-id="${x.id}" aria-label="Quitar ${esc(x.texto)} de la lista">✕</button></li>`;
   }).join("") || `<li class="zona-vacia">La lista está vacía. Escribe abajo algo que te gustaría hacer.</li>`}</ul>`;
-  h += `<div class="agregar"><button class="agregar-mas" data-accion="enviar" data-para="nuevoPorti" aria-label="Agregar">${ICO.mas}</button>` +
-    `<input id="nuevoPorti" data-enter="porti" placeholder="Agregar algo que te gustaría…" enterkeyhint="done" autocomplete="off" aria-label="Agregar algo para ti"></div>`;
+  h += filaAgregar("nuevoPorti", "porti", "Agregar algo que te gustaría");
   h += `</section>`;
 
   h += `</div>`;
@@ -1431,6 +1475,19 @@ function cerrarHoja() {
   hoja.volver = null;
   if (v && document.contains(v)) { try { v.focus({ preventScroll: true }); } catch (e) {} }
 }
+/* ── La fila de agregar ──
+   Es un <form> de verdad, no un div con un input suelto. Dos razones, las
+   dos de iOS: con form, la tecla de retorno manda «Ir» y dispara submit;
+   sin form a veces no dispara nada y se escribe sin que pase nada. Y el
+   botón es type=submit, así que funciona aunque el teclado se cierre.
+   El + además no le quita el foco al campo (ver el pointerdown de abajo). */
+function filaAgregar(id, enter, ph, chico, extra) {
+  return `<form class="agregar${chico ? " chico" : ""}" data-enviar="${id}">` +
+    `<button type="submit" class="agregar-mas" aria-label="${esc(ph)}">${ICO.mas}</button>` +
+    `<input id="${id}" data-enter="${enter}"${extra || ""} placeholder="${esc(ph)}…" ` +
+    `enterkeyhint="go" autocomplete="off" autocorrect="off" aria-label="${esc(ph)}"></form>`;
+}
+
 const campo = (id, et, val, ph, tipo) => `<label class="campo"><span class="campo-et">${esc(et)}</span>` +
   `<input id="${id}" class="campo-i" type="${tipo || "text"}" value="${esc(val || "")}" placeholder="${esc(ph || "")}"></label>`;
 const btn = (t, a, id, cl) => `<button class="accion${cl ? " " + cl : ""}" data-accion="${a}"${id ? ` data-id="${id}"` : ""}>${t}</button>`;
@@ -1682,6 +1739,12 @@ const ACC = {
       if (s.obj && s.n === s.obj) nota(x.texto + ": semana completa.");
       else if (s.obj && s.n === s.suf && s.suf < s.obj) nota(x.texto + ": " + s.n + " de " + s.obj + ". Ya cuenta; la completa sigue ahí."); } },
   "nivel": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => A.nivel(x)); },
+  "subir-pend": d => { const x = Rg.item(d.id); if (!x) return; const n = x.nivel;
+    let si; cambiar(() => { si = A.subirPend(x); });
+    if (si && x.nivel !== n) nota("Ahora es nivel " + x.nivel + "."); },
+  "bajar-pend": d => { const x = Rg.item(d.id); if (!x) return; const n = x.nivel;
+    let si; cambiar(() => { si = A.bajarPend(x); });
+    if (si && x.nivel !== n) nota("Ahora es nivel " + x.nivel + "."); },
   "set-nivel": (d, b) => { const x = Rg.item(d.id); if (!x) return; x.nivel = +d.v; guardar();
     Array.from(b.parentNode.children).forEach(c => c.classList.toggle("on", c === b)); },
   "set-dia": (d, b) => { const x = Rg.item(d.id); if (!x) return; const v = +d.v, i = x.dias.indexOf(v);
@@ -1786,6 +1849,33 @@ document.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey && e.target && e.target.dataset && e.target.dataset.enter) { e.preventDefault(); alEnter(e.target); }
   if (e.key === "Escape") { if ($("#hojas").innerHTML) cerrarHoja(); }
 });
+/* ── Agregar: dos caminos, los dos a prueba de iOS ──
+   1. La tecla de retorno. En iOS manda submit, no siempre un keydown de
+      Enter; por eso la fila es un <form> y aquí se escucha el submit.
+   2. El botón +. Si se espera al clic, en iOS no llega: al soltarse el
+      teclado la página se reacomoda entre el toque y el clic, y el clic
+      acaba cayendo en otro renglón. Se escribe, se toca el +, y no pasa
+      nada. Así que se actúa en el pointerdown, que es el único momento en
+      que el dedo está con seguridad encima, y se evita que el campo pierda
+      el foco: el teclado no se cierra y se pueden agregar varios seguidos. */
+let envioUlt = 0;
+function enviarFila(f) {
+  if (!f) return;
+  envioUlt = Date.now();
+  const el = document.getElementById(f.dataset.enviar); if (el) alEnter(el);
+}
+document.addEventListener("submit", e => {
+  const f = e.target.closest("form[data-enviar]"); if (!f) return;
+  e.preventDefault();
+  if (Date.now() - envioUlt < 500) return;   /* ya lo hizo el pointerdown */
+  enviarFila(f);
+});
+document.addEventListener("pointerdown", e => {
+  const b = e.target.closest && e.target.closest(".agregar-mas"); if (!b) return;
+  const f = b.closest("form[data-enviar]"); if (!f) return;
+  e.preventDefault();
+  enviarFila(f);
+}, { passive: false });
 try { matchMedia("(prefers-color-scheme:dark)").addEventListener("change", () => { if (E && E.ajustes.tema === "sistema") aplicarTema(); }); } catch (e) {}
 setInterval(lineaDia, 60000);
 
@@ -2259,9 +2349,80 @@ const FRASES = {
 const frase = k => { const p = FRASES[k] || []; return p[Math.floor(Math.random() * p.length)] || ""; };
 function fraseDelDia(k, f) {
   const p = FRASES[k] || []; if (!p.length) return "";
-  let h = 0; const t = k + f;
+  return p[revoltura(k + f) % p.length];
+}
+/* Un número estable a partir de un texto: la misma fecha da siempre la misma
+   frase, y dos fechas distintas casi nunca la misma. */
+function revoltura(t) { let h = 0;
   for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0;
-  return p[h % p.length];
+  return h; }
+
+/* ── La palabra de hoy ──
+   Tres repisas, una por momento del día, en el tono de la app hermana: sin
+   signos de admiración, sin felicitaciones y sin prometer resultados. Lo
+   que afirman es agencia —que el día avance por acciones propias— que es el
+   propósito que esta app sirve. Se escoge por fecha y momento: la misma
+   toda la mañana, otra por la tarde, otra de noche. */
+const PALABRAS = {
+  manana: [
+    "Tú puedes hacerlo.",
+    "Lo que hagas en la primera hora decide el tono de las otras quince.",
+    "La disciplina es la promesa callada de no abandonar a quien puedes llegar a ser.",
+    "Nadie va a venir a empujarte. Tampoco hace falta.",
+    "Empezar mal es empezar. Quedarse mirando, no.",
+    "Cuando alineo mi fuerza con mi verdad, el éxito se vuelve sostenible.",
+    "Hoy no tiene que ser extraordinario. Tiene que ser tuyo.",
+    "La constancia no se siente heroica por dentro. Por eso casi nadie la sostiene.",
+    "Elijo el remo antes que la corriente.",
+    "Lo que repites es lo que eres; lo demás es lo que dices.",
+    "No necesitas ganas. Necesitas empezar, y las ganas llegan después.",
+    "El día ya empezó. La pregunta es quién lo está llevando.",
+    "Avanzo por decisión, no por inercia.",
+    "Una acción pequeña hecha hoy pesa más que una grande planeada para el lunes.",
+    "Lo difícil de la mañana es lo que vuelve fácil la tarde."
+  ],
+  tarde: [
+    "Lo que no empezaste todavía cabe en lo que queda del día.",
+    "Media mañana perdida no es un día perdido. Decidir que sí lo es, eso sí lo pierde.",
+    "Vuelvo a lo mío sin castigarme por haberme ido.",
+    "El cansancio no es una señal de parar. A veces es una señal de que ya estás en lo difícil.",
+    "Tú puedes hacerlo.",
+    "La tarde es donde se separa quien quería de quien hace.",
+    "Sostengo el rumbo aunque se me haya movido el ánimo.",
+    "Una cosa más, bien hecha, y el día cambia de color.",
+    "No reviso cuánto falta. Reviso qué sigue.",
+    "Lo que pospongo hoy no desaparece: me espera mañana con intereses.",
+    "Hago lo que dije que iba a hacer, sobre todo ahora que ya no tengo ganas.",
+    "El impulso de la mañana se acaba. La decisión, no.",
+    "Vale más terminar algo mediano que empezar tres cosas buenas.",
+    "Lo que hago cuando nadie mira es lo único que de verdad cuenta.",
+    "Aún hay día. Úsalo."
+  ],
+  noche: [
+    "Lo que hiciste hoy ya cuenta, aunque no haya sido todo.",
+    "Cierro el día sin deberme explicaciones.",
+    "Un día flojo dentro de una semana firme sigue siendo una semana firme.",
+    "Lo que quedó abierto espera. No tiene que resolverse esta noche.",
+    "Mañana empieza en lo que decidas ahora.",
+    "Reviso el día sin juzgarlo. Lo que se repite es lo que hay que mover.",
+    "No se avanza todos los días. Se avanza todas las semanas.",
+    "Hoy hice algo mío. Mañana otra vez.",
+    "El que llega lejos no es el que corrió más rápido, sino el que no se bajó.",
+    "La disciplina es la promesa callada de no abandonar a quien puedes llegar a ser.",
+    "Descansar también es parte de sostenerlo.",
+    "Lo que hoy pareció enorme, mañana tendrá su tamaño.",
+    "No cuento lo que falta. Cuento lo que ya es mío.",
+    "Cuando alineo mi fuerza con mi verdad, el éxito se vuelve sostenible.",
+    "Mañana vuelve a tocarme a mí. Está bien."
+  ]
+};
+/* De qué momento es una hora. La noche empieza a las 20, no a medianoche:
+   el día de verdad ya cerró y lo que toca es otra cosa. */
+function momento(h) { return h < 12 ? "manana" : h < 20 ? "tarde" : "noche"; }
+const MOMENTO_ET = { manana: "Mañana", tarde: "Tarde", noche: "Noche" };
+function palabraDelDia(f, m) {
+  const l = PALABRAS[m] || PALABRAS.manana;
+  return l[revoltura(m + "·" + f) % l.length];
 }
 
 /* ════════ PAISAJES Y ENFOQUE ════════
@@ -2666,9 +2827,14 @@ function revisarDia() {
   E.marcas.ultimoDia = f; guardarYa(); pintar();
   if (!diaDe(f).pase) abrirPase();
 }
+/* El reloj de la portada no se vuelve a pintar solo: sin esto se queda con
+   la hora de cuando se abrió la app, que es peor que no ponerla. */
+function tocarReloj() { const e = $("#portReloj"); if (e) e.textContent = reloj(); }
+setInterval(tocarReloj, 30000);
+
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") { guardarYa(); return; }
-  revisarDia();
+  revisarDia(); tocarReloj();
 });
 addEventListener("pagehide", guardarYa);
 
