@@ -146,7 +146,7 @@ button.it-n:hover{box-shadow:inset 0 0 0 1px var(--linea-fuerte)}
   color:var(--tinta-tenue);box-shadow:inset 0 0 0 1px var(--linea)}
 .agregar-mas svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .agregar-mas:hover{color:var(--llama);box-shadow:inset 0 0 0 1px var(--cera)}
-.agregar input{flex:1;border:0;background:none;padding:14px 0;font-size:16px;outline:none}
+.agregar input{flex:1;min-width:0;border:0;background:none;padding:14px 0;font-size:16px;outline:none}
 .agregar input::placeholder{color:var(--tinta-tenue)}
 
 .aviso-tope,.senal{font-size:13px;color:var(--tinta-baja);margin:18px 0 0;padding-left:13px;
@@ -165,7 +165,7 @@ button.it-n:hover{box-shadow:inset 0 0 0 1px var(--linea-fuerte)}
 .cad-f{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--linea);min-height:54px}
 .cad-f:first-child{border-top:1px solid var(--linea)}
 .cad-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;padding:11px 0}
-.cad-n{font-size:15px;line-height:1.3}
+.cad-n{font-size:15px;line-height:1.3;overflow-wrap:anywhere}
 .cad-d{display:flex;gap:4px}
 .cad-d .d{width:19px;height:19px;border-radius:5px;display:grid;place-items:center;font-size:9.5px;
   font-family:var(--mono);background:var(--panel);color:var(--tinta-tenue)}
@@ -190,7 +190,7 @@ html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
 .meta-c.tibia .meta-fl svg{fill:color-mix(in srgb,var(--cera) 55%,transparent);stroke:var(--cera)}
 .meta-c.viva .meta-fl svg{fill:var(--llama);stroke:none;
   filter:drop-shadow(0 0 7px color-mix(in srgb,var(--llama) 45%,transparent))}
-.meta-n{flex:1;min-width:0;font-size:16px}
+.meta-n{flex:1;min-width:0;overflow-wrap:anywhere;font-size:16px}
 .meta-s{flex:0 0 auto;font-size:12px;color:var(--tinta-baja)}
 .meta-grande{display:flex;align-items:center;gap:14px;background:var(--panel);border-radius:14px;
   padding:16px;margin:0 0 18px}
@@ -226,7 +226,7 @@ html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
   padding:12px 14px;font-size:16px;outline:none;transition:border-color .18s ease}
 .campo-i:focus{border-color:var(--cera)}
 .campo-area{resize:vertical;line-height:1.5;font-family:inherit}
-.campo-area.mono{font-family:var(--mono);font-size:11px}
+.campo-area.mono{font-family:var(--mono);font-size:16px;line-height:1.4}
 .campo-ayuda{font-size:12.5px;color:var(--tinta-baja);margin:-8px 0 16px;line-height:1.45}
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 16px}
 .chip{padding:8px 15px;border-radius:999px;font-size:13.5px;background:var(--panel);color:var(--tinta-baja);
@@ -239,8 +239,7 @@ html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
 .acciones{display:flex;gap:10px;margin:22px 0 0}
 .accion{flex:1;padding:14px;border-radius:13px;text-align:center;font-size:15px;background:var(--panel);
   color:var(--tinta);transition:transform .1s ease,opacity .18s ease}
-.accion.llena{background:var(--llama);color:#fff;font-weight:500}
-html[data-modo="oscuro"] .accion.llena{color:#1a1612}
+.accion.llena{background:var(--llama);color:#1a1612;font-weight:500}
 .accion:active{transform:scale(.985)}
 .acciones:has(> .accion:only-child) .accion{flex:1}
 .hoja-pie{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:18px 0 0;
@@ -362,7 +361,7 @@ html[data-modo="oscuro"] .rt.hecha .rt-c{color:#1a1612}
 .pa-c svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
 .pa.hecha .pa-c{background:var(--oro);box-shadow:none;color:#fff}
 html[data-modo="oscuro"] .pa.hecha .pa-c{color:#1a1612}
-.pa-x{flex:1 1 auto;min-width:0;font-size:13.5px;line-height:1.3;position:relative}
+.pa-x{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;font-size:13.5px;line-height:1.3;position:relative}
 .pa.hecha .pa-x{color:var(--tinta-tenue);text-decoration:line-through;text-decoration-thickness:1px}
 /* El peso de cada parte: presente, en segundo plano, alineado en columna */
 .pa-p{flex:0 0 auto;font-family:var(--mono);font-size:10.5px;color:var(--tinta-baja);
@@ -411,7 +410,7 @@ html[data-modo="oscuro"] .niv1 .niv-b{color:#1a1612}
    siendo un scroll, así que no hace falta un asa en cada fila. */
 .zona-vacia{list-style:none;padding:11px 0;font-size:13px;color:var(--tinta-tenue);
   border-bottom:1px solid var(--linea)}
-[data-arr]{touch-action:pan-y;cursor:grab}
+[data-arr]{cursor:grab}
 body.arrastrando{user-select:none;-webkit-user-select:none}
 body.arrastrando [data-arr]{cursor:grabbing}
 .hueco{opacity:.26}
@@ -567,7 +566,7 @@ input,select,textarea{font-size:16px}
   border-radius:14px;background:var(--panel);text-align:left}
 .port-meta .flama-v{width:42px;height:46px}
 .port-meta-x{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-.port-meta-n{font-size:15px;color:var(--tinta)}
+.port-meta-n{font-size:15px;color:var(--tinta);overflow-wrap:anywhere}
 .port-meta-s{font-size:12px;color:var(--tinta-baja)}
 
 /* ══ LAS TRES CARAS ══
@@ -603,7 +602,7 @@ input,select,textarea{font-size:16px}
   box-shadow:inset 0 0 0 1.4px var(--linea-fuerte);color:transparent;transition:background .2s,color .2s,box-shadow .2s}
 .pt-c svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 .pt.on .pt-c{background:var(--cera);box-shadow:none;color:#4a3f2e}
-.pt-x{font-size:15px;line-height:1.3;color:var(--tinta-baja)}
+.pt-x{font-size:15px;line-height:1.3;color:var(--tinta-baja);overflow-wrap:anywhere}
 .pt.on .pt-x{color:var(--tinta)}
 /* En el teléfono no hay «pasar el ratón por encima»: si la ✕ se esconde
    hasta el hover, en el teléfono no existe. Se queda tenue y siempre;
@@ -714,6 +713,61 @@ html[data-modo="oscuro"] .cn-chip.on{color:#1a1612}
 /* La guía de las partes vive con las partes, no en el renglón de arriba */
 .pa-guia{font-size:12.5px;line-height:1.5;color:var(--tinta-baja);margin:2px 0 10px}
 .mover.vacio{pointer-events:none}
+
+/* Una casilla con su explicación debajo, para decisiones que no se pueden
+   deshacer (unir o reemplazar al conectar la sincronización). */
+.campo-check{display:flex;align-items:flex-start;gap:11px;margin:0 0 18px;cursor:pointer}
+.campo-check input{flex:0 0 auto;width:20px;height:20px;margin:2px 0 0;accent-color:var(--llama)}
+.campo-check span{flex:1;min-width:0;font-size:14.5px;line-height:1.4;color:var(--tinta)}
+.campo-check em{display:block;font-style:normal;font-size:12.5px;line-height:1.45;
+  color:var(--tinta-baja);margin-top:4px}
+
+/* ══ ARREGLOS DE LA AUDITORÍA ══ */
+
+/* El carril de caras es pegajoso y opaco: sin esto, al enfocar un campo que
+   queda arriba, el navegador lo sube justo detrás del rótulo y el toque cae
+   en el botón de cara en vez de en el campo. */
+.lienzo{scroll-padding-top:56px}
+
+/* El relleno reservaba 112px para una barra que no es fija: la tabbar está
+   en el flujo y ya ocupa su alto. Quedaban 113px en blanco al final de
+   cada lista. Se deja holgura para el teclado, no para la barra. */
+.lienzo{padding-bottom:calc(env(safe-area-inset-bottom) + 40px)}
+
+/* Blanco sobre naranja da 2.49:1. Estos tres faltaban. */
+.cad-d .d.on{color:#4a3f2e}
+.cn-chip.on{color:#1a1612}
+html[data-modo="oscuro"] .cn-chip.on{color:#1a1612}
+.niv1 .niv-b{color:#1a1612}
+html[data-modo="oscuro"] .niv1 .niv-b{color:#1a1612}
+
+/* --tinta-tenue no llegaba a 4.5:1 en ninguno de los dos temas, y el propio
+   encabezado de este archivo dice que no se use para texto chico. Se sube
+   hasta que pase, en vez de repasar los quince sitios que lo usan. */
+:root{--tinta-tenue:#6F675C}
+html[data-modo="oscuro"]{--tinta-tenue:#8A7F6E}
+
+/* El área de toque del número de nivel: es el gesto que la propia pantalla
+   anuncia («toca el número para cambiarlo») y medía 26px. */
+.it-n{position:relative}
+.it-n::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:44px;height:44px}
+
+/* La pantalla de enfoque tapa la app pero el aviso tiene que verse encima */
+.toast{z-index:100}
+.concentra{overflow-y:auto}
+
+/* Las caras que no se ven no se tabulan: eran 106 paradas de Tab, y entrar
+   en una cara oculta desplazaba el carril solo. */
+.cara[inert]{opacity:1}
+/* La franja en curso también se dice con una palabra, no solo con color */
+.franja-ahora{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--brasa);font-weight:400;margin-left:8px}
+/* El asa cierra la hoja: antes dibujaba un gesto que no existía */
+.asa{display:block;width:34px;height:4px;margin:0 auto 12px;border-radius:999px;
+  background:var(--linea-fuerte);border:0;padding:0;position:relative}
+.asa::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:72px;height:36px}
 
 </style>
 </head>
@@ -827,16 +881,27 @@ const Guardado = (() => {
     if (local) { try { const v = window.localStorage.getItem(k); if (v) return JSON.parse(v); } catch (e) {} }
     return memoria[k] || null;
   }
+  /* Devuelve si de verdad quedó guardado fuera de la memoria. Antes se
+     tragaba el error y la app seguía como si nada: en modo privado o con la
+     cuota llena se trabajaba todo el día y se perdía al cerrar, sin aviso. */
   function escribir(k, v) {
     memoria[k] = v;
-    if (claude()) { try { window.storage.set(k, JSON.stringify(v)); } catch (e) {} }
-    if (local) { try { window.localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    let fuera = false;
+    if (claude()) { try { window.storage.set(k, JSON.stringify(v)); fuera = true; } catch (e) {} }
+    if (local) { try { window.localStorage.setItem(k, JSON.stringify(v)); fuera = true; } catch (e) {} }
+    return fuera;
   }
-  return { leer, escribir, persistente: () => claude() || local };
+  function borrar(k) {
+    delete memoria[k];
+    if (claude()) { try { window.storage.delete(k); } catch (e) {} }
+    if (local) { try { window.localStorage.removeItem(k); } catch (e) {} }
+  }
+  return { leer, escribir, borrar, persistente: () => claude() || local };
 })();
 
 const VERSION = 8;
 const CLAVE = "cauce:estado:v8";
+const PREVIA = "cauce:previa:v8";
 const VIEJAS = ["cauce:estado:v7", "cauce:estado:v6", "cauce:estado:v5", "cauce:estado:v4", "cauce:estado:v3"];
 const TOPE = 9;   /* el post-it: nueve renglones */
 let E = null;
@@ -930,6 +995,9 @@ function desdeViejo(g) {
     v: VERSION,
     ajustes: { nombre: (g.ajustes || {}).nombre || "", tema: (g.ajustes || {}).tema || "sistema",
       proposito: (g.ajustes || {}).proposito || "", vista: "nivel" },
+    /* Una migración desde v7 no trae «por ti»: se siembra aquí, igual que en
+       la semilla, porque normalizar ya no repuebla una lista vacía. */
+    porti: POR_TI.map(t => ({ id: uid(), texto: t })),
     metas, rutinas, sueltos, dias: {}, marcas: { onboarding: true, ultimoDia: null }
   };
 }
@@ -940,7 +1008,24 @@ function normalizar(e) {
   ["metas", "rutinas", "sueltos", "porti"].forEach(k => { if (!Array.isArray(e[k])) e[k] = []; });
   /* «Haz algo solo por ti» no es una obligación: no tiene nivel, ni cadencia,
      ni fecha. Es una lista de la que se escoge, no una lista que se cumple. */
-  if (!e.porti.length) e.porti = POR_TI.map(t => ({ id: uid(), texto: t }));
+  /* Aquí NO se siembra «por ti». Antes se repoblaba cuando la lista estaba
+     vacía, así que vaciarla a propósito la hacía renacer en la recarga —y
+     con ids nuevos, de modo que al sincronizar salían catorce. La siembra
+     vive en semilla() y en desdeViejo(), que son los dos únicos momentos en
+     que de verdad no hay lista. */
+  /* Los ids se revisan al cargar. Van dentro de atributos del HTML, así que
+     un id con comillas inyecta marcado —y sobrevive a la recarga, porque
+     queda guardado—. Además, un id vacío o repetido hace que la fusión los
+     junte en uno solo, y uno igual a «__proto__» desaparece sin error.
+     Aquí se regenera cualquiera que no sea un id limpio y único. */
+  const idSano = /^[A-Za-z0-9_-]{1,40}$/, vistos = new Set();
+  ["metas", "rutinas", "sueltos", "porti"].forEach(k => {
+    (e[k] || []).forEach(x => {
+      if (!x || typeof x !== "object") return;
+      if (typeof x.id !== "string" || !idSano.test(x.id) || x.id === "__proto__" || vistos.has(x.id)) x.id = uid();
+      vistos.add(x.id);
+    });
+  });
   e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
   Object.values(e.dias).forEach(d => { if (!Array.isArray(d.porti)) d.porti = []; });
   e.marcas = Object.assign({ onboarding: false, ultimoDia: null, tocado: false }, e.marcas || {});
@@ -1476,7 +1561,10 @@ function caraX(c, i) { const h = c.children; return h[i] && h[0] ? h[i].offsetLe
 function caraIr(v, suave) {
   const c = $("#caras"); if (!c) return;
   const i = CARAS.findIndex(x => x[0] === v); if (i < 0) return;
-  c.scrollTo({ left: caraX(c, i), behavior: suave ? "smooth" : "instant" });
+  /* El CSS respeta «menos movimiento»; esto también tiene que hacerlo, o el
+     rótulo cambia de golpe mientras el panel sigue animándose. */
+  const quieto = (() => { try { return matchMedia("(prefers-reduced-motion:reduce)").matches; } catch (e) { return false; } })();
+  c.scrollTo({ left: caraX(c, i), behavior: (suave && !quieto) ? "smooth" : "instant" });
 }
 /* Cuál está a la vista: la más cercana al scroll, no la que toca por cuenta */
 function caraVista(c) {
@@ -1495,16 +1583,17 @@ function pintarHoy() {
   let h = portada(f, mk);
 
   h += `<div class="caras-nav" role="tablist">${CARAS.map(c =>
-    `<button class="cara-b${cara === c[0] ? " on" : ""}" role="tab" aria-selected="${cara === c[0]}" data-accion="cara" data-v="${c[0]}">${c[1]}</button>`).join("")}</div>`;
+    `<button class="cara-b${cara === c[0] ? " on" : ""}" role="tab" aria-selected="${cara === c[0]}" aria-controls="cara-${c[0]}" data-accion="cara" data-v="${c[0]}">${c[1]}</button>`).join("")}</div>`;
   h += `<div class="caras" id="caras">`;
 
   /* ── RUTINA ── */
-  h += `<section class="cara" data-cara="rutina">`;
+  h += `<section class="cara" role="tabpanel" id="cara-rutina" data-cara="rutina">`;
   h += `<p class="bloque-s">Tu rutina, en el orden en que ocurre. Si una actividad tiene partes, el galón las abre aquí mismo.</p>`;
   h += bloques.map(({ fr, items }) => {
     const hechos = items.filter(x => Rg.hecha(x, f)).length;
     const enCurso = ahora >= fr.desde && ahora < fr.hasta;
-    return `<div class="franja-g${enCurso ? " ahora" : ""}" data-fr="${fr.id}"><p class="franja">${esc(fr.nombre)}` +
+    return `<div class="franja-g${enCurso ? " ahora" : ""}" data-fr="${fr.id}"${enCurso ? ' aria-current="time"' : ""}><p class="franja">${esc(fr.nombre)}` +
+      (enCurso ? `<b class="franja-ahora">ahora</b>` : "") +
       `<span>${fr.desde}:00–${fr.hasta === 24 ? "24" : fr.hasta}:00</span>` +
       `<em>${items.length ? hechos + " de " + items.length : "libre"}</em></p>` +
       `<ul class="rutl" data-zona="${fr.id}">${items.map(x => filaRutina(x, f)).join("") ||
@@ -1514,7 +1603,7 @@ function pintarHoy() {
   h += `</section>`;
 
   /* ── PENDIENTES ── */
-  h += `<section class="cara" data-cara="pend">`;
+  h += `<section class="cara" role="tabpanel" id="cara-pend" data-cara="pend">`;
   h += `<p class="bloque-s">Lo suelto: pasa una vez y no tiene por qué llevar a una meta. Tres niveles; toca el número para cambiarlo.</p>`;
   const NIV = [["Primero", "lo que sí o sí hoy"], ["Después", "si el día lo permite"], ["Si da tiempo", "sin prisa"]];
   h += Rg.porNivel(f).map(({ n, items }) =>
@@ -1531,7 +1620,7 @@ function pintarHoy() {
      Sin niveles, sin horas, sin cadencia. Se escoge de la lista, no se cumple.
      Lo único que se guarda es que hubo algo: el día que no, tampoco pasa nada. */
   const hechoHoy = Rg.portiHoy(f), sem = Rg.portiSemana(f), dd = Rg.portiDias(f);
-  h += `<section class="cara" data-cara="porti">`;
+  h += `<section class="cara" role="tabpanel" id="cara-porti" data-cara="porti">`;
   /* Lo de hoy y lo de la semana juntos: eso es lo que hay que leer de un
      vistazo. La lista de abajo es solo de dónde escoger. */
   h += `<div class="porti-alza${hechoHoy.length ? " si" : ""}">` +
@@ -1558,6 +1647,7 @@ function pintarHoy() {
   const cont = $("#caras");
   if (cont) {
     caraIr(cara, false);
+    apagarCaras();
     /* Si pasa la cara con el dedo, el nombre de arriba tiene que seguirlo.
        Sin esto el panel se mueve y el rótulo se queda en el de antes. */
     let pide = 0;
@@ -1575,6 +1665,18 @@ function marcarCara(v) {
   S.cara = v;
   $$(".cara-b").forEach(b => { const on = b.dataset.v === v;
     b.classList.toggle("on", on); b.setAttribute("aria-selected", on); });
+  apagarCaras();
+}
+/* Las tres caras viven a la vez en el carril, así que sin esto se tabula por
+   las dos que no se ven —106 paradas antes de llegar a la barra de abajo— y
+   al entrar en una el navegador la trae a la vista: el carril se mueve solo
+   y la cara activa cambia sin que nadie lo haya pedido. */
+function apagarCaras() {
+  $$("#caras > .cara").forEach(c => {
+    const on = c.dataset.cara === S.cara;
+    if (on) { c.removeAttribute("inert"); c.removeAttribute("aria-hidden"); }
+    else { c.setAttribute("inert", ""); c.setAttribute("aria-hidden", "true"); }
+  });
 }
 
 /* ── El repositorio: lo hecho, por día. No se persigue, se consulta. ── */
@@ -1658,7 +1760,7 @@ function hoja(tit, sub, cuerpo) {
   const a = document.activeElement;
   hoja.volver = a && a !== document.body ? a : null;
   $("#hojas").innerHTML = `<div class="velo" data-accion="cerrar-hoja"></div><div class="hoja" role="dialog" aria-modal="true" aria-labelledby="hojaTit">` +
-    `<div class="asa" aria-hidden="true"></div><h2 class="hoja-t" id="hojaTit" tabindex="-1">${tit}</h2>` +
+    `<button class="asa" data-accion="cerrar-hoja" aria-label="Cerrar"></button><h2 class="hoja-t" id="hojaTit" tabindex="-1">${tit}</h2>` +
     (sub ? `<p class="hoja-s">${sub}</p>` : "") + `<div id="hojaCuerpo">` + cuerpo + `</div></div>`;
   $("#appShell").setAttribute("inert", "");
   setTimeout(() => { const t = $("#hojas [data-autofoco]") || $("#hojaTit"); if (t) try { t.focus({ preventScroll: true }); } catch (e) {} }, 50);
@@ -1786,6 +1888,12 @@ function hojaSync() {
         dos(btn("Desconectar", "sync-fuera"), btn("Sincronizar ahora", "sync-ya", "", "llena"))
       : campo("syTok", "Token de GitHub", "", "ghp_…") +
         campo("syGist", "ID del gist (solo en el segundo dispositivo)", "", "déjalo vacío la primera vez") +
+        /* Qué hacer con lo que ya hay aquí. Por defecto se reemplaza: poner
+           el ID de un gist es decir «este dispositivo recibe lo de allá».
+           Unir solo tiene sentido si de verdad capturaste cosas distintas en
+           los dos, y aun así deja duplicada la semilla. */
+        `<label class="campo-check"><input type="checkbox" id="syUnir">` +
+        `<span>Unir con lo que ya hay en este dispositivo<em>Déjalo sin marcar si este aparato es el nuevo. Unir dos listas recién instaladas duplica la rutina entera.</em></span></label>` +
         `<p class="paso-err" id="hojaErr" role="alert"></p>` +
         dos(btn("Cancelar", "cerrar-hoja"), btn("Conectar", "sync-conectar", "", "llena"))) +
     `<details class="plegable" style="margin-top:20px"><summary><span class="sec-t" style="font-size:15px">Cómo sacar el token</span><span class="mas">+</span></summary>` +
@@ -1843,10 +1951,35 @@ function cerrarPase() { $("#flujo").classList.add("oculto"); $("#appShell").remo
    la app puede morir dentro de esa espera —cambiar de app, bloquear la
    pantalla—, así que al ocultarse se escribe de inmediato. */
 let guardarT = null;
+let avisadoSinGuardar = false;
 function guardarYa() { clearTimeout(guardarT); guardarT = null;
-  if (E) { Guardado.escribir(CLAVE, E); Sync.pendiente(); } }
+  if (!E) return;
+  const ok = Guardado.escribir(CLAVE, E);
+  Sync.pendiente();
+  /* Una vez por sesión: si no se puede guardar, hay que decirlo. Seguir en
+     silencio es prometer que lo de hoy estará mañana. */
+  if (!ok && !avisadoSinGuardar) { avisadoSinGuardar = true;
+    nota("Este navegador no me deja guardar: lo de hoy se perderá al cerrar."); } }
 function guardar() { clearTimeout(guardarT); guardarT = setTimeout(guardarYa, 200); }
-function cambiar(fn) { fn(); if (E && E.marcas) E.marcas.tocado = true; guardar(); pintar(); }
+/* El repintado reescribe #vista entero, así que el botón que se acaba de
+   tocar deja de existir y el foco cae al body. Con el dedo no se nota; con
+   teclado o lector de pantalla hay que volver a tabular la lista entera
+   para dar la segunda pulsación, y las flechas de mover son justo el
+   control que se usa varias veces seguidas. Se anota a quién volver y se
+   vuelve por sus datos, que sobreviven al nuevo HTML. */
+function selDeFoco(k) {
+  if (!k || !k.dataset || !k.dataset.accion) return null;
+  const d = k.dataset;
+  return `[data-accion="${d.accion}"]` +
+    (d.id ? `[data-id="${CSS.escape(d.id)}"]` : "") +
+    (d.i !== undefined ? `[data-i="${d.i}"]` : "") +
+    (d.v !== undefined ? `[data-v="${CSS.escape(d.v)}"]` : "");
+}
+function cambiar(fn) {
+  const sel = selDeFoco(document.activeElement);
+  fn(); if (E && E.marcas) E.marcas.tocado = true; guardar(); pintar();
+  if (sel) { const n = $(sel); if (n) { try { n.focus({ preventScroll: true }); } catch (e) {} } }
+}
 
 /* ── Marcar sin repintar ──
    Volver a escribir toda la vista en cada toque tiene dos costos que no se
@@ -2027,6 +2160,11 @@ const ACC = {
   "sync-conectar": async () => {
     const tok = val("syTok"), gist = val("syGist"), er = document.getElementById("hojaErr");
     if (!tok) { if (er) er.textContent = "Pega el token."; return; }
+    /* Escribir a mano el ID de un gist significa «este dispositivo recibe lo
+       de allá». Si aquí ya hay algo, se pregunta antes, porque unir dos
+       semillas distintas duplica la rutina entera. */
+    const un = document.getElementById("syUnir");
+    Sync.adoptar = !!(gist && !(un && un.checked));
     Sync.poner({ token: tok, gist: gist || null });
     if (er) er.textContent = "Conectando…";
     await Sync.ciclo();
@@ -2039,12 +2177,37 @@ const ACC = {
   "exportar": () => hojaExportar(),
   "importar": () => hojaImportar(),
   "copiar-export": () => { const t = document.getElementById("expJson"); if (!t) return;
-    t.select(); try { document.execCommand("copy"); nota("Copiado."); } catch (e) { nota("Selecciónalo y copia."); } },
+    t.select();
+    const viejo = () => { try { document.execCommand("copy"); nota("Copiado."); } catch (e) { nota("Selecciónalo y copia."); } };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t.value).then(() => nota("Copiado.")).catch(viejo);
+    } else viejo(); },
+  /* Importar reemplaza todo, así que antes de pisar se revisa la forma y se
+     guarda una copia. Antes, cualquier JSON válido —un `[]`, un `42`, el
+     portapapeles equivocado— pasaba por desdeViejo, que todo lo lee con
+     `(g.campo || [])`, y devolvía un estado válido y vacío: la app decía
+     «Importado» y se quedaba sin nada, sin manera de volver. */
   "confirmar-importar": () => { const t = document.getElementById("impJson"), er = document.getElementById("hojaErr");
-    try { const g = JSON.parse(t.value);
+    try {
+      const g = JSON.parse(t.value);
+      if (!g || typeof g !== "object" || Array.isArray(g)) throw new Error("forma");
+      const tiene = ["rutinas", "sueltos", "metas", "acciones", "porti"].some(k => Array.isArray(g[k]));
+      if (!tiene) throw new Error("forma");
+      if (+g.v > VERSION) { if (er) er.textContent = "Ese respaldo es de una versión más nueva de Cauce."; return; }
+      Guardado.escribir(PREVIA, E);                 /* la red de seguridad */
       const nuevo = (+g.v >= 8) ? g : desdeViejo(g);
-      E = normalizar(nuevo); podar(E); Guardado.escribir(CLAVE, E); cerrarHoja(); aplicarTema(); pintar(); nota("Importado.");
-    } catch (e) { if (er) er.textContent = "No se pudo leer. Revisa que esté completo."; } },
+      E = normalizar(nuevo); podar(E); Guardado.escribir(CLAVE, E);
+      cerrarHoja(); aplicarTema(); pintar();
+      nota("Importado. Puedes deshacerlo desde Ajustes.");
+    } catch (e) {
+      if (er) er.textContent = e.message === "forma"
+        ? "Eso no parece un respaldo de Cauce. No se tocó nada."
+        : "No se pudo leer. Revisa que esté completo.";
+    } },
+  "deshacer-importar": async () => {
+    const v = await Guardado.leer(PREVIA); if (!v) return;
+    E = normalizar(v); podar(E); Guardado.escribir(CLAVE, E); Guardado.borrar(PREVIA);
+    cerrarHoja(); aplicarTema(); pintar(); nota("Deshecho. Volvió lo de antes."); },
   "cerrar-hoja": () => { Pomo.tareaPend = ""; Pomo.idPend = null; cerrarHoja(); },
   "enviar": d => { const el = document.getElementById(d.para || "nuevo"); if (el) alEnter(el); },
   "ir-hecho": () => { S.tab = "hecho"; pintar(); },
@@ -2080,7 +2243,11 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey && e.target && e.target.dataset && e.target.dataset.enter) { e.preventDefault(); alEnter(e.target); }
-  if (e.key === "Escape") { if ($("#hojas").innerHTML) cerrarHoja(); }
+  if (e.key === "Escape") {
+    const cz = $("#concentra");
+    if (cz && !cz.classList.contains("oculto")) { detenerPomo(); return; }
+    if ($("#hojas").innerHTML) cerrarHoja();
+  }
 });
 /* ── Agregar: dos caminos, los dos a prueba de iOS ──
    1. La tecla de retorno. En iOS manda submit, no siempre un keydown de
@@ -2110,7 +2277,12 @@ document.addEventListener("pointerdown", e => {
   enviarFila(f);
 }, { passive: false });
 try { matchMedia("(prefers-color-scheme:dark)").addEventListener("change", () => { if (E && E.ajustes.tema === "sistema") aplicarTema(); }); } catch (e) {}
-setInterval(lineaDia, 60000);
+/* Cada minuto: si el día lógico ya cambió, se revalida entero. Antes esto
+   solo pasaba al volver de segundo plano, así que con la pestaña abierta a
+   las 5:01 la pantalla seguía mostrando el día de ayer, ya tachado, y al
+   destachar una fila se escribía una marca en un día que no había vivido. */
+setInterval(() => { if (!E) return;
+  if (E.marcas.ultimoDia !== hoyISO()) revisarDia(); else lineaDia(); }, 60000);
 
 
 /* ════════ ARRASTRAR ════════
@@ -2838,7 +3010,10 @@ function iniciarPomo(tarea, id) {
   reproducirSonido(Pomo.escena);
   try { cerrarHoja(); } catch (e) {}
   pedirPantalla();
-  const ov = $("#concentra"); if (ov) ov.classList.remove("oculto");
+  const ov = $("#concentra");
+  if (ov) { ov.classList.remove("oculto");
+    $("#appShell").setAttribute("inert", "");
+    setTimeout(() => { const b = $(".concentra-salir"); if (b) try { b.focus({ preventScroll: true }); } catch (e) {} }, 50); }
   const ring = $("#concentraProg");
   if (ring) { ring.style.transition = "none"; ring.style.strokeDashoffset = "289.03"; void ring.offsetWidth;
     ring.style.transition = "stroke-dashoffset 1s linear"; }
@@ -2849,6 +3024,7 @@ function iniciarPomo(tarea, id) {
 function detenerPomo() {
   const vueltas = Pomo.vueltas + (Pomo.modo === "foco" && pomoRestante() === 0 ? 1 : 0);
   Pomo.activo = false;
+  $("#appShell").removeAttribute("inert");
   clearInterval(Pomo.timer); Pomo.timer = null;
   clearInterval(Pomo.msgTimer); Pomo.msgTimer = null;
   const ov = $("#concentra"); if (ov) ov.classList.add("oculto");
@@ -2938,6 +3114,10 @@ function unirDia(a, b) {
   d.fuera = [...new Set([...(a.fuera || []), ...(b.fuera || [])])];
   /* Lo que se hizo por uno se hizo, lo haya anotado el celular o la compu */
   d.porti = [...new Set([...(a.porti || []), ...(b.porti || [])])];
+  /* Una frase escrita le gana al hueco vacío. Sin esto, el dispositivo que
+     no armó frase subía su "" y borraba la del que sí la armó. */
+  d.frase = String(a.frase || "").trim() ? a.frase : (b.frase || "");
+  d.porAtajo = Object.assign({}, b.porAtajo || {}, a.porAtajo || {});
   d.pase = !!(a.pase || b.pase);
   return d;
 }
@@ -2956,9 +3136,11 @@ function fusionar(base, local, remoto) {
         const cl = !mismo(l, b), cr = !mismo(r, b);
         if (cl && cr && !mismo(l, r)) { v = l; choques++; } else v = cl ? l : r;
       } else if (l && !r) {
-        v = (b && mismo(l, b)) ? null : l;   /* borrado allá y sin tocar aquí */
+        /* borrado allá; si aquí se había tocado, se conserva y se avisa */
+        if (b && mismo(l, b)) v = null; else { v = l; if (b) choques++; }
       } else if (!l && r) {
-        v = (b && mismo(r, b)) ? null : r;   /* borrado aquí y sin tocar allá */
+        /* borrado aquí; si allá se había tocado, revive y se avisa */
+        if (b && mismo(r, b)) v = null; else { v = r; if (b) choques++; }
       }
       if (v) res.push(v);
     });
@@ -3026,6 +3208,7 @@ const Sync = {
     try {
       if (Sync.cfg.gist) {
         const g = await Sync.api("/gists/" + Sync.cfg.gist);
+        Sync.visto = g && g.updated_at;   /* para no pisar al subir */
         const f = g.files && g.files[Sync.ARCHIVO];
         if (f) {
           const txt = f.truncated ? await (await fetch(f.raw_url)).text() : f.content;
@@ -3036,7 +3219,12 @@ const Sync = {
              nuevos para las mismas cosas. Fusionarla duplicaría la rutina
              entera, así que si aquí nunca se tocó nada se adopta lo de allá
              tal cual. En cuanto hay algo capturado, se fusiona. */
-          if (!Sync.base() && !E.marcas.tocado) {
+          /* Al conectar por primera vez con un gist ajeno, se adopta lo de
+             allá salvo que se haya pedido unir. Antes bastaba un toque para
+             que `tocado` se volviera true y entonces se fusionaban dos
+             semillas distintas: salían doce rutinas en vez de seis. */
+          if (!Sync.base() && (Sync.adoptar || !E.marcas.tocado)) {
+            Sync.adoptar = false;
             E = remoto; podar(E);
             Guardado.escribir(CLAVE, E); pintar();
             if (!callado) nota("Listo: este dispositivo quedó con tus datos.");
@@ -3065,8 +3253,20 @@ const Sync = {
         description: "Cauce · estado", public: false, files: { [Sync.ARCHIVO]: { content: contenido } } }) });
       Sync.poner(Object.assign({}, Sync.cfg, { gist: g.id }));
     } else {
-      await Sync.api("/gists/" + Sync.cfg.gist, { method: "PATCH",
+      /* Antes de pisar, se vuelve a mirar. El PATCH reemplaza el archivo
+         entero: si el otro dispositivo subió algo entre el GET de este ciclo
+         y este momento, escribir a ciegas lo borra —y, peor, la base que se
+         guarda después convierte esa subida perdida en un borrado definitivo
+         también en el otro lado. El gist no tiene If-Match, así que la única
+         concurrencia posible es volver a leer y abortar. */
+      const g = await Sync.api("/gists/" + Sync.cfg.gist);
+      if (Sync.visto && g && g.updated_at && g.updated_at !== Sync.visto) {
+        Sync.visto = g.updated_at;
+        throw new Error("el otro dispositivo escribió primero");
+      }
+      const r = await Sync.api("/gists/" + Sync.cfg.gist, { method: "PATCH",
         body: JSON.stringify({ files: { [Sync.ARCHIVO]: { content: contenido } } }) });
+      if (r && r.updated_at) Sync.visto = r.updated_at;
     }
     /* La base es lo que se subió, no lo que hay ahora. Si se marca algo
        mientras el PATCH viaja, con E vivo ese cambio entraría en la base sin
@@ -3114,6 +3314,9 @@ function semilla() {
       sueltoNuevo({ texto: "Enviar el reclamo del bono educativo · cierra el 15 nov", nivel: 1 }),
       sueltoNuevo({ texto: "Amazon · producto nuevo", nivel: 2 })
     ],
+    /* La lista de «por ti» se siembra aquí, no en normalizar: así vaciarla a
+       propósito la deja vacía en vez de hacerla renacer en cada recarga. */
+    porti: POR_TI.map(t => ({ id: uid(), texto: t })),
     dias: {}, marcas: { onboarding: true, ultimoDia: null, tocado: false }
   });
 }

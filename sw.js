@@ -4,12 +4,17 @@
    Si no hay señal, abre la copia guardada — marcar el gimnasio a las 5:30
    no debería depender de tener datos. */
 const PREFIJO = "cauce-";
-const CACHE = PREFIJO + "v2";
+const CACHE = PREFIJO + "v3";
 const BASE = ["./", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(BASE)).catch(() => {}));
+  /* Uno por uno: addAll es atómico, así que un icono caído dejaba la caché
+     entera vacía y, con el error tragado, la primera visita se quedaba sin
+     copia sin conexión y sin señal de nada. */
+  e.waitUntil(caches.open(CACHE)
+    .then(c => Promise.all(BASE.map(u => c.add(u).catch(() => {}))))
+    .catch(() => {}));
 });
 
 /* Solo se borran las cachés propias. Cache Storage es por origen, no por
@@ -39,8 +44,17 @@ self.addEventListener("fetch", e => {
   if (esPagina) {
     /* no-store: que la caché del navegador no devuelva una versión vieja
        por debajo. La copia de aquí es el respaldo, y es la única. */
+    /* Solo se guarda lo que sirve. Sin este filtro, un 404 de un despliegue
+       a medias —o la pantalla de login de un wifi de hotel, que responde
+       200— sobrescribía la copia buena y la app quedaba muerta sin conexión
+       para siempre, que es justo lo que esta caché existe para evitar. */
     e.respondWith(fetch(req, { cache: "no-store" })
-      .then(r => { const copia = r.clone(); caches.open(CACHE).then(c => c.put(req, copia)); return r; })
+      .then(r => {
+        if (!r.ok || r.type !== "basic") return caches.match(req).then(c => c || r);
+        const copia = r.clone();
+        caches.open(CACHE).then(c => c.put(req, copia)).catch(() => {});
+        return r;
+      })
       .catch(() => caches.match(req).then(r => {
         if (r) return r;
         /* El respaldo a la app solo vale para la app. Otra página dentro de
@@ -53,5 +67,10 @@ self.addEventListener("fetch", e => {
     return;
   }
   e.respondWith(caches.match(req).then(r => r || fetch(req)
-    .then(res => { const copia = res.clone(); caches.open(CACHE).then(c => c.put(req, copia)); return res; })));
+    .then(res => {
+      if (!res.ok || res.type !== "basic") return res;
+      const copia = res.clone();
+      caches.open(CACHE).then(c => c.put(req, copia)).catch(() => {});
+      return res;
+    })));
 });
