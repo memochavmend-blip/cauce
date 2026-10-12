@@ -573,7 +573,7 @@ input,select,textarea{font-size:16px}
    Una al lado de otra con scroll-snap: el navegador hace el gesto, sin
    librería y sin código que persiga el dedo. El indicador se actualiza al
    terminar el desplazamiento. */
-.caras-nav{display:flex;gap:20px;align-items:baseline;margin:0 0 16px;
+.caras-nav{display:flex;gap:22px;align-items:baseline;justify-content:center;margin:0 0 16px;
   position:sticky;top:0;z-index:4;padding:10px 0 10px;background:var(--noche)}
 .cara-b{font-family:var(--serif);font-size:1.22rem;color:var(--tinta-tenue);line-height:1;
   transition:color .25s ease}
@@ -775,6 +775,58 @@ html[data-modo="oscuro"]{--tinta-tenue:#8A7F6E}
    toca el tamaño mínimo de las cajas flex, así que vale de regla general. */
 body{overflow-wrap:break-word}
 
+/* ══ POR TI: LO QUE YA PASÓ ESTA SEMANA ══
+   En un tono más bajo, no tachado. No es una obligación cumplida: es para
+   ver de un vistazo lo que no se ha tocado y poder preferir eso en vez de
+   repetir siempre lo mismo. */
+.pt.sem .pt-x{color:var(--tinta-tenue)}
+.pt.sem{background:color-mix(in srgb,var(--tinta) 3.5%,transparent)}
+.pt.sem .pt-c{opacity:.55}
+.pt-ya{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;
+  text-transform:uppercase;font-style:normal;color:var(--tinta-tenue);margin-top:3px}
+.pt.on.sem{background:color-mix(in srgb,var(--llama) 8%,transparent)}
+.pt.on .pt-x{color:var(--tinta)}
+.porti-pie{font-size:12.5px;line-height:1.5;color:var(--tinta-baja);margin:12px 0 0}
+/* Las flechas de reacomodar: en el borde de la lista no hacen nada y se dice */
+.it-mv[disabled]{opacity:.22}
+
+/* ══ EL CRUCE DEL 80% ══
+   El mismo umbral que ya gobierna la semana, aplicado al día. La flama que
+   ya está en la app sube y se quita sola: nada que abrir, nada que reclamar,
+   nada que coleccionar. Solo transform y opacity, que no recalculan layout. */
+.fiesta{position:fixed;inset:0;z-index:120;display:grid;place-items:center;
+  background:var(--noche);
+  animation:fiestaEntra .4s ease both;padding:40px 28px}
+.fiesta.oculto{display:none}
+.fiesta.yendo{animation:fiestaSale .32s ease both}
+@keyframes fiestaEntra{from{opacity:0}}
+@keyframes fiestaSale{to{opacity:0}}
+.fiesta-c{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:300px}
+.fiesta .flama-v.fiesta-f{width:128px;height:138px;
+  animation:fiestaSube 1.1s cubic-bezier(.2,.8,.25,1) both}
+@keyframes fiestaSube{
+  0%{transform:scale(.28) translateY(26px);opacity:0}
+  55%{transform:scale(1.08) translateY(-4px);opacity:1}
+  100%{transform:scale(1) translateY(0);opacity:1}}
+.fiesta-t{font-family:var(--serif);font-size:1.68rem;line-height:1.2;color:var(--tinta);
+  margin:20px 0 0;letter-spacing:-.015em;text-wrap:balance;
+  animation:fiestaTexto .6s .45s ease both}
+.fiesta-l{font-size:14.5px;line-height:1.5;color:var(--tinta-baja);margin:10px 0 0;
+  text-wrap:pretty;animation:fiestaTexto .6s .62s ease both}
+.fiesta-n{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tinta-tenue);margin:26px 0 0;animation:fiestaTexto .6s .8s ease both}
+/* Un rastro del cauce al fondo: la misma línea de la izquierda, encendida */
+.fiesta::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(to bottom,transparent,var(--llama) 45%,var(--llama) 55%,transparent);
+  opacity:.5;animation:fiestaTexto .8s .2s ease both}
+@keyframes fiestaTexto{from{opacity:0;transform:translateY(9px)}}
+/* Con «menos movimiento» no sube nada: aparece y se va */
+.fiesta.quieto .flama-v.fiesta-f,.fiesta.quieto .fiesta-t,
+.fiesta.quieto .fiesta-l,.fiesta.quieto .fiesta-n{animation:none}
+@media (prefers-reduced-motion:reduce){
+  .fiesta,.fiesta.yendo{animation-duration:.01s}
+  .fiesta .flama-v.fiesta-f,.fiesta-t,.fiesta-l,.fiesta-n{animation:none !important}}
+
 </style>
 </head>
 <body>
@@ -812,6 +864,9 @@ body{overflow-wrap:break-word}
   <span class="rotar-ic"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18.5h2"/></svg></span>
   <span>Cauce se lee en vertical.<br>Gira el teléfono.</span>
 </div>
+<!-- El cruce del 80%: la flama sube, dice una frase y se quita sola. No hay
+     nada que abrir ni que reclamar; el premio es el día, no la app. -->
+<div class="fiesta oculto" id="fiesta" role="status" aria-live="polite" data-accion="cerrar-fiesta"></div>
 <div id="hojas"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
@@ -1003,7 +1058,7 @@ function desdeViejo(g) {
       proposito: (g.ajustes || {}).proposito || "", vista: "nivel" },
     /* Una migración desde v7 no trae «por ti»: se siembra aquí, igual que en
        la semilla, porque normalizar ya no repuebla una lista vacía. */
-    porti: POR_TI.map(t => ({ id: uid(), texto: t })),
+    porti: POR_TI.map((t, i) => ({ id: uid(), texto: t, orden: (i + 1) * 10 })),
     metas, rutinas, sueltos, dias: {}, marcas: { onboarding: true, ultimoDia: null }
   };
 }
@@ -1024,6 +1079,9 @@ function normalizar(e) {
      queda guardado—. Además, un id vacío o repetido hace que la fusión los
      junte en uno solo, y uno igual a «__proto__» desaparece sin error.
      Aquí se regenera cualquiera que no sea un id limpio y único. */
+  /* «Por ti» se puede reacomodar, así que cada cosa lleva su orden. Lo que
+     venga sin él lo recibe por su posición actual, para no barajar nada. */
+  e.porti.forEach((x, i) => { if (typeof x.orden !== "number") x.orden = (i + 1) * 10; });
   const idSano = /^[A-Za-z0-9_-]{1,40}$/, vistos = new Set();
   ["metas", "rutinas", "sueltos", "porti"].forEach(k => {
     (e[k] || []).forEach(x => {
@@ -1217,6 +1275,15 @@ const Rg = {
   portiSemana: f => semanaDe(f).map(k => ({ fecha: k, hubo: ((E.dias[k] || {}).porti || []).length > 0,
     futuro: k > hoyISO() })),
   portiDias: f => semanaDe(f).filter(k => k <= hoyISO() && ((E.dias[k] || {}).porti || []).length > 0).length,
+  /* La lista, en el orden que el usuario le dio */
+  porti: id => E.porti.find(x => x.id === id) || null,
+  portiLista: () => E.porti.slice().sort((a, b) => (a.orden || 0) - (b.orden || 0)),
+  /* Qué cosas de la lista ya se hicieron en algún día de esta semana. No es
+     para tacharlas ni quitarlas: es para poder ver de un vistazo cuáles no
+     se han tocado y preferir esas, en vez de repetir siempre la misma. */
+  portiDeLaSemana: f => { const hoy = hoyISO(), s = new Set();
+    semanaDe(f).forEach(k => { if (k <= hoy) ((E.dias[k] || {}).porti || []).forEach(id => s.add(id)); });
+    return s; },
   /* El repositorio: lo hecho sale de la lista y se guarda por día */
   hechos: () => {
     const ss = E.sueltos.filter(s => s.hecha && s.hechaEl).sort((a, b) => b.hechaEl.localeCompare(a.hechaEl));
@@ -1379,7 +1446,19 @@ const A = {
     if (i >= 0) { d.porti.splice(i, 1); return false; }
     d.porti.push(id); return true;
   },
-  nuevoPorti(texto) { const x = { id: uid(), texto: texto.trim() }; E.porti.push(x); return x; },
+  /* Subir y bajar en «por ti». Aquí no hay niveles: es una sola lista y lo
+     único que cambia es el orden en que se ven, para poner arriba lo que uno
+     quiere tener a la mano. */
+  subirPorti(x) { const l = Rg.portiLista(), i = l.findIndex(y => y.id === x.id);
+    if (i <= 0) return false; A.moverPorti(l, i, i - 1); return true; },
+  bajarPorti(x) { const l = Rg.portiLista(), i = l.findIndex(y => y.id === x.id);
+    if (i < 0 || i >= l.length - 1) return false; A.moverPorti(l, i, i + 1); return true; },
+  moverPorti(l, de, a) { const [x] = l.splice(de, 1); l.splice(a, 0, x);
+    l.forEach((y, k) => { y.orden = (k + 1) * 10; }); },
+  nuevoPorti(texto) {
+    const n = E.porti.reduce((m, y) => Math.max(m, y.orden || 0), 0);
+    const x = { id: uid(), texto: texto.trim(), orden: n + 10 };
+    E.porti.push(x); return x; },
   /* Quitar algo de la lista lo saca de la lista, no de lo que ya pasó. Lo
      que se borraba antes era justo lo único que esa cara guarda: que hubo
      algo ese día. Los días quedan intactos. */
@@ -1416,13 +1495,62 @@ function pintar() {
    sube cuando tachas, no cuando pasa el tiempo. Sigue sin números. */
 function lineaDia() {
   if (!E) return;
-  const mk = Rg.marcador(hoyISO());
+  const f = hoyISO(), mk = Rg.marcador(f);
   const total = mk.rut + mk.pend, hechas = mk.rutH + mk.pendH;
   const p = total ? Math.max(0, Math.min(1, hechas / total)) : 0;
   const el = $("#cauceAndado"), lz = $("#cauceLuz"), cz = $("#cauce");
   if (el) el.style.height = (p * 100) + "%";
   if (lz) { lz.style.top = (p * 100) + "%"; lz.style.opacity = total ? "1" : "0"; }
   if (cz) cz.setAttribute("aria-label", total ? hechas + " de " + total + " del día" : "");
+
+  /* ── El cruce del 80% ──
+     Se dispara solo al CRUZARLO, no cada vez que se dibuja: al abrir la app
+     con el día ya avanzado no pasa nada, porque no hay nada que celebrar de
+     algo que ya estaba. La marca en el día evita que vuelva si se desmarca
+     y se vuelve a marcar. Un día de una o dos cosas no tiene un 80% que
+     valga: el mínimo son tres. */
+  const antes = lineaDia.ultimo;
+  lineaDia.ultimo = p;
+  if (antes === undefined || total < 3) return;
+  if (antes < 0.8 && p >= 0.8 && !diaDe(f).ochenta) {
+    diaMut(f).ochenta = true; guardar();
+    celebrar(hechas, total);
+  }
+}
+
+/* ── Llegar al ochenta ──
+   Es el mismo umbral que ya gobierna la semana: con 4 de 5 ya cuenta. Por
+   eso lo que se dice aquí no es una felicitación inventada sino la regla de
+   la casa aplicada al día. No hay nada que abrir, nada que reclamar y nada
+   que coleccionar: la flama que ya está en la app sube, se dice una frase y
+   se quita sola. El premio es el día, no la app. */
+const FIESTA = [
+  ["El día ya cuenta.", "Lo que sigas haciendo es de más."],
+  ["Ya está lo importante.", "El resto del día es tuyo."],
+  ["Hoy avanzó por ti.", "No por la corriente."],
+  ["Lo difícil ya pasó.", "Lo que queda pesa poco."],
+  ["Esto ya es un día bueno.", "Aunque no cierres el resto."],
+  ["Llegaste al ochenta.", "La misma regla de la semana: con eso cuenta."]
+];
+let fiestaT = null;
+function celebrar(hechas, total) {
+  const n = $("#fiesta"); if (!n) return;
+  const quieto = (() => { try { return matchMedia("(prefers-reduced-motion:reduce)").matches; } catch (e) { return false; } })();
+  const [t, l] = FIESTA[revoltura("80·" + hoyISO()) % FIESTA.length];
+  n.innerHTML = `<div class="fiesta-c">${flamaSVG(100, "fiesta-f")}` +
+    `<p class="fiesta-t">${esc(t)}</p><p class="fiesta-l">${esc(l)}</p>` +
+    `<p class="fiesta-n">${hechas} de ${total} del día</p></div>`;
+  n.classList.toggle("quieto", quieto);
+  n.classList.remove("oculto");
+  try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {}
+  clearTimeout(fiestaT);
+  fiestaT = setTimeout(cerrarFiesta, quieto ? 2400 : 3600);
+}
+function cerrarFiesta() {
+  clearTimeout(fiestaT); fiestaT = null;
+  const n = $("#fiesta"); if (!n || n.classList.contains("oculto")) return;
+  n.classList.add("yendo");
+  setTimeout(() => { n.classList.add("oculto"); n.classList.remove("yendo"); n.innerHTML = ""; }, 320);
 }
 
 /* Un pendiente: nivel a la izquierda, se tacha al tocarlo, ⋯ para editarlo */
@@ -1638,12 +1766,28 @@ function pintarHoy() {
       `<span class="cad-d">${sem.map((d, i) => `<span class="d${d.hubo ? " on" : ""}${d.futuro ? " fut" : ""}">${LETRAS[(i + 1) % 7]}</span>`).join("")}</span>` +
       `<span class="porti-sem-t">${dd === 0 ? "ningún día esta semana" : dd === 1 ? "un día esta semana" : dd + " días esta semana"}</span>` +
     `</div></div>`;
-  h += `<ul class="porti-l">${E.porti.map(x => {
-    const on = hechoHoy.includes(x.id);
-    return `<li class="pt${on ? " on" : ""}"><button class="pt-b" data-accion="porti" data-id="${x.id}" aria-pressed="${on}">` +
-      `<span class="pt-c">${ICO.check}</span><span class="pt-x">${esc(x.texto)}</span></button>` +
+  /* Lo que ya se hizo en algún día de esta semana queda en un tono más
+     bajo. No se tacha ni se quita —no es una obligación cumplida—: es para
+     que de un vistazo se vea lo que no se ha tocado y se pueda preferir
+     eso, en vez de repetir siempre la misma cosa. */
+  const semIds = Rg.portiDeLaSemana(f), lista = Rg.portiLista();
+  const frescas = lista.filter(x => !semIds.has(x.id)).length;
+  h += `<ul class="porti-l">${lista.map((x, i) => {
+    const on = hechoHoy.includes(x.id), ya = semIds.has(x.id);
+    return `<li class="pt${on ? " on" : ""}${ya ? " sem" : ""}">` +
+      `<button class="pt-b" data-accion="porti" data-id="${x.id}" aria-pressed="${on}">` +
+        `<span class="pt-c">${ICO.check}</span>` +
+        `<span class="pt-x">${esc(x.texto)}${ya ? `<em class="pt-ya">ya esta semana</em>` : ""}</span></button>` +
+      `<span class="it-m" data-nodrag>` +
+        `<button class="it-mv" data-nodrag data-accion="subir-porti" data-id="${x.id}"${i === 0 ? " disabled" : ""} aria-label="Subir ${esc(x.texto)}">${ICO.arriba}</button>` +
+        `<button class="it-mv" data-nodrag data-accion="bajar-porti" data-id="${x.id}"${i === lista.length - 1 ? " disabled" : ""} aria-label="Bajar ${esc(x.texto)}">${ICO.abajo}</button>` +
+      `</span>` +
       `<button class="pt-x2" data-nodrag data-accion="porti-quitar" data-id="${x.id}" aria-label="Quitar ${esc(x.texto)} de la lista">✕</button></li>`;
   }).join("") || `<li class="zona-vacia">La lista está vacía. Escribe abajo algo que te gustaría hacer.</li>`}</ul>`;
+  if (lista.length) h += `<p class="porti-pie">${frescas === 0
+    ? "Esta semana pasaste por todas. Si quieres otra cosa, escríbela abajo."
+    : frescas === 1 ? "Queda una que no has hecho esta semana."
+    : "Quedan " + frescas + " que no has hecho esta semana."}</p>`;
   h += filaAgregar("nuevoPorti", "porti", "Agregar algo que te gustaría");
   h += `</section>`;
 
@@ -2157,6 +2301,7 @@ const ACC = {
   "borrar-item": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => A.borrar(x)); cerrarHoja(); nota("Eliminado."); },
   "ver-meta": d => hojaMeta(d.id),
   "arma-frase": () => hojaFrase(),
+  "cerrar-fiesta": () => cerrarFiesta(),
   "cn-palabra": d => { Cn.palabra = d.v; pintarFrase(false); },
   "cn-otras": () => { cnBarajar(); pintarFrase(false); },
   "cn-tallo": () => { Cn.i = (Cn.i + 1) % FRASE_PIEZAS.length; cnBarajar(); pintarFrase(false); },
@@ -2178,6 +2323,8 @@ const ACC = {
   "porti": d => { let si; cambiar(() => { si = A.porti(d.id, hoyISO()); });
     if (si) nota(Rg.portiHoy(hoyISO()).length === 1 ? "Algo por ti. Queda anotado." : "Otra más."); },
   "porti-quitar": d => { cambiar(() => A.quitarPorti(d.id)); },
+  "subir-porti": d => { const x = Rg.porti(d.id); if (x) cambiar(() => A.subirPorti(x)); },
+  "bajar-porti": d => { const x = Rg.porti(d.id); if (x) cambiar(() => A.bajarPorti(x)); },
   "ir-sonido": () => { cerrarHoja(); S.tab = "sonido"; pintar(); },
   "son-escena": d => { if (sonidoManual === d.v) detenerSonido(); else reproducirSonido(d.v); repintarSonido(); },
   "son-parar": () => { detenerSonido(); repintarSonido(); },
@@ -3354,7 +3501,7 @@ function semilla() {
     ],
     /* La lista de «por ti» se siembra aquí, no en normalizar: así vaciarla a
        propósito la deja vacía en vez de hacerla renacer en cada recarga. */
-    porti: POR_TI.map(t => ({ id: uid(), texto: t })),
+    porti: POR_TI.map((t, i) => ({ id: uid(), texto: t, orden: (i + 1) * 10 })),
     dias: {}, marcas: { onboarding: true, ultimoDia: null, tocado: false }
   });
 }
