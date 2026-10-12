@@ -177,10 +177,17 @@ html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
 .cad-f.cuenta .cad-c{color:var(--oro)}
 .cad-f.completo .cad-c{color:var(--llama);font-weight:600}
 
-/* ── Las metas: nombre y una flama que es estado, no barra ──
+/* ── Los propósitos: nombre y una flama que es estado, no barra ──
    No se llena. Arde si las acciones están pasando; se apaga si no.
-   Llegar a la meta no es contable; que las acciones pasen, sí. */
+   Llegar al propósito no es contable; que las acciones pasen, sí.
+   Pueden ser varios, y todos juntos alimentan una sola llama: la de quien
+   usa la app, que vive en la portada y se abre desde ahí. */
 .metas{display:flex;flex-direction:column;gap:1px;margin:0 0 6px}
+.metas.en-hoja{margin:0 0 18px}
+.meta-c.nueva{color:var(--tinta-baja)}
+.meta-mas{flex:0 0 auto;width:26px;height:28px;display:grid;place-items:center;color:var(--tinta-tenue)}
+.meta-mas svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.meta-c.nueva .meta-n{font-size:14.5px}
 .meta-c{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--linea)}
 .meta-c:first-child{border-top:1px solid var(--linea)}
 .meta-fl{flex:0 0 auto;width:26px;height:28px;display:grid;place-items:center}
@@ -198,6 +205,14 @@ html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
 .meta-grande.tibia svg{fill:color-mix(in srgb,var(--cera) 55%,transparent);stroke:var(--cera)}
 .meta-grande.viva svg{fill:var(--llama);stroke:none}
 .meta-grande p{margin:0;font-size:14px;color:var(--tinta-baja);line-height:1.45}
+/* La llama en su hoja: la misma caja, con la flama más grande, porque es la
+   única de la app que es de él y no de un propósito. */
+.meta-grande.llama-g{gap:18px;padding:20px 18px}
+.meta-grande.llama-g svg{width:48px;height:52px}
+.meta-grande.llama-g.viva svg{filter:drop-shadow(0 0 12px color-mix(in srgb,var(--llama) 50%,transparent))}
+.llama-p{margin:-8px 0 18px;font-size:15px;line-height:1.55;color:var(--tinta);
+  padding-left:13px;border-left:2px solid var(--cera)}
+.llama-sin{margin:-8px 0 18px}
 
 .plegable{margin:26px 0 0;border-top:1px solid var(--linea);padding-top:14px}
 .plegable summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none}
@@ -484,7 +499,7 @@ body.arrastrando [data-arr]{cursor:grabbing}
 /* ══ LA FLAMA VIVA ══
    De la app devocional: la llama respira sola con `llamaViva`, y `--fl` la hace arder
    más alto conforme la cadencia se sostiene. No se llena como una barra:
-   llegar a una meta no es contable, pero que las acciones estén pasando sí.
+   llegar a un propósito no es contable, pero que las acciones estén pasando sí.
    `@property` deja animar el número; donde no exista, el salto es seco
    pero el dibujo es el mismo. */
 @property --fl { syntax: "<number>"; inherits: false; initial-value: 0.6; }
@@ -923,14 +938,14 @@ body{overflow-wrap:break-word}
    Rediseñado desde tres post-its de un sistema de papel que ya funcionaba.
    Lo que enseñaban:
 
-   1) Es UNA lista. Gym, Documentos MBA, Amazon, Meditación y Trading
-      Strategy viven en la misma columna. No hay secciones.
+   1) Es UNA lista. El ejercicio, lo que hay que estudiar, un pendiente de
+      la casa y un proyecto viven en la misma columna. No hay secciones.
    2) El número es un nivel, no un orden: varios renglones comparten el 1.
    3) La lista se reescribe entera cada día, y al reescribirla se
-      reprioriza. Entre el 6 y el 10 de marzo, Gym bajó de 1 a 2 y Job
-      opps subió de 3 a 2. Nadie arrastró nada: lo volvió a escribir.
-   4) Lo que se reescribe muchas veces sin tacharse es la señal. «Trading
-      Strategy» lleva tres notas en nivel 1, sin tachar.
+      reprioriza. En las tres notas, de un día a otro un renglón bajó de 1
+      a 2 y otro subió de 3 a 2. Nadie arrastró nada: lo volvió a escribir.
+   4) Lo que se reescribe muchas veces sin tacharse es la señal: en las tres
+      notas hay un renglón que lleva tres días en nivel 1, sin tachar.
    5) Cabe en un post-it: nueve renglones. El papel es el límite de WIP.
 
    De ahí las reglas de esta versión:
@@ -940,9 +955,11 @@ body{overflow-wrap:break-word}
      confirma o se va, y se cuenta cuántas veces se ha confirmado.
    — El trabajo no entra: tiene su propio tracker. Aquí van las acciones que
      llevan al propósito, y los pendientes sueltos.
-   — La semana es la unidad de la rutina: la meta es el 100%, el 80% ya
-     cuenta. No hay flama que se llene, porque llegar a la meta no es
+   — La semana es la unidad de la rutina: el objetivo es el 100%, el 80% ya
+     cuenta. No hay flama que se llene, porque llegar a un propósito no es
      contable; lo contable es si las acciones están pasando.
+   — Los propósitos son varios y cada uno tiene su flama. La llama es una
+     sola, la de quien usa la app, y la alimentan todos juntos.
    ══════════════════════════════════════════════════════════════════════ */
 
 /* ════════ 1 · BASE ════════ */
@@ -1200,7 +1217,7 @@ const Rg = {
   /* ── DOS COSAS SEPARADAS, UNA DEBAJO DE LA OTRA ──
      · TU DÍA      — la rutina por franjas, con sus partes. Son las obligaciones:
        lo que hay que hacer para que las metas avancen. Se repite.
-     · PENDIENTES  — el 3×3. Pasa una vez, y no tiene por qué llevar a una meta.
+     · PENDIENTES  — el 3×3. Pasa una vez, y no tiene por qué llevar a un propósito.
      No se mezclan: una rutina nunca aparece entre los pendientes ni al revés.
      Lo hecho sale de aquí y se va al repositorio, en su propio apartado.      */
   pendientes: f => E.sueltos.filter(s => !s.archivada && !s.hecha)
@@ -1301,6 +1318,51 @@ const Rg = {
     const ahora = Rg.marcasHasta(m, l0, idx), antes = Rg.marcasHasta(m, sumarDias(l0, -7), idx);
     return { ahora, antes, dif: ahora - antes, idx };
   },
+  /* ── LA LLAMA ──
+     Los propósitos son varios y cada uno tiene su flama. La llama es una
+     sola y es la de quien usa la app: se alimenta de todos los propósitos
+     juntos. Completar acciones llena propósitos, y los propósitos llenan
+     la llama.
+     Promedia las razones de los propósitos; no suma sus marcas. Si sumara,
+     un propósito con cinco rutinas ahogaría a uno con una, y la llama
+     terminaría diciendo cómo está repartida la rutina en vez de cómo va
+     la semana.
+     Un propósito que todavía no tiene rutinas no cuenta como cero: no está
+     fallando, está sin empezar. Si contara, escribir un propósito nuevo
+     apagaría la llama —justo al revés de lo que tiene que pasar. Se dice
+     aparte, en «con», para que la pantalla lo pueda contar sin mentir.   */
+  llama: () => Rg.llamaDe(hoyISO()),
+  llamaDe: f => {
+    const fls = E.metas.map(m => Rg.flamaDe(m, f));
+    const con = fls.filter(x => x.estado !== "sin");
+    const base = { metas: E.metas.length, con: con.length, enCurso: lunesDe(f) === lunesDe(hoyISO()) };
+    if (!con.length) return Object.assign(base, { estado: "sin", pct: 0, n: 0, de: 0 });
+    const r2 = con.reduce((a, x) => a + x.pct, 0) / con.length / 100;
+    return Object.assign(base, {
+      estado: r2 >= 0.8 ? "viva" : r2 >= 0.4 ? "tibia" : "apagada",
+      pct: Math.max(0, Math.min(100, Math.round(r2 * 100))),
+      n: con.reduce((a, x) => a + x.n, 0),
+      de: con.reduce((a, x) => a + x.de, 0)
+    });
+  },
+  llamaHistoria: cuantas => {
+    const n = cuantas || 6, l0 = lunesDe(hoyISO());
+    return Array.from({ length: n }, (_, i) => {
+      const lun = sumarDias(l0, -7 * (n - 1 - i)), ll = Rg.llamaDe(lun);
+      return { lunes: lun, pct: ll.pct, n: ll.n, de: ll.de, estado: ll.estado, enCurso: lun === l0 };
+    });
+  },
+  /* ¿Creció la llama? Las marcas de todos los propósitos, a la misma altura
+     de la semana: el miércoles de esta contra el miércoles de la pasada. */
+  llamaCreció: () => {
+    const hoy = hoyISO(), idx = (deISO(hoy).getDay() + 6) % 7, l0 = lunesDe(hoy);
+    let ahora = 0, antes = 0;
+    E.metas.forEach(m => {
+      ahora += Rg.marcasHasta(m, l0, idx);
+      antes += Rg.marcasHasta(m, sumarDias(l0, -7), idx);
+    });
+    return { ahora, antes, dif: ahora - antes, idx };
+  },
   cuenta: f => { const l = Rg.lista(f); return { n: l.length, hechas: l.filter(x => Rg.hecha(x, f)).length,
     uno: l.filter(x => x.nivel === 1).length, unoHechas: l.filter(x => x.nivel === 1 && Rg.hecha(x, f)).length }; },
   /* El progreso del día, en dos cuentas separadas porque son dos cosas */
@@ -1343,6 +1405,14 @@ const Rg = {
 
 /* ════════ 5 · ACCIONES ════════ */
 const A = {
+  /* Un propósito nuevo. La clave guardada sigue llamándose «metas» aunque en
+     pantalla diga «propósitos»: renombrarla rompería todo lo ya guardado y
+     todo lo que viaja en el gist, y el nombre interno no lo ve nadie. */
+  nuevaMeta(nombre) {
+    const m = { id: uid(), nombre: String(nombre || "").trim().slice(0, 48) || "Propósito", lane: "oficio" };
+    E.metas.push(m);
+    return m;
+  },
   marcar(x, f) {
     if (x.tipo === "rutina") {
       const d = diaMut(f), v = !d.hechas[x.id];
@@ -1721,14 +1791,26 @@ function saludo() {
 const reloj = () => { const d = new Date();
   return d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0"); };
 
+/* La línea debajo de la llama: en qué está esta semana. Vive aparte porque
+   la escriben dos sitios —el pintado completo y el repintado suave— y tenían
+   que decir lo mismo. */
+function lineaLlama(ll) {
+  return ll.estado === "sin" ? (ll.metas ? "ningún propósito tiene rutinas todavía" : "aún no has puesto propósitos")
+    : ll.estado === "viva" ? "arde: esta semana vas en cadencia"
+    : ll.estado === "tibia" ? "va a media altura esta semana"
+    : ll.n ? "va baja: esta semana vas atrás" : "esta semana no se ha movido";
+}
+
 /* ── La portada ──
    Lo primero al abrir: quién eres, qué día es, una frase, y cómo vas. El
    resumen son tres cuentas y nada más —rutina, pendientes, por ti— porque un
-   tablero que mide seis cosas deja de leerse de un vistazo. La flama al lado
-   es la del propósito: lo que ya sabe arder cuando las acciones pasan. */
+   tablero que mide seis cosas deja de leerse de un vistazo. La llama al lado
+   es una sola y es la suya: la alimentan todos los propósitos juntos. Antes
+   aquí se asomaba el primer propósito de la lista, que con varios era una
+   elección arbitraria y dejaba a los demás sin aparecer en ninguna parte. */
 function portada(f, mk) {
   const nom = (E.ajustes.nombre || "").trim();
-  const meta = E.metas[0] || null, fl = meta ? Rg.flama(meta) : null;
+  const ll = Rg.llama();
   /* Un aro por cuenta. Dentro del círculo va solo el número hecho, centrado;
      el total baja a la etiqueta. Con «1/4» dentro, el grupo quedaba centrado
      pero el número no, y el aro se veía chueco. */
@@ -1762,10 +1844,10 @@ function portada(f, mk) {
           `</svg><span class="res-n">${Rg.portiHubo(f) ? "sí" : "—"}</span></span>` +
         `<span class="res-et">Por ti<i>${Rg.portiHubo(f) ? "hoy sí" : "aún no"}</i></span></div>` +
     `</div>` +
-    (meta && fl ? `<button class="port-meta" data-accion="ver-meta" data-id="${meta.id}">` +
-      flamaSVG(fl.pct) + `<span class="port-meta-x"><span class="port-meta-n">${esc(meta.nombre)}</span>` +
-      `<span class="port-meta-s">${fl.estado === "sin" ? "sin rutinas que la alimenten" : fl.estado === "viva" ? "va en cadencia esta semana"
-        : fl.estado === "tibia" ? "va a medias esta semana" : fl.n ? "va atrás esta semana" : "esta semana no se ha movido"}</span></span></button>` : "") +
+    `<button class="port-meta" data-accion="ver-llama">` +
+      flamaSVG(ll.pct) + `<span class="port-meta-x">` +
+      `<span class="port-meta-n">${nom ? "La llama de " + esc(nom) : "Tu llama"}</span>` +
+      `<span class="port-meta-s">${esc(lineaLlama(ll))}</span></span></button>` +
     `</header>`;
 }
 
@@ -1824,7 +1906,7 @@ function pintarHoy() {
 
   /* ── PENDIENTES ── */
   h += `<section class="cara" role="tabpanel" id="cara-pend" data-cara="pend">`;
-  h += `<p class="bloque-s">Lo suelto: pasa una vez y no tiene por qué llevar a una meta. Tres niveles; toca el número para cambiarlo.</p>`;
+  h += `<p class="bloque-s">Lo suelto: pasa una vez y no tiene por qué llevar a un propósito. Tres niveles; toca el número para cambiarlo.</p>`;
   const NIV = [["Primero", "lo que sí o sí hoy"], ["Después", "si el día lo permite"], ["Si da tiempo", "sin prisa"]];
   h += Rg.porNivel(f).map(({ n, items }) =>
     `<p class="niv niv${n}"><span class="niv-b">${n}</span>${NIV[n - 1][0]}<em>${NIV[n - 1][1]}</em></p>` +
@@ -1935,7 +2017,7 @@ function pintarHecho() {
    la llama y el núcleo claro, respirando con `llamaViva`. Lo que cambia es qué
    la alimenta: allá una práctica, aquí las semanas del mes que llegaron al
    80/20. No se llena como una barra —arde más alto o más bajo— porque llegar
-   a una meta no es contable y fingir un porcentaje sería mentir. */
+   a un propósito no es contable y fingir un porcentaje sería mentir. */
 /* La flama baja no es una flama apagada: al mínimo se quedaba en un tercio
    del alto y a 34px se leía como un punto, no como una flama chica. El piso
    sube a la mitad; lo que cambia sigue siendo el alto, no si se ve o no. */
@@ -1954,12 +2036,19 @@ function pintarSemana() {
   let h = `<header class="cab"><div><h1 class="dia" tabindex="-1">Semana</h1>` +
     `<p class="dia-s">Del ${esc(fechaCorta(lunesDe(f)))} al ${esc(fechaCorta(sumarDias(lunesDe(f), 6)))}. La meta es la semana completa; con uno menos ya cuenta.</p></div></header>`;
 
-  if (E.metas.length) h += `<div class="metas">${E.metas.map(m => { const fl = Rg.flama(m);
+  /* Los propósitos, cada uno con su flama. Pueden ser varios; la llama que
+     se alimenta de todos está en la portada y se abre desde ahí. */
+  h += `<section class="sec"><div class="sec-cab"><h2 class="sec-t">Propósitos</h2>` +
+    `<span class="cuenta">${E.metas.length}</span></div>` +
+    `<p class="sec-s">Un para qué, no una tarea. Las rutinas que le pongas son lo que lo alimenta, y todos juntos alimentan tu llama.</p>`;
+  h += `<div class="metas">${E.metas.map(m => { const fl = Rg.flama(m);
     return `<button class="meta-c ${fl.estado}" data-accion="ver-meta" data-id="${m.id}">` +
       flamaSVG(fl.pct) +
       `<span class="meta-n">${esc(m.nombre)}</span>` +
       `<span class="meta-s">${fl.estado === "sin" ? "sin rutinas" : fl.estado === "viva" ? "va en cadencia"
-        : fl.estado === "tibia" ? "va a medias" : fl.n ? "va atrás" : "sin movimiento"}</span></button>`; }).join("")}</div>`;
+        : fl.estado === "tibia" ? "va a medias" : fl.n ? "va atrás" : "sin movimiento"}</span></button>`; }).join("")}` +
+    `<button class="meta-c nueva" data-accion="nueva-meta"><span class="meta-mas" aria-hidden="true">${ICO.mas}</span>` +
+    `<span class="meta-n">Nuevo propósito</span></button></div></section>`;
 
   h += `<section class="sec"><h2 class="sec-t">Rutina</h2>`;
   h += seg.length ? `<ul class="cad">${seg.map(r => { const s = Rg.semana(r, f);
@@ -2053,8 +2142,16 @@ function hojaItem(id) {
       `<select id="iSem" class="campo-i">${[0, 1, 2, 3, 4, 5, 6, 7].map(n =>
         `<option value="${n}"${x.semanal === n ? " selected" : ""}>${n ? n + (n === 1 ? " vez" : " veces") : "Las que estén programadas"}</option>`).join("")}</select></label>` +
       `<p class="campo-ayuda">Con 4 o más, saltarte una sigue contando. Pero la semana completa es la meta.</p>` : "") +
-    `<label class="campo"><span class="campo-et">Alimenta</span><select id="iMeta" class="campo-i">` +
-      metas.map(m => `<option value="${m[0]}"${(x.meta || "") === m[0] ? " selected" : ""}>${esc(m[1])}</option>`).join("") + `</select></label>` +
+    /* Desde aquí también se crean propósitos. Antes la lista solo ofrecía
+       «Ninguna» y los que ya existían: para tener otro había que salirse de
+       la ficha, buscarlo en Ajustes y volver —y eso, en la práctica, es no
+       poder. El campo de abajo aparece al elegir «Nuevo propósito» y el
+       propósito se crea al guardar el renglón, no al escribirlo. */
+    `<label class="campo"><span class="campo-et">Alimenta a</span><select id="iMeta" class="campo-i" data-meta-sel>` +
+      metas.map(m => `<option value="${m[0]}"${(x.meta || "") === m[0] ? " selected" : ""}>${esc(m[1])}</option>`).join("") +
+      `<option value="__nueva">+ Nuevo propósito…</option></select></label>` +
+    `<label class="campo oculto" id="iMetaNuevaC"><span class="campo-et">Nombre del propósito nuevo</span>` +
+      `<input id="iMetaNueva" class="campo-i" type="text" value="" placeholder="Salud, Oficio, Casa…" autocomplete="off"></label>` +
     `<div class="acciones" style="margin-top:4px"><button class="accion" data-accion="enfocar" data-id="${x.id}">Enfocar ${METODOS[E.ajustes.metodo || 0].foco} min en esto</button></div>` +
     dos(btn("Cancelar", "cerrar-hoja"), btn("Guardar", "guardar-item", x.id, "llena")) +
     `<div class="hoja-pie">` +
@@ -2063,54 +2160,130 @@ function hojaItem(id) {
       btn("Eliminar", "borrar-item", x.id, "leve") + `</div>`);
 }
 
+const DIAS_S = ["el lunes", "el martes", "el miércoles", "el jueves", "el viernes", "el sábado", "el domingo"];
+/* El veredicto de «¿creció?»: esta semana contra la pasada a la misma altura.
+   Comparar lo que llevo del miércoles contra la semana entera de la pasada
+   sería trampa, y una app que se hace trampa no sirve para nada. */
+function veredictoCrecio(cr, vacio) {
+  return cr.dif > 0 ? `Vas mejor que la semana pasada: ${cr.ahora} contra ${cr.antes} a estas alturas.`
+    : cr.dif < 0 ? `Vas por debajo de la semana pasada: ${cr.ahora} contra ${cr.antes} a estas alturas.`
+    : cr.ahora === 0 ? vacio.replace("%d", DIAS_S[cr.idx])
+    : `Vas igual que la semana pasada: ${cr.ahora} a estas alturas, las dos.`;
+}
+/* Las seis semanas en barras. Se normaliza contra la más alta y no contra
+   100: con todo bajo, seis barras mínimas no dejan ver cuál fue mejor. */
+function barrasFlama(h) {
+  const alto = Math.max(1, ...h.map(x => x.pct));
+  return `<div class="fl-h">${h.map(x =>
+    `<span class="fl-b${x.enCurso ? " hoy" : ""}" title="${esc(fechaCorta(x.lunes))}: ${x.n} de ${x.de}">` +
+      `<span class="fl-bc" style="height:${Math.max(4, Math.round(x.pct / alto * 100))}%"></span>` +
+      `<em>${x.enCurso ? "hoy" : fechaCorta(x.lunes).split(" ")[0]}</em></span>`).join("")}</div>`;
+}
+
+/* ── La llama ──
+   Una sola, y es la de quien usa la app. No es la suma de las flamas de los
+   propósitos sino su altura promedio: aquí se abre para ver de dónde sale,
+   si creció, y qué propósitos la están alimentando y cuáles no. */
+function hojaLlama() {
+  const ll = Rg.llama(), cr = Rg.llamaCreció();
+  const prop = (E.ajustes.proposito || "").trim();
+  const sinProp = !E.metas.length;
+  const cuerpo =
+    `<div class="meta-grande llama-g ${ll.estado}">${flamaSVG(ll.pct, "grande")}<p>${
+      ll.estado === "sin" ? (sinProp
+        ? "Todavía no hay propósitos. La llama arde cuando las acciones de un propósito están pasando, así que primero hay que decir para qué."
+        : "Hay propósitos, pero ninguno tiene rutinas que lo alimente. Mientras no haya acciones que se repitan, no hay nada que seguir.")
+      : ll.estado === "viva" ? "Arde. Esta semana las acciones están pasando."
+      : ll.estado === "tibia" ? "Va a media altura esta semana."
+      : ll.n ? "Va baja: esta semana vas atrás de tu cadencia." : "Esta semana no se ha movido."}</p></div>` +
+    (prop ? `<p class="llama-p">«${esc(prop)}»</p>`
+      : `<p class="campo-ayuda llama-sin">La llama no dice para qué es. Eso lo escribes tú, en Ajustes.</p>`) +
+    (ll.estado === "sin" ? "" :
+      `<p class="campo-et">Semana a semana</p>` + barrasFlama(Rg.llamaHistoria(6)) +
+      `<p class="fl-v">${esc(veredictoCrecio(cr, "Ni esta semana ni la pasada se había movido para %d."))}</p>` +
+      `<p class="campo-ayuda">${ll.con} de ${ll.metas} ${ll.metas === 1 ? "propósito tiene" : "propósitos tienen"} ` +
+        `rutinas que ${ll.con === 1 ? "lo alimentan" : "los alimentan"}. Llevas ${ll.n} de las ${ll.de} marcas ` +
+        `de la semana completa, y la altura se mide contra lo que toca a estas alturas, no contra el domingo. ` +
+        `Cada propósito pesa lo mismo, tenga una rutina o cinco.</p>`) +
+    `<p class="campo-et">${sinProp ? "Empieza por aquí" : "Lo que la alimenta"}</p>` +
+    (sinProp ? `<p class="campo-ayuda">Ponle nombre a lo que de verdad te importa —tu salud, tu oficio, tu casa, lo tuyo— y después cuélgale las rutinas que lo hacen pasar.</p>` : "") +
+    `<div class="metas en-hoja">${E.metas.map(m => { const fl = Rg.flama(m);
+      return `<button class="meta-c ${fl.estado}" data-accion="ver-meta" data-id="${m.id}">` +
+        flamaSVG(fl.pct) + `<span class="meta-n">${esc(m.nombre)}</span>` +
+        `<span class="meta-s">${fl.estado === "sin" ? "sin rutinas" : fl.estado === "viva" ? "va en cadencia"
+          : fl.estado === "tibia" ? "va a medias" : fl.n ? "va atrás" : "sin movimiento"}</span></button>`; }).join("")}` +
+      `<button class="meta-c nueva" data-accion="nueva-meta"><span class="meta-mas" aria-hidden="true">${ICO.mas}</span>` +
+      `<span class="meta-n">Nuevo propósito</span></button></div>` +
+    dos("", btn("Cerrar", "cerrar-hoja", "", "llena"));
+  hoja("Tu llama",
+    "Es una sola. Los propósitos son varios y cada uno tiene su flama; todos juntos alimentan esta.",
+    cuerpo);
+}
+
+/* ── Nuevo propósito ──
+   No se crea nada hasta que tiene nombre: antes se creaba «Nueva meta» en
+   cuanto se tocaba el botón, y cerrar sin escribir dejaba un propósito
+   fantasma en la lista. */
+function hojaNuevaMeta() {
+  hoja("Nuevo propósito",
+    "Un para qué, no una tarea. Lo que lo alimenta son las rutinas que le pongas después.",
+    `<label class="campo"><span class="campo-et">Cómo se llama</span>` +
+    `<input id="nmNom" class="campo-i" type="text" value="" placeholder="Salud, Oficio, Casa…" ` +
+    `data-autofoco data-enter="crear-meta" autocomplete="off"></label>` +
+    `<p class="campo-ayuda">Corto: va debajo de su flama.</p>` +
+    dos(btn("Cancelar", "cerrar-hoja"), btn("Crear", "crear-meta", "", "llena")));
+}
+
 function hojaMeta(id) {
   const m = Rg.meta(id); if (!m) return;
   const rs = E.rutinas.filter(r => r.meta === m.id);
   const fl = Rg.flama(m);
-  const h = Rg.historia(m, 6), cr = Rg.creció(m);
-  const DIAS_S = ["el lunes", "el martes", "el miércoles", "el jueves", "el viernes", "el sábado", "el domingo"];
-  /* La respuesta a «¿creció?»: la misma altura de la semana, esta contra la
-     pasada. Comparar contra la semana entera de la pasada sería trampa. */
-  const veredicto = fl.estado === "sin" ? ""
-    : cr.dif > 0 ? `Vas mejor que la semana pasada: ${cr.ahora} contra ${cr.antes} a estas alturas.`
-    : cr.dif < 0 ? `Vas por debajo de la semana pasada: ${cr.ahora} contra ${cr.antes} a estas alturas.`
-    : cr.ahora === 0 ? `Ni esta semana ni la pasada se había movido para ${DIAS_S[cr.idx]}.`
-    : `Vas igual que la semana pasada: ${cr.ahora} a estas alturas, las dos.`;
-  const alto = Math.max(1, ...h.map(x => x.pct));
+  const cr = Rg.creció(m);
   hoja(esc(m.nombre),
-    "La flama no mide qué tan cerca está la meta: eso no es contable. Mide si las acciones están pasando.",
+    "La flama no mide qué tan cerca está el propósito: eso no es contable. Mide si las acciones están pasando.",
     `<div class="meta-grande ${fl.estado}">${flamaSVG(fl.pct, "grande")}<p>${
-      fl.estado === "sin" ? "Ninguna rutina alimenta esta meta. Mientras no haya acciones recurrentes, no hay nada que seguir."
+      fl.estado === "sin" ? "Ninguna rutina alimenta este propósito. Mientras no haya acciones recurrentes, no hay nada que seguir."
       : fl.estado === "viva" ? "Va en cadencia esta semana."
       : fl.estado === "tibia" ? "Va a medias esta semana."
       : fl.n ? "Va atrás de la cadencia de esta semana." : "Esta semana no se ha movido."}</p></div>` +
     (fl.estado === "sin" ? "" :
-      `<p class="campo-et">Semana a semana</p>` +
-      `<div class="fl-h">${h.map(x =>
-        `<span class="fl-b${x.enCurso ? " hoy" : ""}" title="${esc(fechaCorta(x.lunes))}: ${x.n} de ${x.de}">` +
-          `<span class="fl-bc" style="height:${Math.max(4, Math.round(x.pct / alto * 100))}%"></span>` +
-          `<em>${x.enCurso ? "hoy" : fechaCorta(x.lunes).split(" ")[0]}</em></span>`).join("")}</div>` +
-      `<p class="fl-v">${esc(veredicto)}</p>`) +
+      `<p class="campo-et">Semana a semana</p>` + barrasFlama(Rg.historia(m, 6)) +
+      `<p class="fl-v">${esc(veredictoCrecio(cr, "Ni esta semana ni la pasada se había movido para %d."))}</p>`) +
     campo("mNom", "Nombre", m.nombre, "") +
-    `<p class="campo-et">Lo que la alimenta</p>` +
+    `<p class="campo-et">Lo que lo alimenta</p>` +
     (rs.length ? `<ul class="nota">${rs.map(r => { const s = Rg.semana(r, hoyISO());
       return `<li class="it"><span class="it-n n${r.nivel}">${r.nivel}</span><button class="it-t" data-accion="ver-item" data-id="${r.id}">` +
         `<span class="it-x">${esc(r.texto)}</span><span class="it-s">${s.obj ? s.n + " de " + s.obj + " esta semana" : "sin cadencia"}</span></button></li>`; }).join("")}</ul>`
-      : `<p class="vacio">Nada todavía. Abre un renglón de la lista y ponle esta meta en «Alimenta».</p>`) +
+      : `<p class="vacio">Nada todavía. Abre un renglón de la lista y ponle este propósito en «Alimenta a».</p>`) +
+    `<p class="campo-ayuda">Este propósito alimenta tu llama, junto con los demás. ` +
+      `<button class="enlace" data-accion="ver-llama">Ver la llama</button></p>` +
     dos(btn("Cerrar", "cerrar-hoja"), btn("Guardar", "guardar-meta", m.id, "llena")) +
-    `<div class="hoja-pie">${btn("Eliminar meta", "borrar-meta", m.id, "leve")}</div>`);
+    `<div class="hoja-pie">${btn("Eliminar propósito", "borrar-meta", m.id, "leve")}</div>`);
+}
+
+/* Lee los campos de Ajustes si están en pantalla. Lo llaman «Listo» y todo
+   lo que abre otra hoja desde aquí, para que nada escrito se pierda. */
+function tomarAjustes() {
+  if (!E) return;
+  const n = document.getElementById("aNom"); if (n) E.ajustes.nombre = n.value.trim();
+  const p = document.getElementById("aProp"); if (p) E.ajustes.proposito = p.value.trim();
 }
 
 function hojaAjustes() {
   hoja("Ajustes", "",
     campo("aNom", "Tu nombre", E.ajustes.nombre, "") +
-    `<label class="campo"><span class="campo-et">Propósito · ¿para qué?</span>` +
-    `<textarea id="aProp" class="campo-i campo-area" rows="3" placeholder="No es una meta. Se relee.">${esc(E.ajustes.proposito)}</textarea></label>` +
+    `<label class="campo"><span class="campo-et">Para qué · lo que dice tu llama</span>` +
+    `<textarea id="aProp" class="campo-area campo-i" rows="3" placeholder="No es una meta ni una tarea. Es lo que relees cuando no quieres.">${esc(E.ajustes.proposito)}</textarea></label>` +
+    `<p class="campo-ayuda">Aparece al abrir tu llama. Los propósitos de abajo son los que la alimentan.</p>` +
     `<p class="campo-et">Tema</p><div class="chips">${[["sistema", "Sistema"], ["claro", "Claro"], ["oscuro", "Oscuro"]].map(t =>
       `<button class="chip${E.ajustes.tema === t[0] ? " on" : ""}" data-accion="tema" data-v="${t[0]}">${t[1]}</button>`).join("")}</div>` +
-    `<p class="campo-et">Metas</p><div class="lista-min">${E.metas.map(m =>
-      `<button class="fila-min" data-accion="ver-meta" data-id="${m.id}">${esc(m.nombre)}</button>`).join("")}` +
-    `<button class="fila-min nueva" data-accion="nueva-meta">+ Nueva meta</button></div>` +
+    `<p class="campo-et">Propósitos</p><div class="lista-min">` +
+    `<button class="fila-min" data-accion="ver-llama">Tu llama<span class="fila-dato">${esc(lineaLlama(Rg.llama()))}</span></button>` +
+    E.metas.map(m => { const fl = Rg.flama(m);
+      return `<button class="fila-min" data-accion="ver-meta" data-id="${m.id}">${esc(m.nombre)}` +
+        `<span class="fila-dato">${fl.estado === "sin" ? "sin rutinas" : fl.estado === "viva" ? "en cadencia"
+          : fl.estado === "tibia" ? "a medias" : fl.n ? "atrás" : "sin movimiento"}</span></button>`; }).join("") +
+    `<button class="fila-min nueva" data-accion="nueva-meta">+ Nuevo propósito</button></div>` +
     `<p class="campo-et">Sonido</p><div class="lista-min">` +
     `<button class="fila-min" data-accion="ir-sonido">Paisajes y enfoque<span class="fila-dato">${esc(sonidoManual ? (SONIDO_NOMBRE[sonidoManual] || "sonando") : "")}</span></button></div>` +
     `<p class="campo-et">Datos</p><div class="lista-min">` +
@@ -2274,18 +2447,12 @@ function refrescarCifras(f) {
   /* La flama: se mueven las variables del nodo que ya está, para que la
      transición de --fl corra. Si se reemplazara el SVG, nacería en su sitio
      final y el cambio no se vería. */
-  const meta = E.metas[0];
-  if (meta) {
-    const fl = Rg.flama(meta), alto = (0.5 + 0.5 * (fl.pct / 100)).toFixed(2);
-    $$(".port-meta .nivel-flama, .port-meta .nivel-nucleo").forEach(e => e.style.setProperty("--fl", alto));
-    const g = $(".port-meta .nivel-glow");
-    if (g) g.style.setProperty("--go", (0.14 + 0.3 * (fl.pct / 100)).toFixed(2));
-    const s = $(".port-meta-s");
-    if (s) s.textContent = fl.estado === "sin" ? "sin rutinas que la alimenten"
-      : fl.estado === "viva" ? "va en cadencia esta semana"
-      : fl.estado === "tibia" ? "va a medias esta semana"
-      : fl.n ? "va atrás esta semana" : "esta semana no se ha movido";
-  }
+  const ll = Rg.llama(), alto = (0.5 + 0.5 * (ll.pct / 100)).toFixed(2);
+  $$(".port-meta .nivel-flama, .port-meta .nivel-nucleo").forEach(e => e.style.setProperty("--fl", alto));
+  const g = $(".port-meta .nivel-glow");
+  if (g) g.style.setProperty("--go", (0.14 + 0.3 * (ll.pct / 100)).toFixed(2));
+  const s = $(".port-meta-s");
+  if (s) s.textContent = lineaLlama(ll);
   /* La cuenta de cada franja */
   Rg.porHora(f).forEach(({ fr, items }) => {
     const e = $(`.franja-g[data-fr="${fr.id}"] .franja em`); if (!e) return;
@@ -2377,7 +2544,13 @@ const ACC = {
       x.nivel = Bo.nivel;
       if (x.tipo === "rutina") { x.dias = Bo.dias.slice(); A.aFranja(x, franjaDeHora(x.hora)); }
       const sm = document.getElementById("iSem"); if (sm) x.semanal = +sm.value;
-      const mt = document.getElementById("iMeta"); if (mt) x.meta = mt.value || null; });
+      const mt = document.getElementById("iMeta");
+      if (mt) {
+        /* «Nuevo propósito» con el nombre vacío no crea nada y tampoco borra
+           el propósito que el renglón ya tenía: se queda como estaba. */
+        if (mt.value === "__nueva") { const n = val("iMetaNueva"); if (n) x.meta = A.nuevaMeta(n).id; }
+        else x.meta = mt.value || null;
+      } });
     cerrarHoja(); nota("Guardado."); },
   "pausar": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => { x.pausada = !x.pausada; });
     cerrarHoja(); nota(x.pausada ? "En pausa." : "De vuelta."); },
@@ -2385,7 +2558,7 @@ const ACC = {
     cerrarHoja(); nota("Guardado para después. Está en Semana."); },
   "traer": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => A.traer(x)); nota("De vuelta en la lista de hoy."); },
   "borrar-item": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => A.borrar(x)); cerrarHoja(); nota("Eliminado."); },
-  "ver-meta": d => hojaMeta(d.id),
+  "ver-meta": d => { tomarAjustes(); hojaMeta(d.id); },
   "arma-frase": () => hojaFrase(),
   "cerrar-fiesta": () => cerrarFiesta(),
   "cn-palabra": d => { Cn.palabra = d.v; pintarFrase(false); },
@@ -2394,17 +2567,23 @@ const ACC = {
   "cn-usar": () => { const t = cnTexto(); if (!t) return;
     cambiar(() => { diaMut(hoyISO()).frase = t; }); cerrarHoja(); nota("Tu frase te acompaña hoy."); },
   "cn-quitar": () => { cambiar(() => { delete diaMut(hoyISO()).frase; }); cerrarHoja(); },
-  "nueva-meta": () => { const m = { id: uid(), nombre: "Nueva meta", lane: "oficio" }; E.metas.push(m); guardar(); hojaMeta(m.id); },
+  "ver-llama": () => hojaLlama(),
+  /* Abrir otra hoja desde Ajustes se llevaba lo escrito en «Tu nombre» y en
+     el propósito: la hoja se reemplaza entera y nadie había leído los
+     campos. Se recogen antes de irse. */
+  "nueva-meta": () => { tomarAjustes(); hojaNuevaMeta(); },
+  "crear-meta": () => { const n = val("nmNom");
+    if (!n) { nota("Ponle nombre."); const e = document.getElementById("nmNom"); if (e) e.focus(); return; }
+    let m; cambiar(() => { m = A.nuevaMeta(n); }); hojaMeta(m.id); nota("Propósito creado."); },
   "guardar-meta": d => { const m = Rg.meta(d.id); if (!m) return; cambiar(() => { m.nombre = val("mNom") || m.nombre; });
-    cerrarHoja(); nota("Meta guardada."); },
+    cerrarHoja(); nota("Propósito guardado."); },
   "borrar-meta": d => { cambiar(() => { E.metas = E.metas.filter(m => m.id !== d.id);
     E.rutinas.forEach(r => { if (r.meta === d.id) r.meta = null; });
-    E.sueltos.forEach(s => { if (s.meta === d.id) s.meta = null; }); }); cerrarHoja(); nota("Meta eliminada."); },
+    E.sueltos.forEach(s => { if (s.meta === d.id) s.meta = null; }); }); cerrarHoja(); nota("Propósito eliminado. Las rutinas siguen ahí, sin propósito."); },
   "ajustes": () => hojaAjustes(),
   "tema": (d, b) => { E.ajustes.tema = d.v; aplicarTema(); guardar();
     Array.from(b.parentNode.children).forEach(c => c.classList.toggle("on", c === b)); },
-  "guardar-ajustes": () => { cambiar(() => { E.ajustes.nombre = val("aNom");
-    const p = document.getElementById("aProp"); if (p) E.ajustes.proposito = p.value.trim(); }); cerrarHoja(); },
+  "guardar-ajustes": () => { cambiar(tomarAjustes); cerrarHoja(); },
   "cara": d => { marcarCara(d.v); caraIr(d.v, true); },
   "porti": d => { let si; cambiar(() => { si = A.porti(d.id, hoyISO()); });
     if (si) nota(Rg.portiHoy(hoyISO()).length === 1 ? "Algo por ti. Queda anotado." : "Otra más."); },
@@ -2498,7 +2677,10 @@ const ENTER = {
     nota("Agregada, todos los días. Ajusta los días en su ficha."); },
   "sub": t => { const v = t.value.trim(), r = Rg.item(t.dataset.rut); if (!v || !r) return;
     const id = t.id; cambiar(() => A.nuevaSub(r, v, hoyISO()));
-    setTimeout(() => { const el = document.getElementById(id); if (el) { el.value = ""; el.focus(); } }, 40); }
+    setTimeout(() => { const el = document.getElementById(id); if (el) { el.value = ""; el.focus(); } }, 40); },
+  /* El retorno del teclado crea el propósito: en el teléfono, buscar el
+     botón «Crear» después de escribir el nombre es un paso de más. */
+  "crear-meta": () => { const fn = ACC["crear-meta"]; if (fn) fn({}, null, null); }
 };
 function alEnter(t) { if (!t || !t.dataset.enter) return; const fn = ENTER[t.dataset.enter]; if (fn) fn(t); }
 
@@ -2507,6 +2689,17 @@ document.addEventListener("click", e => {
   if (!b) return;
   const fn = ACC[b.dataset.accion];
   if (fn) { e.preventDefault(); fn(b.dataset, b, e); }
+});
+/* El único select que hace algo al cambiar: «Alimenta a». Si se elige crear
+   un propósito, aparece el campo del nombre y se le va el foco. */
+document.addEventListener("change", e => {
+  const s = e.target;
+  if (!s || !s.matches || !s.matches("select[data-meta-sel]")) return;
+  const c = document.getElementById("iMetaNuevaC"), i = document.getElementById("iMetaNueva");
+  if (!c) return;
+  const nueva = s.value === "__nueva";
+  c.classList.toggle("oculto", !nueva);
+  if (nueva && i) setTimeout(() => { try { i.focus(); } catch (err) {} }, 40);
 });
 document.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey && e.target && e.target.dataset && e.target.dataset.enter) { e.preventDefault(); alEnter(e.target); }
@@ -3585,29 +3778,39 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden" && Sync.activo()) { clearTimeout(Sync.t); Sync.ciclo(true); }
 });
 
-/* ════════ 10 · SEMILLA ════════ */
+/* ════════ 10 · SEMILLA ════════
+   Lo que trae la app recién abierta. Son ejemplos, no los datos de nadie: la
+   página es pública y cualquiera puede entrar. Están en el mismo registro
+   que la lista de «por ti» —cosas que le pasan a cualquiera, sin nombres
+   propios, sin proyectos y sin fechas que solo entienda uno— para que al
+   abrirla se entienda cómo funciona y se puedan borrar en treinta segundos
+   para poner las propias.
+   Dos propósitos y no uno, para que se vea de entrada que son varios y que
+   los dos alimentan la misma llama. Y dos rutinas con partes, para que se
+   vea que una rutina puede tenerlas y que su orden es su peso.            */
 function semilla() {
-  const pasion = { id: uid(), nombre: "Xaman", lane: "pasion" };
+  const salud = { id: uid(), nombre: "Salud", lane: "cuerpo" };
+  const oficio = { id: uid(), nombre: "Oficio", lane: "oficio" };
   const r = (texto, o) => rutinaNueva(Object.assign({ texto }, o));
   return normalizar({
     v: VERSION,
-    /* Sin nombre a propósito: la app no lo necesita y la página es pública.
-       Se pone desde Ajustes, y eso vive solo en el navegador de cada quien. */
-    ajustes: { nombre: "", tema: "sistema", proposito: "Llevar el volante de mi vida. Que avance por acciones mías y no por la corriente.", vista: "nivel" },
-    metas: [pasion],
+    /* Sin nombre y sin el para qué escrito, a propósito: los dos son de
+       quien la use. Se ponen desde Ajustes y viven solo en su navegador. */
+    ajustes: { nombre: "", tema: "sistema", proposito: "", vista: "nivel" },
+    metas: [salud, oficio],
     rutinas: [
-      r("Gym", { nivel: 1, hora: "05:30", area: "Cuerpo", dias: [1, 2, 3, 4, 5], semanal: 5,
-        pasos: ["Fuerza", "Calentar", "Cardio", "Estirar"] }),
-      r("Trading · posiciones después del cierre", { nivel: 1, hora: "15:15", dias: [1, 2, 3, 4, 5], semanal: 5 }),
-      r("MBA · una hora, el envío al día", { nivel: 2, hora: "18:00", dias: [1, 2, 3, 4, 5], semanal: 5 }),
-      r("Oración y meditación", { nivel: 2, hora: "06:30", dias: [1, 2, 3, 4, 5, 6, 0], semanal: 7 }),
-      r("Xaman · sesión de música", { nivel: 2, hora: "19:30", area: "Otro", dias: [2, 4, 6], semanal: 3, meta: pasion.id,
-        pasos: ["Grabar o mezclar 60 minutos en una toma", "Elegir y preparar tracks nuevos", "Escuchar lo grabado y anotar tres cosas", "Mover una pieza de producción"] }),
-      r("Patitas · ventas e inventario", { nivel: 3, hora: "21:00", dias: [1], semanal: 1 })
+      r("Entrenar", { nivel: 1, hora: "06:30", area: "Cuerpo", dias: [1, 2, 3, 4, 5], semanal: 5, meta: salud.id,
+        pasos: ["Lo principal del día", "Calentar", "Algo de cardio", "Estirar al final"] }),
+      r("Caminar media hora", { nivel: 2, hora: "08:00", area: "Cuerpo", dias: [1, 2, 3, 4, 5, 6, 0], semanal: 5, meta: salud.id }),
+      r("Estudiar o practicar una hora", { nivel: 1, hora: "18:00", dias: [1, 2, 3, 4, 5], semanal: 5, meta: oficio.id,
+        pasos: ["Lo de hoy, sin adelantar", "Repasar lo de ayer", "Anotar la duda que quedó"] }),
+      r("Leer veinte minutos", { nivel: 2, hora: "21:30", dias: [1, 2, 3, 4, 5, 6, 0], semanal: 5, meta: oficio.id }),
+      r("Ordenar la casa un rato", { nivel: 3, hora: "20:00", dias: [1, 3, 5], semanal: 3 }),
+      r("Llamar a alguien de la familia", { nivel: 3, hora: "19:00", dias: [0], semanal: 1 })
     ],
     sueltos: [
-      sueltoNuevo({ texto: "Enviar el reclamo del bono educativo · cierra el 15 nov", nivel: 1 }),
-      sueltoNuevo({ texto: "Amazon · producto nuevo", nivel: 2 })
+      sueltoNuevo({ texto: "Sacar la cita que llevo semanas posponiendo", nivel: 1 }),
+      sueltoNuevo({ texto: "Pagar lo que vence este mes", nivel: 2 })
     ],
     /* La lista de «por ti» se siembra aquí, no en normalizar: así vaciarla a
        propósito la deja vacía en vez de hacerla renacer en cada recarga. */
