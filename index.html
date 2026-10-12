@@ -769,6 +769,12 @@ html[data-modo="oscuro"]{--tinta-tenue:#8A7F6E}
 .asa::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   width:72px;height:36px}
 
+/* Una palabra sin espacios parte donde haga falta, en cualquier texto. Las
+   filas de lista ya lo tenían con `anywhere`, pero la señal de pases —que
+   lleva el texto del usuario— se salía 93px de la pantalla. `break-word` no
+   toca el tamaño mínimo de las cajas flex, así que vale de regla general. */
+body{overflow-wrap:break-word}
+
 </style>
 </head>
 <body>
@@ -1758,7 +1764,13 @@ function pintarSemana() {
 let Bo = null;
 function hoja(tit, sub, cuerpo) {
   const a = document.activeElement;
-  hoja.volver = a && a !== document.body ? a : null;
+  if (!(a && $("#hojas").contains(a))) {
+    hoja.volver = a && a !== document.body ? a : null;
+    /* Guardar, Pausar o Eliminar repintan antes de cerrar, así que el nodo
+       que abrió la hoja ya no existe cuando toca devolverle el foco. Por eso
+       se recuerda también cómo encontrarlo otra vez. */
+    hoja.volverSel = a ? (a.id ? "#" + CSS.escape(a.id) : selDeFoco(a)) : null;
+  }
   $("#hojas").innerHTML = `<div class="velo" data-accion="cerrar-hoja"></div><div class="hoja" role="dialog" aria-modal="true" aria-labelledby="hojaTit">` +
     `<button class="asa" data-accion="cerrar-hoja" aria-label="Cerrar"></button><h2 class="hoja-t" id="hojaTit" tabindex="-1">${tit}</h2>` +
     (sub ? `<p class="hoja-s">${sub}</p>` : "") + `<div id="hojaCuerpo">` + cuerpo + `</div></div>`;
@@ -1768,10 +1780,11 @@ function hoja(tit, sub, cuerpo) {
 /* Al cerrar, el foco vuelve al botón que la abrió. Si no, cae al body y
    quien navega con teclado o lector de pantalla pierde el lugar. */
 function cerrarHoja() {
-  const v = hoja.volver;
+  const v = hoja.volver, vs = hoja.volverSel;
   $("#hojas").innerHTML = ""; $("#appShell").removeAttribute("inert");
-  hoja.volver = null; Bo = null;
-  if (v && document.contains(v)) { try { v.focus({ preventScroll: true }); } catch (e) {} }
+  hoja.volver = null; hoja.volverSel = null; Bo = null;
+  const n = (v && document.contains(v)) ? v : (vs ? $(vs) : null);
+  if (n) { try { n.focus({ preventScroll: true }); } catch (e) {} }
 }
 /* ── La fila de agregar ──
    Es un <form> de verdad, no un div con un input suelto. Dos razones, las
@@ -1975,6 +1988,27 @@ function selDeFoco(k) {
     (d.i !== undefined ? `[data-i="${d.i}"]` : "") +
     (d.v !== undefined ? `[data-v="${CSS.escape(d.v)}"]` : "");
 }
+/* ── Repintar sin borrar lo que se está escribiendo ──
+   El ciclo de sincronización llega solo, sin que nadie lo pida. Si cae
+   mientras tecleas, pintar() reescribe #vista entera y el renglón a medio
+   escribir desaparece sin dejar rastro: no hay deshacer para algo que nunca
+   llegó a guardarse. Aquí se recogen los campos y el cursor antes, y se
+   devuelven después. */
+function pintarSuave() {
+  const campos = {};
+  $$("#vista input, #vista textarea").forEach(c => { if (c.id && c.value) campos[c.id] = c.value; });
+  const a = document.activeElement;
+  const dentro = a && a.closest && a.closest("#vista");
+  const sel = dentro ? (a.id ? "#" + CSS.escape(a.id) : selDeFoco(a)) : null;
+  const cur = dentro && a.selectionStart != null ? [a.selectionStart, a.selectionEnd] : null;
+  pintar();
+  Object.keys(campos).forEach(id => { const c = document.getElementById(id); if (c) c.value = campos[id]; });
+  if (!sel) return;
+  const n = $(sel); if (!n) return;
+  try { n.focus({ preventScroll: true });
+    if (cur && n.setSelectionRange) n.setSelectionRange(cur[0], cur[1]); } catch (e) {}
+}
+
 function cambiar(fn) {
   const sel = selDeFoco(document.activeElement);
   fn(); if (E && E.marcas) E.marcas.tocado = true; guardar(); pintar();
@@ -3226,12 +3260,16 @@ const Sync = {
           if (!Sync.base() && (Sync.adoptar || !E.marcas.tocado)) {
             Sync.adoptar = false;
             E = remoto; podar(E);
-            Guardado.escribir(CLAVE, E); pintar();
+            Guardado.escribir(CLAVE, E); pintarSuave();
             if (!callado) nota("Listo: este dispositivo quedó con tus datos.");
           } else {
+            const antes = JSON.stringify(E);
             const { e: fus, choques } = fusionar(Sync.base(), E, remoto);
             E = normalizar(fus); podar(E);
-            Guardado.escribir(CLAVE, E); pintar();
+            Guardado.escribir(CLAVE, E);
+            /* Casi todos los ciclos no traen nada nuevo: si nada cambió, no
+               hay por qué tocar la pantalla. */
+            if (JSON.stringify(E) !== antes) pintarSuave();
             if (choques && !callado) nota(choques === 1
               ? "Una cosa cambió en los dos dispositivos: se quedó la de aquí."
               : choques + " cosas cambiaron en los dos dispositivos: se quedaron las de aquí.");
