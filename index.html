@@ -792,40 +792,87 @@ body{overflow-wrap:break-word}
 
 /* ══ EL CRUCE DEL 80% ══
    El mismo umbral que ya gobierna la semana, aplicado al día. La flama que
-   ya está en la app sube y se quita sola: nada que abrir, nada que reclamar,
-   nada que coleccionar. Solo transform y opacity, que no recalculan layout. */
+   ya está en la app sube dentro de su disco, con dos halos que se abren y
+   unas chispas: nada que abrir, nada que reclamar, nada que coleccionar.
+   Todo es transform y opacity, que no recalculan layout por frame. */
 .fiesta{position:fixed;inset:0;z-index:120;display:grid;place-items:center;
-  background:var(--noche);
-  animation:fiestaEntra .4s ease both;padding:40px 28px}
+  background:var(--noche);animation:fiestaEntra .4s ease both;padding:36px 26px}
 .fiesta.oculto{display:none}
-.fiesta.yendo{animation:fiestaSale .32s ease both}
+.fiesta.yendo{animation:fiestaSale .34s ease both}
 @keyframes fiestaEntra{from{opacity:0}}
 @keyframes fiestaSale{to{opacity:0}}
-.fiesta-c{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:300px}
-.fiesta .flama-v.fiesta-f{width:128px;height:138px;
-  animation:fiestaSube 1.1s cubic-bezier(.2,.8,.25,1) both}
+.fiesta-c{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:330px}
+
+/* El disco con la flama dentro, como el icono */
+.fiesta-aro{position:relative;display:grid;place-items:center;width:230px;height:230px}
+.fiesta-disco{position:absolute;width:196px;height:196px;border-radius:50%;
+  background:radial-gradient(circle at 50% 56%,
+    color-mix(in srgb,var(--llama) 42%,transparent) 0%,
+    color-mix(in srgb,var(--cera) 46%,transparent) 58%,
+    color-mix(in srgb,var(--cera) 18%,transparent) 100%);
+  animation:fiestaDisco .72s cubic-bezier(.2,.9,.25,1) both}
+@keyframes fiestaDisco{
+  0%{transform:scale(.2);opacity:0}
+  60%{transform:scale(1.06);opacity:1}
+  100%{transform:scale(1);opacity:1}}
+
+/* Dos halos que se abren y se van: el calor saliendo */
+.fiesta-halo{position:absolute;width:196px;height:196px;border-radius:50%;
+  border:2px solid var(--llama);opacity:0;animation:fiestaHalo 1.5s .25s ease-out both}
+.fiesta-halo.dos{animation-delay:.62s;border-width:1.5px}
+@keyframes fiestaHalo{
+  0%{transform:scale(.55);opacity:.55}
+  100%{transform:scale(1.9);opacity:0}}
+
+/* La flama sube desde abajo, como si trepara por el cauce */
+.fiesta .flama-v.fiesta-f{position:relative;width:170px;height:184px;
+  animation:fiestaSube 1.15s .1s cubic-bezier(.18,.85,.25,1) both}
 @keyframes fiestaSube{
-  0%{transform:scale(.28) translateY(26px);opacity:0}
-  55%{transform:scale(1.08) translateY(-4px);opacity:1}
+  0%{transform:scale(.22) translateY(74px);opacity:0}
+  45%{opacity:1}
+  62%{transform:scale(1.1) translateY(-6px)}
   100%{transform:scale(1) translateY(0);opacity:1}}
-.fiesta-t{font-family:var(--serif);font-size:1.68rem;line-height:1.2;color:var(--tinta);
-  margin:20px 0 0;letter-spacing:-.015em;text-wrap:balance;
-  animation:fiestaTexto .6s .45s ease both}
-.fiesta-l{font-size:14.5px;line-height:1.5;color:var(--tinta-baja);margin:10px 0 0;
-  text-wrap:pretty;animation:fiestaTexto .6s .62s ease both}
+
+/* Chispas que suben y se apagan */
+.fiesta-chispas{position:absolute;inset:0;pointer-events:none}
+.fiesta-chispas i{position:absolute;left:50%;bottom:30%;width:5px;height:5px;border-radius:50%;
+  background:var(--llama);opacity:0;animation:fiestaChispa 1.9s ease-out both}
+.fiesta-chispas i:nth-child(1){animation-delay:.55s;--dx:-64px;--dy:-124px;width:4px;height:4px}
+.fiesta-chispas i:nth-child(2){animation-delay:.70s;--dx:48px;--dy:-146px}
+.fiesta-chispas i:nth-child(3){animation-delay:.84s;--dx:-30px;--dy:-168px;width:3px;height:3px}
+.fiesta-chispas i:nth-child(4){animation-delay:.96s;--dx:76px;--dy:-112px;width:3px;height:3px}
+.fiesta-chispas i:nth-child(5){animation-delay:1.10s;--dx:-82px;--dy:-152px}
+.fiesta-chispas i:nth-child(6){animation-delay:1.24s;--dx:22px;--dy:-186px;width:4px;height:4px}
+.fiesta-chispas i:nth-child(7){animation-delay:1.38s;--dx:-14px;--dy:-130px;width:3px;height:3px}
+@keyframes fiestaChispa{
+  0%{transform:translate(0,0) scale(.5);opacity:0}
+  18%{opacity:.85}
+  100%{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+
+.fiesta-t{font-family:var(--serif);font-size:1.66rem;line-height:1.22;color:var(--tinta);
+  margin:14px 0 0;letter-spacing:-.015em;text-wrap:balance;
+  animation:fiestaTexto .6s .55s ease both}
+.fiesta-t.cita{font-size:1.34rem;line-height:1.36;font-style:italic;letter-spacing:-.005em}
+.fiesta-l{font-size:14.5px;line-height:1.5;color:var(--tinta-baja);margin:11px 0 0;
+  text-wrap:pretty;animation:fiestaTexto .6s .72s ease both}
+.fiesta-a{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--tinta-baja);
+  margin:14px 0 0;animation:fiestaTexto .6s .72s ease both}
+.fiesta-a::before{content:"— "}
 .fiesta-n{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--tinta-tenue);margin:26px 0 0;animation:fiestaTexto .6s .8s ease both}
+  color:var(--tinta-tenue);margin:26px 0 0;animation:fiestaTexto .6s .9s ease both}
+@keyframes fiestaTexto{from{opacity:0;transform:translateY(9px)}}
 /* Un rastro del cauce al fondo: la misma línea de la izquierda, encendida */
 .fiesta::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
   background:linear-gradient(to bottom,transparent,var(--llama) 45%,var(--llama) 55%,transparent);
   opacity:.5;animation:fiestaTexto .8s .2s ease both}
-@keyframes fiestaTexto{from{opacity:0;transform:translateY(9px)}}
-/* Con «menos movimiento» no sube nada: aparece y se va */
-.fiesta.quieto .flama-v.fiesta-f,.fiesta.quieto .fiesta-t,
-.fiesta.quieto .fiesta-l,.fiesta.quieto .fiesta-n{animation:none}
+/* Con «menos movimiento» no sube nada ni hay chispas: aparece y se va */
+.fiesta.quieto .fiesta-disco,.fiesta.quieto .flama-v.fiesta-f,.fiesta.quieto .fiesta-t,
+.fiesta.quieto .fiesta-l,.fiesta.quieto .fiesta-a,.fiesta.quieto .fiesta-n{animation:none}
+.fiesta.quieto .fiesta-halo,.fiesta.quieto .fiesta-chispas{display:none}
 @media (prefers-reduced-motion:reduce){
   .fiesta,.fiesta.yendo{animation-duration:.01s}
-  .fiesta .flama-v.fiesta-f,.fiesta-t,.fiesta-l,.fiesta-n{animation:none !important}}
+  .fiesta-disco,.fiesta .flama-v.fiesta-f,.fiesta-t,.fiesta-l,.fiesta-a,.fiesta-n{animation:none !important}
+  .fiesta-halo,.fiesta-chispas{display:none}}
 
 </style>
 </head>
@@ -1524,27 +1571,66 @@ function lineaDia() {
    la casa aplicada al día. No hay nada que abrir, nada que reclamar y nada
    que coleccionar: la flama que ya está en la app sube, se dice una frase y
    se quita sola. El premio es el día, no la app. */
+/* Lo que se dice al cruzar el ochenta. Mitad voz de la casa, mitad citas.
+   De las citas solo están las que pude verificar en su fuente: la mitad de
+   lo que circula como «frase motivacional» está mal atribuido, y poner una
+   atribución falsa en la app sería una mentira repetida todos los días.
+   Por eso «somos lo que hacemos repetidamente» va a nombre de Will Durant,
+   que es quien lo escribió al resumir a Aristóteles, y no de Aristóteles. */
 const FIESTA = [
+  /* De la casa */
   ["El día ya cuenta.", "Lo que sigas haciendo es de más."],
   ["Ya está lo importante.", "El resto del día es tuyo."],
   ["Hoy avanzó por ti.", "No por la corriente."],
   ["Lo difícil ya pasó.", "Lo que queda pesa poco."],
   ["Esto ya es un día bueno.", "Aunque no cierres el resto."],
-  ["Llegaste al ochenta.", "La misma regla de la semana: con eso cuenta."]
+  ["Llegaste al ochenta.", "La misma regla de la semana: con eso cuenta."],
+  ["Llevaste el volante.", "El día fue a donde tú lo mandaste."],
+  ["Nadie te empujó.", "Esto lo hiciste tú."],
+  ["Hoy no se te fue de las manos.", "Y eso se construye un día a la vez."],
+  ["Un día así, repetido, es una vida distinta.", "Mañana otra vez."],
+  ["La cadencia se sostuvo.", "Es lo único que de verdad cuenta."],
+  ["Lo que dijiste que ibas a hacer, lo hiciste.", "Eso es todo el truco."],
+  /* Citas verificadas en su fuente */
+  ["No nos atrevemos a muchas cosas porque son difíciles; son difíciles porque no nos atrevemos.", "", "Séneca"],
+  ["Mientras se aplaza, la vida pasa.", "", "Séneca"],
+  ["Para el que no sabe a qué puerto se dirige, ningún viento es favorable.", "", "Séneca"],
+  ["Deja de discutir cómo debe ser un hombre bueno. Sélo.", "", "Marco Aurelio"],
+  ["¿Para esto fui hecho, para quedarme bajo las mantas y darme calor?", "", "Marco Aurelio"],
+  ["No son las cosas las que perturban, sino la opinión que de ellas se tiene.", "", "Epicteto"],
+  ["Dite primero qué quieres ser; después, haz lo que tengas que hacer.", "", "Epicteto"],
+  ["Las virtudes se adquieren ejercitándolas.", "", "Aristóteles"],
+  ["Somos lo que hacemos repetidamente.", "", "Will Durant"],
+  ["Un viaje de mil leguas empieza con un paso.", "", "Lao Tsé"],
+  ["Nada en la vida ha de ser temido, solo comprendido.", "", "Marie Curie"],
+  ["El que lee mucho y anda mucho, ve mucho y sabe mucho.", "", "Cervantes"]
 ];
 let fiestaT = null;
 function celebrar(hechas, total) {
   const n = $("#fiesta"); if (!n) return;
   const quieto = (() => { try { return matchMedia("(prefers-reduced-motion:reduce)").matches; } catch (e) { return false; } })();
-  const [t, l] = FIESTA[revoltura("80·" + hoyISO()) % FIESTA.length];
-  n.innerHTML = `<div class="fiesta-c">${flamaSVG(100, "fiesta-f")}` +
-    `<p class="fiesta-t">${esc(t)}</p><p class="fiesta-l">${esc(l)}</p>` +
+  const [t, l, autor] = FIESTA[revoltura("80·" + hoyISO()) % FIESTA.length];
+  const cita = !!autor;
+  n.innerHTML = `<div class="fiesta-c">` +
+    `<span class="fiesta-aro">` +
+      `<span class="fiesta-halo"></span><span class="fiesta-halo dos"></span>` +
+      `<span class="fiesta-disco"></span>` +
+      flamaSVG(100, "fiesta-f") +
+      `<span class="fiesta-chispas">${"<i></i>".repeat(7)}</span>` +
+    `</span>` +
+    `<p class="fiesta-t${cita ? " cita" : ""}">${cita ? "«" + esc(t) + "»" : esc(t)}</p>` +
+    (cita ? `<p class="fiesta-a">${esc(autor)}</p>` : `<p class="fiesta-l">${esc(l)}</p>`) +
     `<p class="fiesta-n">${hechas} de ${total} del día</p></div>`;
   n.classList.toggle("quieto", quieto);
   n.classList.remove("oculto");
-  try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {}
+  /* Dos toques cortos, no uno: se siente como un «ahí está», no como un
+     error. En iOS no existe vibrate, así que esto es solo para Android. */
+  try { if (navigator.vibrate) navigator.vibrate([14, 70, 26]); } catch (e) {}
+  /* El sonido se dispara dentro del toque que cruzó el ochenta, que es lo
+     que deja a iOS desbloquear el audio. Si el navegador no deja, calla. */
+  try { Pad.desbloquear(); Pad.fuego(E.ajustes.volumen == null ? 0.5 : E.ajustes.volumen); } catch (e) {}
   clearTimeout(fiestaT);
-  fiestaT = setTimeout(cerrarFiesta, quieto ? 2400 : 3600);
+  fiestaT = setTimeout(cerrarFiesta, quieto ? 2600 : 4400);
 }
 function cerrarFiesta() {
   clearTimeout(fiestaT); fiestaT = null;
@@ -2680,7 +2766,7 @@ const Pad = (() => {
   function desbloquear(){
     const c = contexto(); if(!c) return;
     try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
-    try{ c.resume(); }catch(e){}
+    try{ const pr = c.resume(); if (pr && pr.catch) pr.catch(()=>{}); }catch(e){}
     if(!desbloqueado){
       try{
         const b = c.createBuffer(1, 1, c.sampleRate);
@@ -2693,7 +2779,7 @@ const Pad = (() => {
     try{
       detener(0);
       const c = contexto(); if(!c) return false;
-      try{ c.resume(); }catch(e){}
+      try{ const pr = c.resume(); if (pr && pr.catch) pr.catch(()=>{}); }catch(e){}
       const p = PRESETS[escena] || PRESETS.vela; actual = PRESETS[escena] ? escena : "vela";
       master = c.createGain(); master.gain.value = 0; master.connect(c.destination);
       bus = c.createGain(); bus.gain.value = 1; bus.connect(master);
@@ -2882,9 +2968,33 @@ const Pad = (() => {
     }, s*1000+400);
     fuentes=[]; moduladores=[]; master=null; bus=null;
   }
+  /* El fuego que prende: tres golpes de cuenco que suben —fundamental,
+     quinta, octava— con un soplo grave debajo que abre el filtro, como
+     cuando la llama agarra. No se parece ni a la campana del enfoque ni al
+     temporizador, para que se sepa qué pasó sin mirar. */
+  /* `cAlt` existe para poder medir el sonido sin tarjeta: se le pasa un
+     OfflineAudioContext y se renderiza a un buffer. Sin esa costura, la
+     única forma de saber si suena sería creerlo. */
+  function fuego(vol, cAlt){
+    try{
+      const c = cAlt || contexto(); if(!c) return;
+      if(!cAlt) try{ const pr = c.resume(); if (pr && pr.catch) pr.catch(()=>{}); }catch(e){}
+      const t = c.currentTime, v = Math.max(0, Math.min(1, vol == null ? .5 : vol));
+      const salida = c.createGain(); salida.gain.value = .6 * v; salida.connect(c.destination);
+      const n = bufRuido(c, 1.6, "rosa");
+      const f = c.createBiquadFilter(); f.type = "bandpass"; f.Q.value = .9;
+      f.frequency.setValueAtTime(150, t); f.frequency.exponentialRampToValueAtTime(1500, t + .6);
+      const ng = c.createGain();
+      ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(.2, t + .14);
+      ng.gain.exponentialRampToValueAtTime(.0001, t + 1.2);
+      n.connect(f); f.connect(ng); ng.connect(salida); n.start(t); n.stop(t + 1.6);
+      [[196, 0, .5], [293.66, .32, .44], [392, .66, .52]].forEach(([hz, d, a]) =>
+        cuenco(c, t + d, hz, 0, a, salida));
+    }catch(e){}
+  }
   function campana(){
     try{
-      const c = contexto(); if(!c) return; try{ c.resume(); }catch(e){}
+      const c = contexto(); if(!c) return; try{ const pr = c.resume(); if (pr && pr.catch) pr.catch(()=>{}); }catch(e){}
       const t = c.currentTime;
       [880, 1318.5].forEach((f,i)=>{
         const o = c.createOscillator(); o.type = "sine"; o.frequency.value = f;
@@ -2913,7 +3023,7 @@ const Pad = (() => {
     }catch(e){}
   }
   function escuchar(fn){ oyente = fn || null; }
-  return { iniciar, detener, volumen, activo:()=>vivo, escena:()=>(vivo ? actual : null), desbloquear, campana, respirar, escuchar };
+  return { iniciar, detener, volumen, activo:()=>vivo, escena:()=>(vivo ? actual : null), desbloquear, campana, fuego, respirar, escuchar };
 })();
 
 /* Desbloqueo de audio para iOS: en el primer gesto y al volver a la app.
