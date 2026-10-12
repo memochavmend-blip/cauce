@@ -333,6 +333,36 @@ html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
 .franja span{text-transform:none;letter-spacing:.02em;color:var(--tinta-tenue)}
 .franja em{margin-left:auto;font-style:normal;letter-spacing:.02em;font-variant-numeric:tabular-nums}
 .franja-g.ahora .franja{color:var(--oro)}
+/* El tramo de horas abre el editor de bloques. Parece texto hasta que se
+   toca: subrayarlo de entrada metería cuatro subrayados en una pantalla que
+   vive de no tener ninguno. El área de toque sí es de verdad. */
+.franja-ed{font:inherit;letter-spacing:.02em;text-transform:none;color:var(--tinta-tenue);
+  padding:14px 9px;margin:-14px -9px;border-radius:7px;font-variant-numeric:tabular-nums;
+  text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;
+  transition:color .15s ease,text-decoration-color .15s ease}
+.franja-ed:active{color:var(--llama);text-decoration-color:var(--cera)}
+@media (hover:hover){.franja-ed:hover{color:var(--tinta-baja);text-decoration-color:var(--linea-fuerte)}}
+.franja-g.ahora .franja-ed{color:var(--oro)}
+
+/* ── El editor de los bloques ──
+   Una fila por bloque: el nombre, la hora de arranque y, debajo, el tramo
+   que resulta. El tramo es texto calculado y no un campo, porque el final
+   no se elige: es el principio del siguiente. */
+.fr-filas{display:flex;flex-direction:column;margin:0 0 4px}
+.fr-f{display:grid;grid-template-columns:1fr auto;gap:8px 10px;align-items:center;
+  padding:13px 0;border-bottom:1px solid var(--linea)}
+.fr-f:first-child{border-top:1px solid var(--linea)}
+.fr-n{background:transparent;border:0;padding:4px 0;font-size:15.5px;color:var(--tinta);
+  min-width:0;border-bottom:1px solid transparent}
+.fr-n:focus{outline:none;border-bottom-color:var(--cera)}
+.fr-h{display:flex;align-items:center;gap:7px}
+.fr-et{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta-tenue)}
+.fr-s{width:auto;padding:8px 10px;font-size:15px;font-variant-numeric:tabular-nums}
+.fr-rango{grid-column:1/-1;margin:0;font-size:12px;color:var(--tinta-baja);line-height:1.4}
+.fr-f.mal .fr-n{color:var(--llama)}
+.fr-f.mal .fr-s{box-shadow:inset 0 0 0 1.5px var(--llama)}
+.fr-aviso{font-size:12.5px;line-height:1.5;color:var(--tinta-baja);margin:10px 0 16px;min-height:1.5em}
+.accion.apagada{opacity:.45}
 
 .rutl{list-style:none;margin:0;padding:0}
 .rt{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--linea);min-height:50px}
@@ -970,11 +1000,16 @@ const pad2 = n => String(n).padStart(2, "0");
 const DIA_MS = 86400000;
 const aISO = d => d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
 const deISO = s => { const p = String(s).split("-").map(Number); return new Date(p[0], (p[1] || 1) - 1, p[2] || 1); };
-/* El día empieza a las 5, no a medianoche. Es la hora a la que empieza la
-   rutina, y es la que hace que lo marcado a la una de la mañana cuente para
-   la noche que todavía no termina y no para un día que no ha empezado. */
-const DIA_INICIA = 5;
-const hoyISO = () => { const d = new Date(); d.setHours(d.getHours() - DIA_INICIA); return aISO(d); };
+/* El día no empieza a medianoche, empieza cuando empieza la rutina: es la
+   hora a la que arranca el primer bloque, y es la que hace que lo marcado a
+   la una de la mañana cuente para la noche que todavía no termina y no para
+   un día que no ha empezado. Como el primer bloque se puede mover desde
+   Ajustes, esta hora se mueve con él —son la misma cosa dicha dos veces, y
+   tenerlas separadas significaría que a las 5:30 la lista cambia de día
+   mientras el bloque de la mañana dice que todavía no ha empezado. */
+const DIA_INICIA_DEF = 5 * 60;
+const inicioDia = () => { const f = franjas(); return f.length ? f[0].desde : DIA_INICIA_DEF; };
+const hoyISO = () => { const d = new Date(); d.setMinutes(d.getMinutes() - inicioDia()); return aISO(d); };
 const sumarDias = (s, n) => { const d = deISO(s); d.setDate(d.getDate() + n); return aISO(d); };
 const diasEntre = (a, b) => Math.round((deISO(b) - deISO(a)) / DIA_MS);
 const lunesDe = s => { const d = deISO(s), n = (d.getDay() + 6) % 7; d.setDate(d.getDate() - n); return aISO(d); };
@@ -1043,7 +1078,7 @@ function rutinaNueva(o) {
     meta: null, pausada: false, pasos: [] }, o || {});
   /* Sin franja explícita, la hora decide dónde cae la primera vez. De ahí en
      adelante manda el campo: arrastrar tiene que poder contradecir al reloj. */
-  if (!FRANJAS.some(x => x.id === base.franja)) base.franja = franjaDeHora(base.hora);
+  if (!franjas().some(x => x.id === base.franja)) base.franja = franjaDeHora(base.hora);
   return base;
 }
 function sueltoNuevo(o) {
@@ -1056,18 +1091,55 @@ function diaMut(f) { const d = E.dias[f] = Object.assign(diaVacio(), E.dias[f] |
 
 const horaEnMin = h => { const p = String(h || "").split(":");
   return p.length === 2 ? (+p[0] || 0) * 60 + (+p[1] || 0) : 9999; };
-const franjaDeHora = h => { const m = horaEnMin(h); if (m === 9999) return "jornada";
-  const f = FRANJAS.find(x => m >= x.desde * 60 && m < x.hasta * 60); return f ? f.id : "jornada"; };
+const hhmm = m => pad2(Math.floor(((m % 1440) + 1440) % 1440 / 60)) + ":" + pad2(((m % 60) + 60) % 60);
+/* El bloque de la noche cruza la medianoche —de 21:00 a 5:00— así que su
+   tramo va al revés que los otros tres. Sin esto, lo puesto a la 1 de la
+   mañana no caía en ningún bloque y terminaba en la jornada por descarte. */
+const enFranja = (fr, m) => fr.desde <= fr.hasta
+  ? (m >= fr.desde && m < fr.hasta)
+  : (m >= fr.desde || m < fr.hasta);
+const franjaDeHora = h => { const fs = franjas(), m = horaEnMin(h);
+  if (m === 9999) return (fs[1] || fs[0]).id;
+  const f = fs.find(x => enFranja(x, m)); return f ? f.id : (fs[1] || fs[0]).id; };
 /* Ejemplos para arrancar. Son lo que son: cosas que nadie exige. */
 const POR_TI = ["Leer un libro", "Caminar en el parque", "Tomar el sol",
   "Darme tiempo sin hacer nada", "Escuchar música sin otra cosa de fondo",
   "Hablar con alguien que quiero", "Cocinar algo que me guste"];
-const FRANJAS = [
-  { id: "manana", nombre: "Mañana", desde: 5, hasta: 7 },
-  { id: "jornada", nombre: "Jornada", desde: 7, hasta: 18 },
-  { id: "tarde", nombre: "Tarde", desde: 18, hasta: 21 },
-  { id: "noche", nombre: "Noche", desde: 21, hasta: 24 }
+/* ── LOS BLOQUES DEL DÍA ──
+   Cuatro tramos seguidos que dan la vuelta al reloj. Se guarda solo dónde
+   empieza cada uno, en minutos desde medianoche: el final de cada bloque es
+   el principio del siguiente, y el del último es el principio del primero.
+   Guardar también el final permitiría huecos y traslapes —una hora que no
+   cae en ningún bloque, o que cae en dos— y eso no se puede arreglar desde
+   la pantalla, solo esconder.
+   Los ids no cambian nunca aunque se les cambie el nombre: son lo que cada
+   rutina guardada tiene escrito, y renombrarlos la dejaría sin bloque. */
+const FRANJAS_DEF = [
+  { id: "manana", nombre: "Mañana", desde: 5 * 60 },
+  { id: "jornada", nombre: "Jornada", desde: 7 * 60 },
+  { id: "tarde", nombre: "Tarde", desde: 18 * 60 },
+  { id: "noche", nombre: "Noche", desde: 21 * 60 }
 ];
+const FRANJA_PASO = 30;   /* se eligen de media en media hora */
+/* Los bloques de un estado, con su final ya calculado. Tolera que no haya
+   estado todavía: la semilla crea rutinas antes de que exista E. */
+function franjasDe(e) {
+  const g = (e && e.ajustes && Array.isArray(e.ajustes.franjas) && e.ajustes.franjas.length === FRANJAS_DEF.length)
+    ? e.ajustes.franjas : null;
+  const base = FRANJAS_DEF.map((d, i) => {
+    const x = g && g[i];
+    const desde = x && Number.isFinite(+x.desde) ? Math.round(+x.desde) : d.desde;
+    return { id: d.id, nombre: (x && typeof x.nombre === "string" && x.nombre.trim()) || d.nombre,
+      desde: Math.min(1439, Math.max(0, desde)) };
+  });
+  /* Si lo guardado no va en orden creciente, no se intenta adivinar: se
+     vuelve a los de siempre. Un orden roto deja bloques de duración
+     negativa, y con eso la lista del día deja de tener sentido. */
+  for (let i = 1; i < base.length; i++) if (base[i].desde <= base[i - 1].desde) return conFin(FRANJAS_DEF.slice());
+  return conFin(base);
+}
+function conFin(fs) { return fs.map((x, i) => Object.assign({}, x, { hasta: fs[(i + 1) % fs.length].desde })); }
+const franjas = () => franjasDe(E);
 
 /* Migración desde v7 y anteriores. Nada de lo capturado se pierde: lo que
    no cabe en la lista de nueve entra archivado y se puede traer desde
@@ -1081,7 +1153,7 @@ function desdeViejo(g) {
   const esTrabajo = r => r.area === "Trabajo";
   const rutinas = (g.rutinas || []).filter(r => r.frecuencia !== "mes").map(r => rutinaNueva({
     id: r.id, texto: r.nombre, hora: r.hora || "", area: r.area || "", dias: r.dias || [],
-    franja: FRANJAS.some(x => x.id === r.franja) ? r.franja : franjaDeHora(r.hora),
+    franja: franjas().some(x => x.id === r.franja) ? r.franja : franjaDeHora(r.hora),
     semanal: r.semanal || 0, pasos: (r.pasos || []).slice(),
     meta: r.meta || null, pausada: !!r.pausada || esTrabajo(r),
     nivel: r.peso ? 1 : (r.semanal >= 5 ? 1 : 2)
@@ -1112,7 +1184,7 @@ function desdeViejo(g) {
   }))));
   /* Numerar al migrar: si todo queda en cero, arrastrar no tiene contra qué
      ordenar y el primer movimiento barajaría la lista entera. */
-  FRANJAS.forEach(fr => rutinas.filter(r => r.franja === fr.id)
+  franjas().forEach(fr => rutinas.filter(r => r.franja === fr.id)
     .sort((a, b) => horaEnMin(a.hora) - horaEnMin(b.hora))
     .forEach((r, i) => { r.orden = (i + 1) * 10; }));
   [1, 2, 3].forEach(n => sueltos.filter(x => x.nivel === n).forEach((x, i) => { x.orden = (i + 1) * 10; }));
@@ -1173,7 +1245,7 @@ function normalizar(e) {
      el campo, porque arrastrar tiene que poder contradecir al reloj. */
   e.rutinas.forEach(r => { r.tipo = "rutina"; if (!Array.isArray(r.dias)) r.dias = [];
     if (!Array.isArray(r.pasos)) r.pasos = []; if (typeof r.area !== "string") r.area = "";
-    if (!FRANJAS.some(x => x.id === r.franja)) r.franja = franjaDeHora(r.hora);
+    if (!franjasDe(e).some(x => x.id === r.franja)) r.franja = franjaDeHora(r.hora);
     if (typeof r.orden !== "number") r.orden = horaEnMin(r.hora);
     if (typeof r.semanal !== "number") r.semanal = 0; if (![1, 2, 3].includes(r.nivel)) r.nivel = 2;
     if (typeof r.hora !== "string") r.hora = ""; if (r.meta && !e.metas.some(m => m.id === r.meta)) r.meta = null; });
@@ -1245,7 +1317,7 @@ const Rg = {
   porHora: f => {
     const d = diaDe(f);
     const rs = E.rutinas.filter(r => Rg.tocaRutina(r, f) && !d.fuera.includes(r.id));
-    return FRANJAS.map(fr => ({ fr, items: rs.filter(x => x.franja === fr.id)
+    return franjas().map(fr => ({ fr, items: rs.filter(x => x.franja === fr.id)
       .sort((a, b) => (a.orden - b.orden) || horaEnMin(a.hora) - horaEnMin(b.hora)) }));
   },
   /* Los pendientes en tres grupos: arrastrar de uno a otro cambia el nivel */
@@ -1461,7 +1533,7 @@ const A = {
     /* El destino se valida aquí, no donde venga: una franja que no existe o
        un nivel fuera de 1..3 dejaría el renglón fuera de toda vista aunque
        siguiera guardado. Si no cuadra, no se mueve nada. */
-    if (x.tipo === "rutina") { if (!FRANJAS.some(fr => fr.id === destino)) return false; }
+    if (x.tipo === "rutina") { if (!franjas().some(fr => fr.id === destino)) return false; }
     else { const n = +destino; if (!(n >= 1 && n <= 3)) return false; }
     const lista = x.tipo === "rutina"
       ? (x.franja = destino, E.rutinas.filter(r => r.franja === destino && r.id !== x.id))
@@ -1475,13 +1547,13 @@ const A = {
   },
   /* Agregar una obligación directo al bloque donde la quiere */
   nuevaRutina(texto, franja) {
-    const fr = FRANJAS.find(x => x.id === franja) || FRANJAS[1];
+    const fs = franjas(), fr = fs.find(x => x.id === franja) || fs[1];
     const hermanas = E.rutinas.filter(r => r.franja === fr.id);
     /* Nace para los siete días. Antes nacía de lunes a viernes: agregada en
        sábado decía «Agregada» y no aparecía en ninguna parte hasta el lunes,
        que por fuera es exactamente lo mismo que perderla. Los días se
        recortan después, en su hoja, que es donde se ve lo que se cambia. */
-    const r = rutinaNueva({ texto: texto.trim(), franja: fr.id, hora: pad2(fr.desde) + ":00",
+    const r = rutinaNueva({ texto: texto.trim(), franja: fr.id, hora: hhmm(fr.desde),
       orden: (hermanas.length + 1) * 10, dias: [1, 2, 3, 4, 5, 6, 0], semanal: 7 });
     E.rutinas.push(r); return r;
   },
@@ -1505,10 +1577,10 @@ const A = {
      La hora se ajusta al principio de la franja nueva, porque la franja es
      justo el tramo de horas, y si no, el renglón diría una cosa y estaría
      en otra. */
-  aFranja(x, fr) { const f = FRANJAS.find(y => y.id === fr); if (!f) return;
+  aFranja(x, fr) { const f = franjas().find(y => y.id === fr); if (!f) return;
     x.franja = fr;
     const m = horaEnMin(x.hora);
-    if (m === 9999 || m < f.desde * 60 || m >= f.hasta * 60) x.hora = pad2(f.desde) + ":00"; },
+    if (m === 9999 || !enFranja(f, m)) x.hora = hhmm(f.desde); },
   /* El orden se calcula contra lo que SE VE hoy, no contra todas las
      rutinas de la franja: si la vecina de arriba es de lunes y hoy es
      sábado, intercambiar con ella deja la pantalla igual y la flecha
@@ -1880,7 +1952,7 @@ function caraVista(c) {
 
 function pintarHoy() {
   const f = hoyISO(), mk = Rg.marcador(f), bloques = Rg.porHora(f), ps = Rg.pendientes(f);
-  const ahora = new Date().getHours();
+  const d0 = new Date(), ahora = d0.getHours() * 60 + d0.getMinutes();
   const cara = CARAS.some(c => c[0] === S.cara) ? S.cara : "rutina";
   let h = portada(f, mk);
 
@@ -1893,10 +1965,14 @@ function pintarHoy() {
   h += `<p class="bloque-s">Tu rutina, en el orden en que ocurre. Si una actividad tiene partes, el galón las abre aquí mismo.</p>`;
   h += bloques.map(({ fr, items }) => {
     const hechos = items.filter(x => Rg.hecha(x, f)).length;
-    const enCurso = ahora >= fr.desde && ahora < fr.hasta;
+    const enCurso = enFranja(fr, ahora);
+    /* El tramo de horas es un botón, y abre el editor de los bloques. Es
+       donde se mira cuando el bloque no cuadra con el día de uno, y es el
+       único sitio donde ya se está viendo la hora que hay que cambiar. */
     return `<div class="franja-g${enCurso ? " ahora" : ""}" data-fr="${fr.id}"${enCurso ? ' aria-current="time"' : ""}><p class="franja">${esc(fr.nombre)}` +
       (enCurso ? `<b class="franja-ahora">ahora</b>` : "") +
-      `<span>${fr.desde}:00–${fr.hasta === 24 ? "24" : fr.hasta}:00</span>` +
+      `<button class="franja-ed" data-accion="franjas" aria-label="Cambiar los horarios de los bloques del día">` +
+        `${hhmm(fr.desde)}–${hhmm(fr.hasta)}</button>` +
       `<em>${items.length ? hechos + " de " + items.length : "libre"}</em></p>` +
       `<ul class="rutl" data-zona="${fr.id}">${items.map(x => filaRutina(x, f)).join("") ||
         `<li class="zona-vacia">Suelta algo aquí, o escribe abajo.</li>`}</ul>` +
@@ -2220,6 +2296,69 @@ function hojaLlama() {
     cuerpo);
 }
 
+/* ── Los bloques del día ──
+   Cuatro tramos seguidos: solo se elige dónde empieza cada uno, porque el
+   final de cada uno es el principio del siguiente. Así no hay forma de
+   dejar un hueco ni un traslape.
+   El cuerpo vive aparte de la hoja a propósito: el recorrido de bienvenida
+   va a enseñar esto mismo en una de sus pantallas, y tiene que ser la misma
+   pieza y no una copia que se quede atrás. Los selectores que el recorrido
+   puede señalar son `.franja-ed` (en la rutina) y `#frFilas`.            */
+function cuerpoFranjas() {
+  const fs = franjas();
+  const opciones = [];
+  for (let m = 0; m < 1440; m += FRANJA_PASO) opciones.push(m);
+  return `<div class="fr-filas" id="frFilas">` + fs.map((fr, i) => {
+    /* La hora del primero es además la hora a la que la lista pasa al día
+       siguiente; se dice en la fila, no en una nota al pie que nadie lee. */
+    return `<div class="fr-f" data-i="${i}">` +
+      `<input class="fr-n" id="frNom${i}" type="text" value="${esc(fr.nombre)}" ` +
+        `maxlength="18" autocomplete="off" aria-label="Nombre del bloque ${i + 1}">` +
+      `<label class="fr-h"><span class="fr-et">empieza</span>` +
+        `<select class="campo-i fr-s" id="frH${i}" data-fr-sel aria-label="Hora a la que empieza ${esc(fr.nombre)}">` +
+        opciones.map(m => `<option value="${m}"${m === fr.desde ? " selected" : ""}>${hhmm(m)}</option>`).join("") +
+        `</select></label>` +
+      `<p class="fr-rango" id="frR${i}"></p></div>`;
+  }).join("") + `</div>` +
+    `<p class="fr-aviso" id="frAviso" role="status" aria-live="polite"></p>`;
+}
+/* Relee los cuatro selectores y reescribe lo que de ellos depende: el tramo
+   de cada bloque, el aviso y si se puede guardar. No vuelve a dibujar los
+   selectores, para no quitarle el foco a quien está eligiendo. */
+function revisarFranjas() {
+  const n = FRANJAS_DEF.length, v = [];
+  for (let i = 0; i < n; i++) { const e = document.getElementById("frH" + i); if (!e) return; v.push(+e.value); }
+  let malo = -1;
+  for (let i = 1; i < n; i++) if (v[i] <= v[i - 1]) { malo = i; break; }
+  for (let i = 0; i < n; i++) {
+    const r = document.getElementById("frR" + i); if (!r) continue;
+    const fin = v[(i + 1) % n];
+    r.textContent = malo >= 0 ? "" : `de ${hhmm(v[i])} a ${hhmm(fin)}` +
+      (i === n - 1 ? " · cruza la medianoche" : "") +
+      (i === 0 ? " · aquí empieza tu día" : "");
+    /* Se marcan los dos de la discordia —el que se pasó y el de arriba—, no
+       uno solo: desde la pantalla, cualquiera de los dos se puede mover
+       para arreglarlo, y señalar nada más uno dice a medias cuál es el lío. */
+    const fila = r.closest(".fr-f");
+    if (fila) fila.classList.toggle("mal", malo >= 0 && (i === malo || i === malo - 1));
+  }
+  const av = document.getElementById("frAviso");
+  if (av) av.textContent = malo >= 0
+    ? `Cada bloque tiene que empezar después del anterior. Ahora «${(document.getElementById("frNom" + malo) || {}).value || ""}» empieza antes o a la misma hora que el de arriba.`
+    : `Tu día empieza a las ${hhmm(v[0])} y termina a las ${hhmm(v[0])} del día siguiente. Lo que marques antes de esa hora cuenta para el día anterior, que es el que todavía no termina.`;
+  const g = document.querySelector('[data-accion="guardar-franjas"]');
+  if (g) { g.disabled = malo >= 0; g.classList.toggle("apagada", malo >= 0); }
+}
+function hojaFranjas() {
+  hoja("Los bloques del día",
+    "Tu rutina se reparte en cuatro tramos seguidos. Elige dónde empieza cada uno: el final de uno es el principio del siguiente, y el último da la vuelta a la medianoche.",
+    cuerpoFranjas() +
+    `<p class="campo-ayuda">Cambiar un horario no mueve lo que ya tienes puesto: cada rutina se queda en su bloque, con su hora. Es el bloque el que se ensancha o se encoge.</p>` +
+    dos(btn("Cancelar", "cerrar-hoja"), btn("Guardar", "guardar-franjas", "", "llena")) +
+    `<div class="hoja-pie">${btn("Volver a los de siempre", "franjas-defecto", "", "leve")}</div>`);
+  setTimeout(revisarFranjas, 0);
+}
+
 /* ── Nuevo propósito ──
    No se crea nada hasta que tiene nombre: antes se creaba «Nueva meta» en
    cuanto se tocaba el botón, y cerrar sin escribir dejaba un propósito
@@ -2284,6 +2423,9 @@ function hojaAjustes() {
         `<span class="fila-dato">${fl.estado === "sin" ? "sin rutinas" : fl.estado === "viva" ? "en cadencia"
           : fl.estado === "tibia" ? "a medias" : fl.n ? "atrás" : "sin movimiento"}</span></button>`; }).join("") +
     `<button class="fila-min nueva" data-accion="nueva-meta">+ Nuevo propósito</button></div>` +
+    `<p class="campo-et">Tu día</p><div class="lista-min">` +
+    `<button class="fila-min" data-accion="franjas">Bloques del día` +
+      `<span class="fila-dato">${franjas().map(x => hhmm(x.desde)).join(" · ")}</span></button></div>` +
     `<p class="campo-et">Sonido</p><div class="lista-min">` +
     `<button class="fila-min" data-accion="ir-sonido">Paisajes y enfoque<span class="fila-dato">${esc(sonidoManual ? (SONIDO_NOMBRE[sonidoManual] || "sonando") : "")}</span></button></div>` +
     `<p class="campo-et">Datos</p><div class="lista-min">` +
@@ -2519,10 +2661,10 @@ const ACC = {
   "nivel": d => { const x = Rg.item(d.id); if (!x) return; cambiar(() => A.nivel(x)); },
   "subir-rut": d => { const x = Rg.item(d.id); if (!x) return; const fr = x.franja;
     let si; cambiar(() => { si = A.subirRut(x, hoyISO()); });
-    if (si && x.franja !== fr) nota("Pasó a " + (FRANJAS.find(y => y.id === x.franja) || {}).nombre + "."); },
+    if (si && x.franja !== fr) nota("Pasó a " + (franjas().find(y => y.id === x.franja) || {}).nombre + "."); },
   "bajar-rut": d => { const x = Rg.item(d.id); if (!x) return; const fr = x.franja;
     let si; cambiar(() => { si = A.bajarRut(x, hoyISO()); });
-    if (si && x.franja !== fr) nota("Pasó a " + (FRANJAS.find(y => y.id === x.franja) || {}).nombre + "."); },
+    if (si && x.franja !== fr) nota("Pasó a " + (franjas().find(y => y.id === x.franja) || {}).nombre + "."); },
   "subir-pend": d => { const x = Rg.item(d.id); if (!x) return; const n = x.nivel;
     let si; cambiar(() => { si = A.subirPend(x); });
     if (si && x.nivel !== n) nota("Ahora es nivel " + x.nivel + "."); },
@@ -2568,6 +2710,26 @@ const ACC = {
     cambiar(() => { diaMut(hoyISO()).frase = t; }); cerrarHoja(); nota("Tu frase te acompaña hoy."); },
   "cn-quitar": () => { cambiar(() => { delete diaMut(hoyISO()).frase; }); cerrarHoja(); },
   "ver-llama": () => hojaLlama(),
+  "franjas": () => { tomarAjustes(); hojaFranjas(); },
+  "guardar-franjas": () => {
+    const n = FRANJAS_DEF.length, v = [], nom = [];
+    for (let i = 0; i < n; i++) {
+      const s = document.getElementById("frH" + i), t = document.getElementById("frNom" + i);
+      if (!s) return;
+      v.push(+s.value); nom.push((t ? t.value : "").trim().slice(0, 18) || FRANJAS_DEF[i].nombre);
+    }
+    for (let i = 1; i < n; i++) if (v[i] <= v[i - 1]) { nota("Cada bloque empieza después del anterior."); return; }
+    const antes = inicioDia();
+    cambiar(() => { E.ajustes.franjas = FRANJAS_DEF.map((d, i) => ({ id: d.id, nombre: nom[i], desde: v[i] })); });
+    cerrarHoja();
+    /* Mover la hora de arranque mueve también cuándo la lista pasa al día
+       siguiente. Si eso acaba de cambiar qué día es AHORA, se dice: ver la
+       lista de ayer sin explicación parece que la app perdió lo de hoy. */
+    const d = new Date(), m = d.getHours() * 60 + d.getMinutes();
+    const cruzo = antes !== v[0] && ((m < antes) !== (m < v[0]));
+    nota(cruzo ? "Listo. Con este cambio, ahora mismo estás en el día anterior." : "Listo.");
+  },
+  "franjas-defecto": () => { cambiar(() => { delete E.ajustes.franjas; }); hojaFranjas(); nota("De vuelta a los de siempre."); },
   /* Abrir otra hoja desde Ajustes se llevaba lo escrito en «Tu nombre» y en
      el propósito: la hoja se reemplaza entera y nadie había leído los
      campos. Se recogen antes de irse. */
@@ -2690,11 +2852,14 @@ document.addEventListener("click", e => {
   const fn = ACC[b.dataset.accion];
   if (fn) { e.preventDefault(); fn(b.dataset, b, e); }
 });
-/* El único select que hace algo al cambiar: «Alimenta a». Si se elige crear
-   un propósito, aparece el campo del nombre y se le va el foco. */
+/* Los selectores que hacen algo al cambiar, sin esperar a Guardar: el de los
+   bloques del día, que recalcula los tramos y el aviso, y el de «Alimenta a»,
+   que descubre el campo para nombrar un propósito nuevo. */
 document.addEventListener("change", e => {
   const s = e.target;
-  if (!s || !s.matches || !s.matches("select[data-meta-sel]")) return;
+  if (!s || !s.matches) return;
+  if (s.matches("select[data-fr-sel]")) { revisarFranjas(); return; }
+  if (!s.matches("select[data-meta-sel]")) return;
   const c = document.getElementById("iMetaNuevaC"), i = document.getElementById("iMetaNueva");
   if (!c) return;
   const nueva = s.value === "__nueva";
@@ -2845,7 +3010,7 @@ const Arr = {
     const antesFranja = x.tipo === "rutina" ? x.franja : null;
     cambiar(() => A.mover(x, d.zona, d.antes));
     if (antesFranja && x.franja !== antesFranja) {
-      const fr = FRANJAS.find(f => f.id === x.franja);
+      const fr = franjas().find(f => f.id === x.franja);
       nota(x.texto + " pasó a " + (fr ? fr.nombre.toLowerCase() : x.franja) + ".");
     } else if (antesNivel && x.nivel !== antesNivel) {
       nota(x.texto + ": ahora es nivel " + x.nivel + ".");
@@ -3317,7 +3482,7 @@ const PALABRAS = {
 };
 /* De qué momento es una hora. Antes de las 5 todavía es la noche anterior,
    igual que para el día: a las 2 de la mañana no empieza nada. */
-function momento(h) { return h < DIA_INICIA ? "noche" : h < 12 ? "manana" : h < 20 ? "tarde" : "noche"; }
+function momento(h) { return h * 60 < inicioDia() ? "noche" : h < 12 ? "manana" : h < 20 ? "tarde" : "noche"; }
 const MOMENTO_ET = { manana: "Mañana", tarde: "Tarde", noche: "Noche" };
 function palabraDelDia(f, m) {
   const propia = (diaDe(f).frase || "").trim();
