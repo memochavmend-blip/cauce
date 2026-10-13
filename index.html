@@ -214,6 +214,13 @@ html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
   padding-left:13px;border-left:2px solid var(--cera)}
 .llama-sin{margin:-8px 0 18px}
 
+/* Volver a donde se venía. Solo sale cuando se llegó por un enlace: si se
+   tocó la pestaña, no hay nada atrás y el botón sería ruido. */
+.volver{display:inline-flex;align-items:center;gap:5px;margin:0 0 6px -8px;padding:10px 8px;
+  font-size:13.5px;color:var(--tinta-baja);border-radius:9px;min-height:44px}
+.volver svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+@media (hover:hover){.volver:hover{color:var(--tinta)}}
+
 .plegable{margin:26px 0 0;border-top:1px solid var(--linea);padding-top:14px}
 .plegable summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none}
 .plegable summary::-webkit-details-marker{display:none}
@@ -1772,7 +1779,7 @@ const A = {
 };
 
 /* ════════ 6 · VISTAS ════════ */
-const S = { tab: "hoy", cara: "rutina", hoja: null, abiertas: [], pase: [] };
+const S = { tab: "hoy", cara: "rutina", hoja: null, abiertas: [], pase: [], volverA: null };
 
 function pintar() {
   if (!E) return;
@@ -2090,10 +2097,14 @@ function pintarHoy() {
   h += `<section class="cara" role="tabpanel" id="cara-pend" data-cara="pend">`;
   h += `<p class="bloque-s">Lo suelto: pasa una vez y no tiene por qué llevar a un propósito. Tres niveles; toca el número para cambiarlo.</p>`;
   const NIV = [["Primero", "lo que sí o sí hoy"], ["Después", "si el día lo permite"], ["Si da tiempo", "sin prisa"]];
+  /* Un campo por nivel, como la rutina tiene uno por franja. Antes había
+     uno solo al pie y todo nacía en el 2: para poner algo en el 1 había que
+     escribirlo, buscarlo y tocarle el número. Si los tres niveles son la
+     decisión de esta pantalla, tiene que poderse tomar al escribir. */
   h += Rg.porNivel(f).map(({ n, items }) =>
     `<p class="niv niv${n}"><span class="niv-b">${n}</span>${NIV[n - 1][0]}<em>${NIV[n - 1][1]}</em></p>` +
-    `<ul class="nota" data-zona="${n}">${items.map(filaPend).join("") || `<li class="zona-vacia">—</li>`}</ul>`).join("");
-  h += filaAgregar("nuevo", "nuevo", "Agregar pendiente");
+    `<ul class="nota" data-zona="${n}">${items.map(filaPend).join("") || `<li class="zona-vacia">—</li>`}</ul>` +
+    filaAgregar("pend_" + n, "nuevo", "Agregar a " + NIV[n - 1][0].toLowerCase(), true, ` data-nivel="${n}"`)).join("");
   if (ps.length > TOPE) h += `<p class="aviso-tope">Son ${ps.length} pendientes. En papel cabían nueve. Baja a nivel 3 lo que no sea de esta semana.</p>`;
   const viejo = ps.filter(x => x.pases >= 3)[0];
   if (viejo) h += `<p class="senal">${esc(viejo.texto)} lleva ${viejo.pases} pases sin hacerse. O es más chico de lo que parece, o no es de nivel ${viejo.nivel}.</p>`;
@@ -2182,7 +2193,9 @@ function apagarCaras() {
 /* ── El repositorio: lo hecho, por día. No se persigue, se consulta. ── */
 function pintarHecho() {
   const dias = Rg.hechos(), n = dias.reduce((a, g) => a + g.items.length, 0);
-  let h = `<header class="cab"><div><h1 class="dia" tabindex="-1">Hecho</h1>` +
+  let h = S.volverA ? `<button class="volver" data-accion="volver">` +
+    `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Volver a pendientes</button>` : "";
+  h += `<header class="cab"><div><h1 class="dia" tabindex="-1">Hecho</h1>` +
     `<p class="dia-s">${n ? n + (n === 1 ? " pendiente cerrado" : " pendientes cerrados") + ", del más reciente al más viejo." : "Todavía no hay nada aquí."}</p></div></header>`;
   h += dias.map(g => `<p class="franja">${esc(fechaLarga(g.f))}<em>${g.items.length}</em></p>` +
     `<ul class="nota">${g.items.map(s => `<li class="it hecha">` +
@@ -3086,7 +3099,13 @@ function aplicarTema() {
 const ACC = {
   /* Al cambiar de pestaña la vista vuelve arriba. Sin esto, Semana abría a
      la altura donde se dejó Hoy, que no es la misma página. */
-  "tab": d => { S.tab = d.tab; pintar(); const l = $("#lienzo"); if (l) l.scrollTop = 0; },
+  /* Tocar una pestaña es navegar a mano: deja de haber un «volver» que
+     tenga sentido, porque ya no se llegó aquí desde ningún lado. */
+  "tab": d => { S.volverA = null; S.tab = d.tab; pintar(); const l = $("#lienzo"); if (l) l.scrollTop = 0; },
+  "volver": () => { const v = S.volverA; if (!v) return;
+    S.volverA = null; S.tab = v.tab; if (v.cara) S.cara = v.cara;
+    pintar(); const l = $("#lienzo"); if (l) l.scrollTop = 0;
+    if (v.cara) caraIr(v.cara, false); },
   "plegar": d => { const i = S.abiertas.indexOf(d.id);
     if (i >= 0) S.abiertas.splice(i, 1); else S.abiertas.push(d.id); pintar(); },
   "marcar-sub": d => { const r = Rg.item(d.id); if (!r) return; let res;
@@ -3279,7 +3298,11 @@ const ACC = {
     cerrarHoja(); aplicarTema(); pintar(); nota("Deshecho. Volvió lo de antes."); },
   "cerrar-hoja": () => { Pomo.tareaPend = ""; Pomo.idPend = null; cerrarHoja(); },
   "enviar": d => { const el = document.getElementById(d.para || "nuevo"); if (el) alEnter(el); },
-  "ir-hecho": () => { S.tab = "hecho"; pintar(); },
+  /* Se guarda de dónde se vino: a esta pantalla se llega por un enlace, y
+     una pantalla a la que se entra por un enlace tiene que decir cómo se
+     sale. La barra de pestañas está, pero volver a lo que estabas mirando
+     pedía adivinar que «Hoy» te devuelve a la cara de pendientes. */
+  "ir-hecho": () => { S.volverA = { tab: "hoy", cara: "pend" }; S.tab = "hecho"; pintar(); },
   "fab": () => { S.tab = "hoy"; pintar(); setTimeout(() => { const el = document.getElementById("nuevo"); if (el) el.focus(); }, 60); },
   "pase-toggle": (d, b) => { const i = S.pase.indexOf(d.id);
     if (i >= 0) S.pase.splice(i, 1); else S.pase.push(d.id);
@@ -3289,8 +3312,11 @@ const ACC = {
 };
 const ENTER = {
   "nuevo": t => { const v = t.value.trim(); if (!v) return;
-    cambiar(() => A.agregar(v)); t.value = "";
-    setTimeout(() => { const el = document.getElementById("nuevo"); if (el) el.focus(); }, 40); },
+    /* El campo dice en qué nivel nace. Sin el dato, el 2, que es donde cae
+       lo que no se decidió. */
+    const n = +t.dataset.nivel || 2, id = t.id;
+    cambiar(() => A.agregar(v, n));
+    setTimeout(() => { const el = document.getElementById(id); if (el) { el.value = ""; el.focus(); } }, 40); },
   "porti": t => { const v = t.value.trim(); if (!v) return;
     cambiar(() => A.nuevoPorti(v)); t.value = "";
     setTimeout(() => { const el = document.getElementById("nuevoPorti"); if (el) el.focus(); }, 40); },
@@ -3345,6 +3371,14 @@ document.addEventListener("keydown", e => {
       que el dedo está con seguridad encima, y se evita que el campo pierda
       el foco: el teclado no se cierra y se pueden agregar varios seguidos. */
 let envioUlt = 0;
+/* El + hace su trabajo en el pointerdown, para no quitarle el foco al campo.
+   Pero el toque todavía no termina: el clic llega después, y para entonces
+   la lista ya creció y el dedo está encima de otra cosa —el número del
+   renglón recién dibujado, por ejemplo, que al tocarlo cambia de nivel. Así,
+   agregar un pendiente le subía el nivel a otro sin que nadie lo pidiera.
+   Se traga el clic que remata ese mismo toque, uno solo: si el siguiente es
+   de verdad del usuario, pasa. */
+let tragarClic = 0;
 function enviarFila(f) {
   if (!f) return;
   envioUlt = Date.now();
@@ -3360,6 +3394,7 @@ document.addEventListener("pointerdown", e => {
   const b = e.target.closest && e.target.closest(".agregar-mas"); if (!b) return;
   const f = b.closest("form[data-enviar]"); if (!f) return;
   e.preventDefault();
+  tragarClic = Date.now();
   enviarFila(f);
 }, { passive: false });
 try { matchMedia("(prefers-color-scheme:dark)").addEventListener("change", () => { if (E && E.ajustes.tema === "sistema") aplicarTema(); }); } catch (e) {}
@@ -3491,7 +3526,14 @@ const Arr = {
     Arr.el = null; Arr.fantasma = null; Arr.id = null; Arr.viva = false; Arr.destino = null;
   }
 };
-document.addEventListener("click", e => { if (Arr.comer) { e.preventDefault(); e.stopPropagation(); } }, true);
+document.addEventListener("click", e => {
+  if (Arr.comer) { e.preventDefault(); e.stopPropagation(); return; }
+  /* El clic que cierra el toque del + (ver `tragarClic`): llega cuando la
+     lista ya se movió debajo del dedo. */
+  if (tragarClic && Date.now() - tragarClic < 600) {
+    tragarClic = 0; e.preventDefault(); e.stopPropagation();
+  }
+}, true);
 document.addEventListener("pointerdown", Arr.inicio, { passive: true });
 document.addEventListener("pointermove", Arr.mueve, { passive: false });
 document.addEventListener("pointerup", Arr.fin);
