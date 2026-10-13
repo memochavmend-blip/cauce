@@ -287,7 +287,74 @@ html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
 .pase-t{font-size:15px;line-height:1.3}
 .pase-s{font-size:12px;color:var(--tinta-baja)}
 .paso-acc{margin:26px 0 0}
-.onb-top,.onb-dots,.onb-back,.flujo-x{display:none}
+
+/* ── La bienvenida ──
+   La misma capa del pase, con una barra arriba: atrás, los puntos de
+   avance y «saltar por ahora». La barra no se va con el desplazamiento,
+   así que el contenido es el que rueda y no la capa entera. */
+.onb.onb-guia{overflow:hidden;padding-top:calc(env(safe-area-inset-top) + 12px)}
+.onb.onb-guia #flujoCont{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;padding-bottom:10px}
+.onb.onb-guia .paso-acc{margin-top:auto;padding-top:26px;display:flex;align-items:center;gap:12px}
+.onb-top{flex:0 0 auto;display:flex;align-items:center;gap:12px;margin:0 0 20px;min-height:40px}
+.onb-back{flex:0 0 auto;width:40px;height:40px;margin-left:-10px;display:grid;place-items:center;
+  color:var(--tinta-baja);border-radius:50%}
+.onb-back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.onb-dots{flex:1;display:flex;align-items:center;gap:6px}
+.onb-dot{width:6px;height:6px;border-radius:50%;background:var(--linea-fuerte);transition:background .25s ease,width .25s ease}
+.onb-dot.on{background:var(--llama)}
+.onb-dot.on:last-of-type,.onb-dots .onb-dot.on + .onb-dot:not(.on){}
+.onb-x{flex:0 0 auto;font-size:13px;color:var(--tinta-baja);min-height:40px;padding:0 4px}
+.onb-l{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:11px}
+.onb-l li{position:relative;padding-left:17px;font-size:15px;line-height:1.5;color:var(--tinta-baja)}
+.onb-l li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--cera)}
+.onb-l b{font-weight:600;color:var(--tinta)}
+.onb-priv{font-size:12.5px;line-height:1.55;color:var(--tinta-tenue);margin:0;
+  padding:13px 14px;border-radius:12px;background:var(--panel)}
+.onb-ops{display:flex;flex-direction:column;gap:10px;margin:0 0 16px}
+.onb-op{display:flex;flex-direction:column;gap:3px;text-align:left;padding:15px;border-radius:13px;
+  background:var(--panel);border:1.5px solid transparent;transition:border-color .18s ease,background .18s ease}
+.onb-op.on{border-color:var(--cera);background:color-mix(in srgb,var(--llama) 9%,var(--panel))}
+.onb-op-t{font-size:16px;color:var(--tinta)}
+.onb-op-s{font-size:13px;line-height:1.45;color:var(--tinta-baja)}
+.onb-acc{justify-content:space-between}
+.onb-acc .accion.llena{flex:1}
+.onb.onb-guia .fr-filas{margin-bottom:0}
+
+/* ── El recorrido ──
+   Encima de las hojas (41) y de la pantalla de enfoque (96), debajo del
+   aviso de girar (200). El oscurecido no es un rectángulo negro con un
+   agujero: es la sombra desbordada del propio hueco, que así lo sigue
+   mientras se mueve sin que haya nada que recortar. */
+.tour{position:fixed;inset:0;z-index:150}
+/* La app queda `inert` durante el recorrido, pero NO desenfocada: el
+   desenfoque de las hojas existe para mandar la mirada al frente, y aquí el
+   frente es la app misma. Con el filtro puesto, el hueco enseñaba borroso
+   justo lo que estaba explicando. */
+html.con-tour #appShell[inert]{filter:none;opacity:1}
+.tour-foco{position:fixed;border-radius:14px;pointer-events:none;
+  box-shadow:0 0 0 200vmax rgba(14,13,12,.62);
+  outline:1.5px solid color-mix(in srgb,var(--llama) 75%,transparent);
+  transition:top .38s cubic-bezier(.3,.7,.3,1),left .38s cubic-bezier(.3,.7,.3,1),
+             width .38s cubic-bezier(.3,.7,.3,1),height .38s cubic-bezier(.3,.7,.3,1)}
+.tour-foco.sin{top:50%;left:50%;width:0;height:0;outline:none}
+.tour-caja{position:fixed;width:min(340px,calc(100vw - 32px));background:var(--panel);
+  border:1px solid var(--linea-fuerte);border-radius:18px;padding:18px 18px 14px;color:var(--tinta);
+  box-shadow:0 18px 50px rgba(0,0,0,.28);
+  transition:top .38s cubic-bezier(.3,.7,.3,1),left .38s cubic-bezier(.3,.7,.3,1)}
+.tour-caja.centro{top:50%;left:50%;transform:translate(-50%,-50%)}
+.tour-n{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--tinta-baja);margin:0 0 6px}
+.tour-t{font-family:var(--serif);font-size:20px;font-weight:400;margin:0 0 6px}
+.tour-x{font-size:14px;line-height:1.55;color:var(--tinta-baja);margin:0}
+.tour-acc{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px}
+.tour-saltar{font-size:13px;color:var(--tinta-baja);min-height:44px;padding:0 6px}
+.tour-sig{background:var(--llama);color:#1a1612;font-weight:600;font-size:14px;border-radius:12px;
+  min-height:44px;padding:0 20px}
+html[data-modo="oscuro"] .tour-sig{color:#1a1612}
+@media (prefers-reduced-motion:reduce){.tour-foco,.tour-caja{transition:none}}
+
+.flujo-x{display:none}
 
 /* ══ FAB Y PESTAÑAS ══ */
 /* Sin botón flotante: el campo de agregar vive al pie de la lista y nunca
@@ -1228,10 +1295,16 @@ function normalizar(e) {
   });
   e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
   Object.values(e.dias).forEach(d => { if (!Array.isArray(d.porti)) d.porti = []; });
-  e.marcas = Object.assign({ onboarding: false, ultimoDia: null, tocado: false }, e.marcas || {});
+  e.marcas = Object.assign({ onboarding: false, tour: false, ultimoDia: null, tocado: false }, e.marcas || {});
   /* Si ya hay días capturados, esto no es una instalación en blanco aunque
      la marca falte: falla del lado de conservar, no del de pisar. */
   if (Object.keys(e.dias || {}).length) e.marcas.tocado = true;
+  /* Y a quien ya usó la app no se le enseña la bienvenida, aunque la marca
+     se haya perdido o venga de otra parte: que a alguien con seis meses de
+     días capturados le salga una pantalla de «empieza por aquí» no es un
+     detalle, es la app diciéndole que no sabe quién es. Se puede volver a
+     ver cuando se quiera, desde Ajustes. */
+  if (e.marcas.tocado) { e.marcas.onboarding = true; }
   /* Empates en el orden hacen que arrastrar baraje la lista: se desempatan aquí */
   const desempatar = (lista, clave) => {
     const grupos = {};
@@ -2322,6 +2395,19 @@ function cuerpoFranjas() {
   }).join("") + `</div>` +
     `<p class="fr-aviso" id="frAviso" role="status" aria-live="polite"></p>`;
 }
+/* Lee los cuatro selectores y devuelve los bloques, o null si el orden es
+   imposible. Lo usan la hoja de Ajustes y la pantalla de la bienvenida: las
+   dos enseñan los mismos campos y tienen que validar igual. */
+function leerFranjas() {
+  const n = FRANJAS_DEF.length, r = [];
+  for (let i = 0; i < n; i++) {
+    const s = document.getElementById("frH" + i), t = document.getElementById("frNom" + i);
+    if (!s) return null;
+    r.push({ desde: +s.value, nombre: (t ? t.value : "").trim().slice(0, 18) || FRANJAS_DEF[i].nombre });
+  }
+  for (let i = 1; i < n; i++) if (r[i].desde <= r[i - 1].desde) return null;
+  return r;
+}
 /* Relee los cuatro selectores y reescribe lo que de ellos depende: el tramo
    de cada bloque, el aviso y si se puede guardar. No vuelve a dibujar los
    selectores, para no quitarle el foco a quien está eligiendo. */
@@ -2346,15 +2432,16 @@ function revisarFranjas() {
   if (av) av.textContent = malo >= 0
     ? `Cada bloque tiene que empezar después del anterior. Ahora «${(document.getElementById("frNom" + malo) || {}).value || ""}» empieza antes o a la misma hora que el de arriba.`
     : `Tu día empieza a las ${hhmm(v[0])} y termina a las ${hhmm(v[0])} del día siguiente. Lo que marques antes de esa hora cuenta para el día anterior, que es el que todavía no termina.`;
-  const g = document.querySelector('[data-accion="guardar-franjas"]');
-  if (g) { g.disabled = malo >= 0; g.classList.toggle("apagada", malo >= 0); }
+  /* El botón de avanzar se llama distinto en Ajustes y en la bienvenida,
+     pero lleva la misma marca: los dos se apagan con un orden imposible. */
+  $$(".fr-guarda").forEach(g => { g.disabled = malo >= 0; g.classList.toggle("apagada", malo >= 0); });
 }
 function hojaFranjas() {
   hoja("Los bloques del día",
     "Tu rutina se reparte en cuatro tramos seguidos. Elige dónde empieza cada uno: el final de uno es el principio del siguiente, y el último da la vuelta a la medianoche.",
     cuerpoFranjas() +
     `<p class="campo-ayuda">Cambiar un horario no mueve lo que ya tienes puesto: cada rutina se queda en su bloque, con su hora. Es el bloque el que se ensancha o se encoge.</p>` +
-    dos(btn("Cancelar", "cerrar-hoja"), btn("Guardar", "guardar-franjas", "", "llena")) +
+    dos(btn("Cancelar", "cerrar-hoja"), btn("Guardar", "guardar-franjas", "", "llena fr-guarda")) +
     `<div class="hoja-pie">${btn("Volver a los de siempre", "franjas-defecto", "", "leve")}</div>`);
   setTimeout(revisarFranjas, 0);
 }
@@ -2414,8 +2501,7 @@ function hojaAjustes() {
     `<label class="campo"><span class="campo-et">Para qué · lo que dice tu llama</span>` +
     `<textarea id="aProp" class="campo-area campo-i" rows="3" placeholder="No es una meta ni una tarea. Es lo que relees cuando no quieres.">${esc(E.ajustes.proposito)}</textarea></label>` +
     `<p class="campo-ayuda">Aparece al abrir tu llama. Los propósitos de abajo son los que la alimentan.</p>` +
-    `<p class="campo-et">Tema</p><div class="chips">${[["sistema", "Sistema"], ["claro", "Claro"], ["oscuro", "Oscuro"]].map(t =>
-      `<button class="chip${E.ajustes.tema === t[0] ? " on" : ""}" data-accion="tema" data-v="${t[0]}">${t[1]}</button>`).join("")}</div>` +
+    `<p class="campo-et">Tema</p>` + chipsTema() +
     `<p class="campo-et">Propósitos</p><div class="lista-min">` +
     `<button class="fila-min" data-accion="ver-llama">Tu llama<span class="fila-dato">${esc(lineaLlama(Rg.llama()))}</span></button>` +
     E.metas.map(m => { const fl = Rg.flama(m);
@@ -2426,6 +2512,9 @@ function hojaAjustes() {
     `<p class="campo-et">Tu día</p><div class="lista-min">` +
     `<button class="fila-min" data-accion="franjas">Bloques del día` +
       `<span class="fila-dato">${franjas().map(x => hhmm(x.desde)).join(" · ")}</span></button></div>` +
+    `<p class="campo-et">Cómo funciona</p><div class="lista-min">` +
+    `<button class="fila-min" data-accion="onb">Ver la bienvenida otra vez<span class="fila-dato">desde cero</span></button>` +
+    `<button class="fila-min" data-accion="tour">Recorrido de inicio<span class="fila-dato">un minuto</span></button></div>` +
     `<p class="campo-et">Sonido</p><div class="lista-min">` +
     `<button class="fila-min" data-accion="ir-sonido">Paisajes y enfoque<span class="fila-dato">${esc(sonidoManual ? (SONIDO_NOMBRE[sonidoManual] || "sonando") : "")}</span></button></div>` +
     `<p class="campo-et">Datos</p><div class="lista-min">` +
@@ -2503,6 +2592,304 @@ function pintarPase() {
   $("#appShell").setAttribute("inert", "");
 }
 function cerrarPase() { $("#flujo").classList.add("oculto"); $("#appShell").removeAttribute("inert"); }
+
+/* ════════ 8b · LA BIENVENIDA ════════
+   La primera vez que alguien abre la app, antes de ver nada. Usa la misma
+   capa del pase diario —`#flujo`— porque es la misma idea: pantalla
+   completa, una decisión por pantalla, y la app detrás esperando.
+   La secuencia se calcula, no está fija: lo que se contesta en una pantalla
+   puede quitar o agregar otras. Y se guarda en qué pantalla va, para que
+   cerrar la app a la mitad no obligue a empezar de cero.
+   Regla de qué se pregunta aquí: solo lo que cambia lo que la app enseña.
+   Todo lo demás vive en Ajustes y no merece robarle a nadie una pantalla
+   la primera vez que entra.                                              */
+const Onb = {
+  seq: [], i: 0,
+  /* nuevo: la app acaba de instalarse. Repetir la bienvenida desde Ajustes
+     NO es eso, y por eso la pantalla de «empezar en blanco» solo sale en
+     una instalación nueva: en un repaso sería un botón de borrar todo
+     escondido dentro de un paseo. */
+  nuevo: false, vacio: false, abierto: false
+};
+
+function onbSecuencia() {
+  const s = ["bienvenida", "nombre", "paraque"];
+  if (Onb.nuevo) s.push("arranque");
+  if (Onb.vacio || !E.metas.length) s.push("propositos");
+  s.push("bloques", "tema");
+  return s;
+}
+
+/* Los chips del tema: una sola fuente para la bienvenida y para Ajustes.
+   El manejador de `tema` ya aplica en vivo y mueve el `on`, así que la
+   vista previa sale gratis en las dos. */
+const chipsTema = () => `<div class="chips">${[["sistema", "Sistema"], ["claro", "Claro"], ["oscuro", "Oscuro"]].map(t =>
+  `<button class="chip${E.ajustes.tema === t[0] ? " on" : ""}" data-accion="tema" data-v="${t[0]}">${t[1]}</button>`).join("")}</div>`;
+
+const onbAcc = (sig, saltar) => `<div class="paso-acc onb-acc">` +
+  (saltar ? `<button class="accion leve" data-accion="onb-sig" data-saltar="1">Después lo afino</button>` : `<span></span>`) +
+  `<button class="accion llena fr-guarda" data-accion="onb-sig">${esc(sig)}</button></div>`;
+
+function onbPantalla(tipo) {
+  if (tipo === "bienvenida") return {
+    html: `<h1 class="paso-t">Cauce</h1>` +
+      `<p class="paso-s">Una lista al día y las acciones que llevan a donde quieres ir. No es una agenda ni un gestor de proyectos: es la nota de papel que se vuelve a escribir cada mañana.</p>` +
+      `<ul class="onb-l"><li>Tu <b>rutina</b>, repartida en bloques por hora.</li>` +
+      `<li>Los <b>pendientes</b> sueltos, en tres niveles.</li>` +
+      `<li>Algo <b>por ti</b>, que no te exige nadie.</li></ul>` +
+      `<p class="onb-priv">Todo se queda en este dispositivo. No hay cuenta ni servidor. Si después lo quieres también en otro, se sincroniza con un archivo privado de tu propia cuenta de GitHub.</p>` +
+      `<div class="paso-acc"><button class="accion llena" data-accion="onb-sig">Empezar</button></div>`
+  };
+
+  if (tipo === "nombre") return {
+    html: `<h1 class="paso-t">¿Cómo te llamas?</h1>` +
+      `<p class="paso-s">Aparece en el saludo al abrir la app. Nada más, y no sale de aquí.</p>` +
+      `<label class="campo"><span class="campo-et">Tu nombre</span>` +
+      `<input id="onbNom" class="campo-i" type="text" value="${esc(E.ajustes.nombre || "")}" placeholder="Como te llame la gente" autocomplete="off"></label>` +
+      `<p class="campo-ayuda">Puedes cambiarlo después, en Ajustes.</p>` + onbAcc("Siguiente", true),
+    wire() { const e = document.getElementById("onbNom"); if (e) setTimeout(() => { try { e.focus(); } catch (x) {} }, 120); },
+    tomar(saltar) { if (saltar) return; const e = document.getElementById("onbNom"); if (e) E.ajustes.nombre = e.value.trim(); }
+  };
+
+  if (tipo === "paraque") return {
+    html: `<h1 class="paso-t">¿Para qué?</h1>` +
+      `<p class="paso-s">Una frase para releer los días en que no quieres. No es una meta ni una tarea: es lo que tu llama representa.</p>` +
+      `<label class="campo"><span class="campo-et">Tu para qué</span>` +
+      `<textarea id="onbProp" class="campo-i campo-area" rows="3" placeholder="Escríbelo como te salga.">${esc(E.ajustes.proposito || "")}</textarea></label>` +
+      `<p class="campo-ayuda">Puedes dejarlo en blanco y escribirlo cuando aparezca solo. Vive en Ajustes.</p>` +
+      onbAcc("Siguiente", true),
+    tomar(saltar) { if (saltar) return; const e = document.getElementById("onbProp"); if (e) E.ajustes.proposito = e.value.trim(); }
+  };
+
+  if (tipo === "arranque") return {
+    html: `<h1 class="paso-t">¿Cómo quieres empezar?</h1>` +
+      `<p class="paso-s">Las dos se pueden deshacer: todo lo que traiga se borra en un toque.</p>` +
+      `<div class="onb-ops">` +
+      [["no", "Con ejemplos", "Seis rutinas y dos pendientes de muestra, para ver cómo se mueve antes de poner los tuyos."],
+       ["si", "En blanco", "Sin nada. La primera línea la escribes tú."]].map(o =>
+        `<button class="onb-op${(Onb.vacio ? "si" : "no") === o[0] ? " on" : ""}" data-accion="onb-vacio" data-v="${o[0]}" aria-pressed="${(Onb.vacio ? "si" : "no") === o[0]}">` +
+        `<span class="onb-op-t">${esc(o[1])}</span><span class="onb-op-s">${esc(o[2])}</span></button>`).join("") +
+      `</div><p class="campo-ayuda">Las ideas de «por ti» se quedan en los dos casos: son sugerencias, no compromisos.</p>` +
+      onbAcc("Siguiente")
+  };
+
+  if (tipo === "propositos") return {
+    html: `<h1 class="paso-t">¿Qué quieres que avance?</h1>` +
+      `<p class="paso-s">Un propósito es un para qué, no una tarea: salud, oficio, casa, lo tuyo. Cada uno tiene su flama, y todos juntos alimentan la tuya.</p>` +
+      [0, 1, 2].map(i => `<label class="campo"><span class="campo-et">${i === 0 ? "El primero" : i === 1 ? "Otro" : "Y otro"}</span>` +
+        `<input id="onbProp${i}" class="campo-i" type="text" value="" placeholder="${["Salud", "Oficio", "Casa"][i]}" autocomplete="off"></label>`).join("") +
+      `<p class="campo-ayuda">Con uno basta para empezar. Se agregan y se quitan cuando quieras.</p>` +
+      onbAcc("Siguiente", true),
+    wire() { const e = document.getElementById("onbProp0"); if (e) setTimeout(() => { try { e.focus(); } catch (x) {} }, 120); },
+    tomar(saltar) {
+      if (saltar) return;
+      /* Se crean al salir de la pantalla, pero volver atrás y entrar otra
+         vez no los duplica: primero se quitan los que creó esta misma
+         pantalla la vez anterior. */
+      E.metas = E.metas.filter(m => !m.deOnb);
+      [0, 1, 2].forEach(i => { const e = document.getElementById("onbProp" + i); const v = e ? e.value.trim() : "";
+        if (v) { const m = A.nuevaMeta(v); m.deOnb = true; } });
+    }
+  };
+
+  if (tipo === "bloques") return {
+    html: `<h1 class="paso-t">¿Cómo es tu día?</h1>` +
+      `<p class="paso-s">Tu rutina se reparte en cuatro bloques seguidos. Elige dónde empieza cada uno: el primero marca a qué hora empieza tu día.</p>` +
+      cuerpoFranjas() +
+      `<p class="campo-ayuda">Se cambian cuando quieras, desde la rutina misma o desde Ajustes.</p>` +
+      onbAcc("Siguiente"),
+    wire() { revisarFranjas(); },
+    /* Devuelve false y no avanza si el orden es imposible */
+    tomar() { const r = leerFranjas(); if (!r) return false;
+      E.ajustes.franjas = r.map((x, i) => ({ id: FRANJAS_DEF[i].id, nombre: x.nombre, desde: x.desde })); }
+  };
+
+  if (tipo === "tema") return {
+    html: `<h1 class="paso-t">¿Claro u oscuro?</h1>` +
+      `<p class="paso-s">Se aplica mientras eliges. Por defecto sigue a tu teléfono.</p>` +
+      chipsTema() +
+      `<p class="campo-ayuda">Al terminar te enseño la app en un minuto. Puedes repetir el recorrido cuando quieras, desde Ajustes.</p>` +
+      `<div class="paso-acc"><button class="accion llena" data-accion="onb-sig">Entrar a Cauce</button></div>`
+  };
+
+  return { html: `<h1 class="paso-t">…</h1>` + onbAcc("Siguiente") };
+}
+
+function onbRender() {
+  const p = onbPantalla(Onb.seq[Onb.i]);
+  const barra = $("#onbTop");
+  if (barra) barra.innerHTML =
+    `<button class="onb-back${Onb.i === 0 ? " oculto" : ""}" data-accion="onb-atras" aria-label="Atrás">` +
+      `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>` +
+    `<span class="onb-dots" role="status" aria-label="Pantalla ${Onb.i + 1} de ${Onb.seq.length}">` +
+      Onb.seq.map((_, k) => `<i class="onb-dot${k <= Onb.i ? " on" : ""}"></i>`).join("") + `</span>` +
+    `<button class="onb-x" data-accion="onb-saltar">Saltar por ahora</button>`;
+  const cont = $("#flujoCont");
+  cont.innerHTML = p.html;
+  cont.scrollTop = 0;
+  if (p.wire) p.wire();
+  Onb.pantalla = p;
+}
+
+function onbSig(saltar) {
+  const p = Onb.pantalla;
+  /* Aplicar lo de esta pantalla. Si devuelve false, no se puede avanzar
+     todavía: la pantalla ya dijo por qué en su propio aviso. */
+  if (p && p.tomar && p.tomar(!!saltar) === false) return;
+  /* Una respuesta puede ramificar: se recalcula la secuencia sin perder
+     dónde vamos. */
+  const aqui = Onb.seq[Onb.i];
+  Onb.seq = onbSecuencia();
+  const j = Onb.seq.indexOf(aqui);
+  Onb.i = (j >= 0 ? j : Onb.i) + 1;
+  E.marcas.onbIdx = Onb.i; guardar();
+  if (Onb.i >= Onb.seq.length) return terminarOnb();
+  onbRender();
+}
+function onbAtras() { if (Onb.i > 0) { Onb.i--; E.marcas.onbIdx = Onb.i; guardar(); onbRender(); } }
+
+function abrirOnb(nuevo, desde) {
+  Onb.nuevo = !!nuevo; Onb.vacio = false; Onb.abierto = true;
+  Onb.seq = onbSecuencia();
+  Onb.i = Math.min(Math.max(0, desde || 0), Onb.seq.length - 1);
+  const fl = $("#flujo");
+  fl.classList.remove("oculto"); fl.classList.add("onb-guia");
+  if (!$("#onbTop")) { const b = document.createElement("div"); b.className = "onb-top"; b.id = "onbTop"; fl.insertBefore(b, $("#flujoCont")); }
+  $("#appShell").setAttribute("inert", "");
+  onbRender();
+}
+
+/* Terminar y saltar valen lo mismo: la app nunca queda a medias, porque
+   todo lo que la bienvenida pregunta tiene ya un valor por defecto. */
+function terminarOnb() {
+  if (Onb.vacio) {
+    /* Lo pedido en la pantalla de arranque se aplica aquí y no al
+       contestarla, para que «Atrás» siga sirviendo de verdad. */
+    E.rutinas = []; E.sueltos = []; E.metas = E.metas.filter(m => m.deOnb);
+  }
+  E.metas.forEach(m => { delete m.deOnb; });
+  E.marcas.onboarding = true; delete E.marcas.onbIdx;
+  /* Terminar la bienvenida NO cuenta como haber capturado algo. `tocado` es
+     lo que decide si este dispositivo adopta los datos del otro al
+     sincronizar por primera vez o los fusiona con los suyos; marcarlo aquí
+     haría que un teléfono recién estrenado fusionara su semilla con la
+     cuenta de verdad y saliera todo por duplicado. Contestar «¿cómo te
+     llamas?» no es haber empezado a usar la app. */
+  guardar();
+  Onb.abierto = false; Onb.pantalla = null;
+  const fl = $("#flujo");
+  fl.classList.add("oculto"); fl.classList.remove("onb-guia");
+  const b = $("#onbTop"); if (b) b.remove();
+  $("#appShell").removeAttribute("inert");
+  S.tab = "hoy"; S.cara = "rutina"; pintar();
+  /* El recorrido arranca solo al terminar la bienvenida, y solo si no se ha
+     visto. Los 900 ms son para que el inicio se pinte y se asiente: medir
+     un elemento que todavía se está acomodando deja el hueco en otro
+     sitio. */
+  if (!E.marcas.tour) setTimeout(() => { try { Tour.iniciar(); } catch (e) {} }, 900);
+}
+
+/* ════════ 8c · EL RECORRIDO ════════
+   Un hueco sobre el elemento de verdad, no una captura: lo que se señala es
+   lo que está en pantalla, así que no se puede quedar desfasado del día que
+   sigue cambiando. La capa tapa los toques a propósito —el recorrido se
+   mira, no se usa— y termina igual si se completa o si se salta.        */
+const TOUR = {
+  sig: "Siguiente", saltar: "Saltar", listo: "Listo", de: "{i} de {n}",
+  pasos: [
+    { t: "Cauce en un minuto", x: "Lo esencial, en unos cuantos toques. Puedes saltarlo y repetirlo después desde Ajustes.", btn: "Empezar" },
+    { sel: ".port-meta", t: "Tu llama", x: "Una sola, y es la tuya. La alimentan tus propósitos: cuando las acciones están pasando, arde alto. Tócala para ver de dónde sale." },
+    { sel: ".resumen", t: "Cómo vas hoy", x: "Tres cuentas y nada más: la rutina, los pendientes y si hoy hubo algo por ti. Un tablero de seis cosas deja de leerse de un vistazo." },
+    { sel: ".caras-nav", t: "Tres listas, no una pared", x: "Rutina, pendientes y por ti. Se pasa con el dedo o tocando el nombre." },
+    { sel: '[data-cara="rutina"] .rt-c', alt: ".rt-c", t: "Tocar la tacha", x: "Un toque en el círculo y la actividad queda hecha. Otro toque la deshace." },
+    { sel: '[data-cara="rutina"] .rt-ch', alt: ".rt-ch", t: "Las partes", x: "Si una actividad tiene partes, el galón las abre aquí mismo. El orden es el peso: la primera pesa más, y con las de arriba ya cuenta." },
+    { sel: ".franja-ed", t: "Los bloques del día", x: "Tu rutina se reparte en cuatro tramos. Toca las horas para moverlos: el primero marca a qué hora empieza tu día." },
+    { sel: '[data-cara="rutina"] .agregar', alt: ".agregar", t: "Escribir una línea", x: "Se agrega al bloque donde estás, y aparece hoy mismo. Los días y la cadencia se ajustan después, en su ficha." },
+    { sel: "#cauce", t: "La línea del día", x: "A la izquierda, de arriba abajo: por dónde va el día y cuánto llevas hecho. Se mueve sola." },
+    { sel: ".tabbar", t: "Lo demás", x: "Semana es la cadencia y los propósitos. Hecho es lo que ya pasó. Sonido es el paisaje y el temporizador de enfoque." },
+    { sel: ".port-aj", t: "Ajustes", x: "Tu nombre, los bloques, los propósitos, sincronizar con otro dispositivo — y repetir este recorrido cuando quieras.", btn: "Listo" }
+  ]
+};
+
+const Tour = (() => {
+  let i = 0, pasos = [], raiz = null, foco = null, caja = null, onKey = null, onRes = null;
+  const quieto = () => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } };
+  /* Visible = existe, no está dentro de algo oculto y mide algo. Un paso que
+     señala la nada es peor que un paso de menos. */
+  const ver = sel => { if (!sel) return null; const el = document.querySelector(sel);
+    if (!el || el.closest(".oculto")) return null; const r = el.getBoundingClientRect();
+    return (r.width && r.height) ? el : null; };
+  const objetivo = p => ver(p.sel) || ver(p.alt);
+
+  function iniciar() {
+    if (raiz) return;
+    try { cerrarHoja(); } catch (e) {}
+    /* Siempre desde el inicio y con la cara de la rutina a la vista: varios
+       pasos señalan cosas que viven dentro de ella, y el carrusel no se
+       mueve solo. */
+    S.tab = "hoy"; S.cara = "rutina"; pintar(); caraIr("rutina", false);
+    pasos = TOUR.pasos.filter(p => !p.sel || objetivo(p)); i = 0;
+    raiz = document.createElement("div"); raiz.className = "tour";
+    raiz.innerHTML = '<div class="tour-foco sin"></div>' +
+      '<div class="tour-caja centro" role="dialog" aria-modal="true" aria-labelledby="tourT" aria-live="polite"></div>';
+    document.body.appendChild(raiz);
+    $("#appShell").setAttribute("inert", "");
+    document.documentElement.classList.add("con-tour");
+    foco = raiz.querySelector(".tour-foco"); caja = raiz.querySelector(".tour-caja");
+    onKey = e => { if (e.key === "Escape") fin(); else if (e.key === "ArrowRight") ir(1); else if (e.key === "ArrowLeft") ir(-1); };
+    onRes = () => { const el = pasos[i] && objetivo(pasos[i]); if (el) coloca(el); };
+    document.addEventListener("keydown", onKey); addEventListener("resize", onRes);
+    pinta(true);
+  }
+  function ir(d) { const n = i + d; if (n < 0) return; if (n >= pasos.length) return fin(); i = n; pinta(true); }
+  function pinta(desplazar) {
+    const p = pasos[i], ultimo = i === pasos.length - 1;
+    caja.innerHTML =
+      `<p class="tour-n">${esc(TOUR.de.replace("{i}", i + 1).replace("{n}", pasos.length))}</p>` +
+      `<h2 class="tour-t" id="tourT">${esc(p.t)}</h2><p class="tour-x">${esc(p.x)}</p>` +
+      `<div class="tour-acc">${ultimo ? "<span></span>" : `<button type="button" class="tour-saltar">${esc(TOUR.saltar)}</button>`}` +
+      `<button type="button" class="tour-sig">${esc(p.btn || (ultimo ? TOUR.listo : TOUR.sig))}</button></div>`;
+    caja.querySelector(".tour-sig").addEventListener("click", () => ir(1));
+    const sk = caja.querySelector(".tour-saltar"); if (sk) sk.addEventListener("click", fin);
+    setTimeout(() => { try { caja.querySelector(".tour-sig").focus({ preventScroll: true }); } catch (e) {} }, 60);
+    const el = p.sel ? objetivo(p) : null;
+    if (!el) {
+      /* Tarjeta al centro: hay que borrar TODO el estilo en línea del paso
+         anterior, o el `top` y el `left` que quedaron le ganan a la clase
+         y la tarjeta «centrada» sale donde estaba la de antes. */
+      foco.classList.add("sin"); ["top", "left", "width", "height"].forEach(k => { foco.style[k] = ""; });
+      caja.classList.add("centro"); caja.style.top = caja.style.left = caja.style.width = ""; return;
+    }
+    foco.classList.remove("sin");
+    if (desplazar) {
+      try { el.scrollIntoView({ block: "center", behavior: quieto() ? "auto" : "smooth" }); } catch (e) {}
+      setTimeout(() => { if (raiz) coloca(el); }, quieto() ? 30 : 420);   /* medir después del desplazamiento */
+    } else coloca(el);
+  }
+  function coloca(el) {
+    const r = el.getBoundingClientRect(), m = 8, vw = innerWidth, vh = innerHeight;
+    Object.assign(foco.style, { top: r.top - m + "px", left: r.left - m + "px",
+      width: r.width + 2 * m + "px", height: r.height + 2 * m + "px" });
+    caja.classList.remove("centro");
+    const cw = Math.min(340, vw - 32); caja.style.width = cw + "px";
+    const ch = caja.offsetHeight;
+    let y = r.bottom + m + 14;                      /* debajo del objetivo */
+    if (y + ch > vh - 16) y = r.top - m - 14 - ch;  /* si no cabe, encima */
+    if (y < 16) y = Math.max(16, (vh - ch) / 2);    /* si tampoco, al centro */
+    const x = Math.max(16, Math.min(r.left + r.width / 2 - cw / 2, vw - cw - 16));
+    caja.style.top = y + "px"; caja.style.left = x + "px";
+  }
+  function fin() {
+    if (E && E.marcas) { E.marcas.tour = true; guardar(); }   /* terminar o saltar: visto */
+    document.removeEventListener("keydown", onKey); removeEventListener("resize", onRes);
+    if (raiz) raiz.remove();
+    raiz = null; foco = null; caja = null;
+    $("#appShell").removeAttribute("inert");
+    document.documentElement.classList.remove("con-tour");
+    try { $("#lienzo").scrollTo({ top: 0, behavior: quieto() ? "auto" : "smooth" }); } catch (e) {}
+  }
+  return { iniciar, fin, activo: () => !!raiz, pasos: () => pasos.map(p => p.t), en: () => i };
+})();
 
 /* ════════ 9 · MANEJADORES ════════ */
 /* El guardado espera 200 ms para no escribir en cada tecla. En el teléfono
@@ -2711,16 +3098,21 @@ const ACC = {
   "cn-quitar": () => { cambiar(() => { delete diaMut(hoyISO()).frase; }); cerrarHoja(); },
   "ver-llama": () => hojaLlama(),
   "franjas": () => { tomarAjustes(); hojaFranjas(); },
+  "onb-sig": (d) => onbSig(d && d.saltar),
+  "onb-atras": () => onbAtras(),
+  "onb-saltar": () => terminarOnb(),
+  "onb-vacio": (d, b) => { Onb.vacio = d.v === "si";
+    Array.from(b.parentNode.children).forEach(c => { const on = c === b;
+      c.classList.toggle("on", on); c.setAttribute("aria-pressed", on); }); },
+  /* Repetir la bienvenida desde Ajustes no es una instalación nueva: no se
+     ofrece empezar en blanco, y nada de lo capturado se toca. */
+  "onb": () => { cerrarHoja(); abrirOnb(false, 0); },
+  "tour": () => { cerrarHoja(); setTimeout(() => { try { Tour.iniciar(); } catch (e) {} }, 240); },
   "guardar-franjas": () => {
-    const n = FRANJAS_DEF.length, v = [], nom = [];
-    for (let i = 0; i < n; i++) {
-      const s = document.getElementById("frH" + i), t = document.getElementById("frNom" + i);
-      if (!s) return;
-      v.push(+s.value); nom.push((t ? t.value : "").trim().slice(0, 18) || FRANJAS_DEF[i].nombre);
-    }
-    for (let i = 1; i < n; i++) if (v[i] <= v[i - 1]) { nota("Cada bloque empieza después del anterior."); return; }
-    const antes = inicioDia();
-    cambiar(() => { E.ajustes.franjas = FRANJAS_DEF.map((d, i) => ({ id: d.id, nombre: nom[i], desde: v[i] })); });
+    const r = leerFranjas();
+    if (!r) { nota("Cada bloque empieza después del anterior."); return; }
+    const antes = inicioDia(), v = r.map(x => x.desde);
+    cambiar(() => { E.ajustes.franjas = FRANJAS_DEF.map((d, i) => ({ id: d.id, nombre: r[i].nombre, desde: v[i] })); });
     cerrarHoja();
     /* Mover la hora de arranque mueve también cuándo la lista pasa al día
        siguiente. Si eso acaba de cambiar qué día es AHORA, se dice: ver la
@@ -3980,7 +4372,10 @@ function semilla() {
     /* La lista de «por ti» se siembra aquí, no en normalizar: así vaciarla a
        propósito la deja vacía en vez de hacerla renacer en cada recarga. */
     porti: POR_TI.map((t, i) => ({ id: uid(), texto: t, orden: (i + 1) * 10 })),
-    dias: {}, marcas: { onboarding: true, ultimoDia: null, tocado: false }
+    /* Lo único que la semilla deja sin ver: la bienvenida. Es la señal de
+       que esto es una instalación nueva —nadie ha abierto la app todavía—
+       y es lo que `arrancar()` lee para enseñarla. */
+    dias: {}, marcas: { onboarding: false, tour: false, ultimoDia: null, tocado: false }
   });
 }
 
@@ -3996,6 +4391,10 @@ try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock
    siguiente muestra la lista de ayer, ya tachada. */
 function revisarDia() {
   if (!E) return;
+  /* Mientras la bienvenida o el recorrido están abiertos no se repinta ni
+     se abre el pase: repintar deja el hueco del recorrido señalando un nodo
+     que ya no existe, y una capa encima de otra no se puede cerrar. */
+  if (Onb.abierto || Tour.activo()) return;
   const f = hoyISO();
   if (E.marcas.ultimoDia !== f) { E.marcas.ultimoDia = f; guardarYa(); pintar(); }
   /* El pase se abre mientras quede algo que pasar y no se haya resuelto, no
@@ -4029,6 +4428,12 @@ async function arrancar() {
      día: nada se archivaba y «pases» no avanzaba, que es justo la señal
      sobre la que descansa el resto. */
   if (E.marcas.ultimoDia !== f) { E.marcas.ultimoDia = f; guardar(); }
+  /* La bienvenida va primero y sola. Si toca, el pase diario no se abre ese
+     día: una capa de pantalla completa encima de otra deja a quien abre la
+     app por primera vez contestando preguntas sobre una lista que todavía
+     no ha visto. Además, en una instalación nueva no hay nada que pasar.
+     Se reanuda donde se quedó, por si la app se cerró a la mitad. */
+  if (!E.marcas.onboarding) { abrirOnb(true, E.marcas.onbIdx || 0); return Sync.cargar(); }
   if (!diaDe(f).pase && Rg.paraPase(f).length) abrirPase();
   /* Lo del otro dispositivo llega después de pintar: la app abre al instante
      aunque la red esté lenta o no haya. */
