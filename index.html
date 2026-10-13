@@ -4285,11 +4285,22 @@ function fusionar(base, local, remoto) {
 
 const Sync = {
   CLAVE_CFG: "cauce:gh", CLAVE_BASE: "cauce:base:v8", ARCHIVO: "cauce.json",
+  /* Chocar al escribir se trata aparte de los demás errores: no hay nada
+     roto, solo otro dispositivo que llegó primero. Cuatro intentos bastan:
+     con tres o cuatro aparatos abiertos las escrituras son de milisegundos
+     y las esperas suman unos diecisiete segundos. Si después de eso sigue
+     chocando, es que pasa otra cosa y conviene decirlo. */
+  /* El reintento lleva su propio temporizador. Con el de `pendiente()` no
+     servía de nada: guardar es un antirrebote de 200 ms, así que el guardado
+     que seguía al choque reprogramaba el mismo temporizador y empujaba el
+     reintento de un segundo a seis. */
+  CHOQUE: "el otro dispositivo escribió primero", REINTENTOS: 4, reintento: 0, tR: null,
   cfg: null, estado: "apagado", cuando: null, t: null, yendo: false,
 
   cargar() { try { Sync.cfg = JSON.parse(localStorage.getItem(Sync.CLAVE_CFG) || "null"); } catch (e) { Sync.cfg = null; } return Sync.cfg; },
   poner(c) { Sync.cfg = c; try { localStorage.setItem(Sync.CLAVE_CFG, JSON.stringify(c)); } catch (e) {} },
-  olvidar() { Sync.cfg = null; Sync.estado = "apagado";
+  olvidar() { Sync.cfg = null; Sync.estado = "apagado"; Sync.reintento = 0;
+    clearTimeout(Sync.t); clearTimeout(Sync.tR);
     try { localStorage.removeItem(Sync.CLAVE_CFG); localStorage.removeItem(Sync.CLAVE_BASE); } catch (e) {} },
   activo: () => !!(Sync.cfg && Sync.cfg.token),
   base() { try { return JSON.parse(localStorage.getItem(Sync.CLAVE_BASE) || "null"); } catch (e) { return null; } },
@@ -4314,6 +4325,9 @@ const Sync = {
 
   async ciclo(callado) {
     if (!Sync.activo() || Sync.yendo) return;
+    /* Cualquier ciclo deja sin efecto un reintento pendiente: va a hacer lo
+       mismo que iba a hacer él, y si vuelve a chocar pondrá uno nuevo. */
+    clearTimeout(Sync.tR);
     Sync.yendo = true; Sync.estado = "sincronizando"; Sync.repinta();
     try {
       if (Sync.cfg.gist) {
@@ -4353,9 +4367,23 @@ const Sync = {
         }
       }
       await Sync.subir();
-      Sync.estado = "al día"; Sync.cuando = Date.now();
+      Sync.estado = "al día"; Sync.cuando = Date.now(); Sync.reintento = 0;
     } catch (err) {
-      Sync.estado = "sin sincronizar · " + err.message;
+      /* Chocar al escribir no es una falla: es dos dispositivos subiendo a
+         la vez, y abortar es justo lo que evita que uno pise al otro. Lo
+         que sí era una falla es quedarse ahí. Se reintenta solo.
+         La espera crece y lleva algo de azar: si dos abortaran y los dos
+         reintentaran exactamente al mismo tiempo, volverían a chocar, y a
+         la misma hora, indefinidamente. */
+      if (err && err.message === Sync.CHOQUE && Sync.reintento < Sync.REINTENTOS) {
+        Sync.reintento++;
+        const espera = Math.round(700 * Math.pow(2, Sync.reintento - 1) * (1 + Math.random() * 0.6));
+        Sync.estado = "reintentando";
+        Sync.tR = setTimeout(() => Sync.ciclo(true), espera);
+      } else {
+        Sync.estado = "sin sincronizar · " + err.message;
+        Sync.reintento = 0;
+      }
     }
     Sync.yendo = false; Sync.repinta();
   },
@@ -4376,7 +4404,7 @@ const Sync = {
       const g = await Sync.api("/gists/" + Sync.cfg.gist);
       if (Sync.visto && g && g.updated_at && g.updated_at !== Sync.visto) {
         Sync.visto = g.updated_at;
-        throw new Error("el otro dispositivo escribió primero");
+        throw new Error(Sync.CHOQUE);
       }
       const r = await Sync.api("/gists/" + Sync.cfg.gist, { method: "PATCH",
         body: JSON.stringify({ files: { [Sync.ARCHIVO]: { content: contenido } } }) });
@@ -4392,6 +4420,9 @@ const Sync = {
   repinta() { const el = document.getElementById("syncEstado"); if (el) el.textContent = Sync.linea(); },
   linea() {
     if (!Sync.activo()) return "No está conectado. Este dispositivo guarda solo lo suyo.";
+    /* «Reintentando» a secas se lee como un error. No lo es: se dice qué
+       pasó y que se está resolviendo solo. */
+    if (Sync.estado === "reintentando") return "Otro dispositivo escribió primero. Reintentando…";
     if (Sync.estado === "al día" && Sync.cuando) {
       const m = Math.round((Date.now() - Sync.cuando) / 60000);
       return "Al día · " + (m < 1 ? "hace un momento" : m < 60 ? "hace " + m + " min" : "hace " + Math.round(m / 60) + " h");
