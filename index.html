@@ -292,34 +292,65 @@ html[data-modo="oscuro"] .cad-d .d.on{color:#1a1612}
    La misma capa del pase, con una barra arriba: atrás, los puntos de
    avance y «saltar por ahora». La barra no se va con el desplazamiento,
    así que el contenido es el que rueda y no la capa entera. */
-.onb.onb-guia{overflow:hidden;padding-top:calc(env(safe-area-inset-top) + 12px)}
-.onb.onb-guia #flujoCont{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  display:flex;flex-direction:column;padding-bottom:10px}
-.onb.onb-guia .paso-acc{margin-top:auto;padding-top:26px;display:flex;align-items:center;gap:12px}
-.onb-top{flex:0 0 auto;display:flex;align-items:center;gap:12px;margin:0 0 20px;min-height:40px}
-.onb-back{flex:0 0 auto;width:40px;height:40px;margin-left:-10px;display:grid;place-items:center;
-  color:var(--tinta-baja);border-radius:50%}
+.onb.onb-guia{overflow:hidden;padding:calc(env(safe-area-inset-top) + 16px) 22px calc(env(safe-area-inset-bottom) + 10px)}
+.onb.onb-guia #flujoCont{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column}
+/* El cuerpo se centra en lo que sobra, pero no se encoge: si la pantalla
+   trae mucho, crece y se desplaza en vez de recortarse por arriba. */
+.onb-cuerpo{flex:1 0 auto;display:flex;flex-direction:column;justify-content:center;padding:18px 0}
+.onb.onb-guia .paso-acc{margin:30px 0 0;display:flex;flex-direction:column;align-items:stretch;gap:2px}
+/* Oscuro y de ancho completo: el color de la llama es de la llama. Los dos
+   tonos se invierten solos con el tema, así que en oscuro queda claro. */
+.onb.onb-guia .accion.llena{background:var(--tinta);color:var(--noche);font-weight:600;
+  font-size:16px;padding:19px;border-radius:15px}
+.onb-luego{align-self:center;font-size:13.5px;color:var(--tinta-baja);min-height:44px;padding:0 10px;text-align:center}
+
+.onb-top{flex:0 0 auto;position:relative;display:flex;align-items:center;justify-content:center;min-height:30px}
+.onb-back{position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:40px;height:40px;
+  display:grid;place-items:center;color:var(--tinta-baja);border-radius:50%}
 .onb-back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.onb-dots{flex:1;display:flex;align-items:center;gap:6px}
-.onb-dot{width:6px;height:6px;border-radius:50%;background:var(--linea-fuerte);transition:background .25s ease,width .25s ease}
+.onb-dots{display:flex;align-items:center;gap:7px}
+.onb-dot{width:7px;height:7px;border-radius:50%;background:var(--linea-fuerte);transition:background .25s ease}
 .onb-dot.on{background:var(--llama)}
-.onb-dot.on:last-of-type,.onb-dots .onb-dot.on + .onb-dot:not(.on){}
-.onb-x{flex:0 0 auto;font-size:13px;color:var(--tinta-baja);min-height:40px;padding:0 4px}
+.onb-marca{flex:0 0 auto;display:grid;place-items:center;padding:14px 0 0}
+.onb-marca .flama-v{width:40px;height:44px}
+.onb-marca svg{fill:var(--llama);stroke:none}
+.onb-pie{flex:0 0 auto;display:grid;place-items:center;padding:4px 0 6px}
+.onb-x{font-size:14px;color:var(--tinta-baja);min-height:44px;padding:0 14px}
+
+/* La pregunta, grande y en serif: es lo único que la pantalla pide. */
+.onb-cuerpo .paso-t{font-size:clamp(28px,8.4vw,36px);line-height:1.14;letter-spacing:-.012em;margin:0 0 10px}
+.onb-cuerpo .paso-s{font-size:15px;margin:0 0 26px}
+/* Campos de contorno, no de relleno: la pregunta ya es grande y en serif,
+   y un bloque beige debajo le quita el aire que la hace legible. El foco
+   se marca con el mismo contorno en color de llama —no con un segundo
+   anillo por fuera, que con el borde del campo se veía doble. */
+.onb-cuerpo .campo-et{margin-bottom:7px}
+.onb-cuerpo .campo-i{padding:17px 16px;border-radius:14px;font-size:16px;
+  background:none;border:1.5px solid var(--linea-fuerte)}
+.onb-cuerpo .campo-i:focus-visible,.onb-cuerpo .campo-i:focus{outline:none;border-color:var(--llama)}
+.onb-cuerpo .campo-i::placeholder{color:var(--tinta-tenue)}
+.onb-cuerpo select.campo-i{border-color:var(--linea-fuerte)}
+.onb-cuerpo .campo-ayuda{margin:12px 0 0}
+.onb-campos{display:flex;flex-direction:column;gap:11px}
+
 .onb-l{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:11px}
 .onb-l li{position:relative;padding-left:17px;font-size:15px;line-height:1.5;color:var(--tinta-baja)}
 .onb-l li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--cera)}
 .onb-l b{font-weight:600;color:var(--tinta)}
 .onb-priv{font-size:12.5px;line-height:1.55;color:var(--tinta-tenue);margin:0;
   padding:13px 14px;border-radius:12px;background:var(--panel)}
-.onb-ops{display:flex;flex-direction:column;gap:10px;margin:0 0 16px}
-.onb-op{display:flex;flex-direction:column;gap:3px;text-align:left;padding:15px;border-radius:13px;
-  background:var(--panel);border:1.5px solid transparent;transition:border-color .18s ease,background .18s ease}
-.onb-op.on{border-color:var(--cera);background:color-mix(in srgb,var(--llama) 9%,var(--panel))}
-.onb-op-t{font-size:16px;color:var(--tinta)}
-.onb-op-s{font-size:13px;line-height:1.45;color:var(--tinta-baja)}
-.onb-acc{justify-content:space-between}
-.onb-acc .accion.llena{flex:1}
+.onb-ops{display:flex;flex-direction:column;gap:11px;margin:0 0 4px}
+.onb-op{display:flex;flex-direction:column;gap:4px;text-align:left;padding:18px 17px;border-radius:15px;
+  border:1.5px solid var(--linea-fuerte);transition:border-color .18s ease,background .18s ease}
+.onb-op.on{border-color:var(--llama);background:color-mix(in srgb,var(--llama) 11%,transparent)}
+.onb-op-t{font-size:16.5px;color:var(--tinta)}
+.onb-op-s{font-size:13.5px;line-height:1.45;color:var(--tinta-baja)}
 .onb.onb-guia .fr-filas{margin-bottom:0}
+.onb.onb-guia .chips{gap:10px}
+.onb.onb-guia .chip{flex:1;padding:16px 10px;border-radius:14px;font-size:15.5px;text-align:center;
+  border:1.5px solid var(--linea-fuerte);background:none}
+.onb.onb-guia .chip.on{border-color:var(--llama);background:color-mix(in srgb,var(--llama) 11%,transparent);color:var(--tinta)}
 
 /* ── El recorrido ──
    Encima de las hojas (41) y de la pantalla de enfoque (96), debajo del
@@ -2626,9 +2657,13 @@ function onbSecuencia() {
 const chipsTema = () => `<div class="chips">${[["sistema", "Sistema"], ["claro", "Claro"], ["oscuro", "Oscuro"]].map(t =>
   `<button class="chip${E.ajustes.tema === t[0] ? " on" : ""}" data-accion="tema" data-v="${t[0]}">${t[1]}</button>`).join("")}</div>`;
 
+/* El botón de avanzar ocupa el ancho entero y es oscuro —no del color de la
+   llama— para que la llama siga siendo una sola cosa en la pantalla: la de
+   arriba. Debajo, y solo cuando la pregunta es opcional, la salida chica. */
 const onbAcc = (sig, saltar) => `<div class="paso-acc onb-acc">` +
-  (saltar ? `<button class="accion leve" data-accion="onb-sig" data-saltar="1">Después lo afino</button>` : `<span></span>`) +
-  `<button class="accion llena fr-guarda" data-accion="onb-sig">${esc(sig)}</button></div>`;
+  `<button class="accion llena fr-guarda" data-accion="onb-sig">${esc(sig)}</button>` +
+  (saltar ? `<button class="onb-luego" data-accion="onb-sig" data-saltar="1">Después lo afino</button>` : "") +
+  `</div>`;
 
 function onbPantalla(tipo) {
   if (tipo === "bienvenida") return {
@@ -2638,14 +2673,16 @@ function onbPantalla(tipo) {
       `<li>Los <b>pendientes</b> sueltos, en tres niveles.</li>` +
       `<li>Algo <b>por ti</b>, que no te exige nadie.</li></ul>` +
       `<p class="onb-priv">Todo se queda en este dispositivo. No hay cuenta ni servidor. Si después lo quieres también en otro, se sincroniza con un archivo privado de tu propia cuenta de GitHub.</p>` +
-      `<div class="paso-acc"><button class="accion llena" data-accion="onb-sig">Empezar</button></div>`
+      onbAcc("Empezar")
   };
 
   if (tipo === "nombre") return {
     html: `<h1 class="paso-t">¿Cómo te llamas?</h1>` +
       `<p class="paso-s">Aparece en el saludo al abrir la app. Nada más, y no sale de aquí.</p>` +
-      `<label class="campo"><span class="campo-et">Tu nombre</span>` +
-      `<input id="onbNom" class="campo-i" type="text" value="${esc(E.ajustes.nombre || "")}" placeholder="Como te llame la gente" autocomplete="off"></label>` +
+      /* Sin etiqueta encima: la pregunta grande ya dice qué va aquí, y
+         ponerlo dos veces solo mete ruido entre la pregunta y el campo. */
+      `<input id="onbNom" class="campo-i" type="text" value="${esc(E.ajustes.nombre || "")}" ` +
+      `placeholder="Tu nombre" autocomplete="off" aria-label="Tu nombre">` +
       `<p class="campo-ayuda">Puedes cambiarlo después, en Ajustes.</p>` + onbAcc("Siguiente", true),
     wire() { const e = document.getElementById("onbNom"); if (e) setTimeout(() => { try { e.focus(); } catch (x) {} }, 120); },
     tomar(saltar) { if (saltar) return; const e = document.getElementById("onbNom"); if (e) E.ajustes.nombre = e.value.trim(); }
@@ -2654,8 +2691,8 @@ function onbPantalla(tipo) {
   if (tipo === "paraque") return {
     html: `<h1 class="paso-t">¿Para qué?</h1>` +
       `<p class="paso-s">Una frase para releer los días en que no quieres. No es una meta ni una tarea: es lo que tu llama representa.</p>` +
-      `<label class="campo"><span class="campo-et">Tu para qué</span>` +
-      `<textarea id="onbProp" class="campo-i campo-area" rows="3" placeholder="Escríbelo como te salga.">${esc(E.ajustes.proposito || "")}</textarea></label>` +
+      `<textarea id="onbProp" class="campo-i campo-area" rows="3" aria-label="Tu para qué" ` +
+      `placeholder="Escríbelo como te salga.">${esc(E.ajustes.proposito || "")}</textarea>` +
       `<p class="campo-ayuda">Puedes dejarlo en blanco y escribirlo cuando aparezca solo. Vive en Ajustes.</p>` +
       onbAcc("Siguiente", true),
     tomar(saltar) { if (saltar) return; const e = document.getElementById("onbProp"); if (e) E.ajustes.proposito = e.value.trim(); }
@@ -2676,8 +2713,9 @@ function onbPantalla(tipo) {
   if (tipo === "propositos") return {
     html: `<h1 class="paso-t">¿Qué quieres que avance?</h1>` +
       `<p class="paso-s">Un propósito es un para qué, no una tarea: salud, oficio, casa, lo tuyo. Cada uno tiene su flama, y todos juntos alimentan la tuya.</p>` +
-      [0, 1, 2].map(i => `<label class="campo"><span class="campo-et">${i === 0 ? "El primero" : i === 1 ? "Otro" : "Y otro"}</span>` +
-        `<input id="onbProp${i}" class="campo-i" type="text" value="" placeholder="${["Salud", "Oficio", "Casa"][i]}" autocomplete="off"></label>`).join("") +
+      `<div class="onb-campos">` + [0, 1, 2].map(i =>
+        `<input id="onbProp${i}" class="campo-i" type="text" value="" placeholder="${["Salud", "Oficio", "Casa"][i]}" ` +
+        `autocomplete="off" aria-label="Propósito ${i + 1}">`).join("") + `</div>` +
       `<p class="campo-ayuda">Con uno basta para empezar. Se agregan y se quitan cuando quieras.</p>` +
       onbAcc("Siguiente", true),
     wire() { const e = document.getElementById("onbProp0"); if (e) setTimeout(() => { try { e.focus(); } catch (x) {} }, 120); },
@@ -2709,7 +2747,7 @@ function onbPantalla(tipo) {
       `<p class="paso-s">Se aplica mientras eliges. Por defecto sigue a tu teléfono.</p>` +
       chipsTema() +
       `<p class="campo-ayuda">Al terminar te enseño la app en un minuto. Puedes repetir el recorrido cuando quieras, desde Ajustes.</p>` +
-      `<div class="paso-acc"><button class="accion llena" data-accion="onb-sig">Entrar a Cauce</button></div>`
+      onbAcc("Entrar a Cauce")
   };
 
   return { html: `<h1 class="paso-t">…</h1>` + onbAcc("Siguiente") };
@@ -2718,14 +2756,20 @@ function onbPantalla(tipo) {
 function onbRender() {
   const p = onbPantalla(Onb.seq[Onb.i]);
   const barra = $("#onbTop");
+  /* Arriba: los puntos al centro y la flecha de atrás flotando a la
+     izquierda. Centrados y no en una esquina, porque el avance es lo único
+     que la barra tiene que decir. */
   if (barra) barra.innerHTML =
     `<button class="onb-back${Onb.i === 0 ? " oculto" : ""}" data-accion="onb-atras" aria-label="Atrás">` +
       `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>` +
     `<span class="onb-dots" role="status" aria-label="Pantalla ${Onb.i + 1} de ${Onb.seq.length}">` +
-      Onb.seq.map((_, k) => `<i class="onb-dot${k <= Onb.i ? " on" : ""}"></i>`).join("") + `</span>` +
-    `<button class="onb-x" data-accion="onb-saltar">Saltar por ahora</button>`;
+      Onb.seq.map((_, k) => `<i class="onb-dot${k <= Onb.i ? " on" : ""}"></i>`).join("") + `</span>`;
   const cont = $("#flujoCont");
-  cont.innerHTML = p.html;
+  /* La flama preside todas las pantallas: es la marca de la app y lo que
+     todo esto va a alimentar. Se dibuja aquí y no en cada pantalla, para
+     que sea la misma en todas sin repetirla seis veces. */
+  cont.innerHTML = `<div class="onb-marca">${flamaSVG(100, "onb-f")}</div>` +
+    `<div class="onb-cuerpo">` + p.html + `</div>`;
   cont.scrollTop = 0;
   if (p.wire) p.wire();
   Onb.pantalla = p;
@@ -2755,6 +2799,11 @@ function abrirOnb(nuevo, desde) {
   const fl = $("#flujo");
   fl.classList.remove("oculto"); fl.classList.add("onb-guia");
   if (!$("#onbTop")) { const b = document.createElement("div"); b.className = "onb-top"; b.id = "onbTop"; fl.insertBefore(b, $("#flujoCont")); }
+  /* «Saltar por ahora» vive al pie de la capa, no dentro de la pantalla:
+     no es una respuesta a la pregunta de arriba, es salirse de todo. */
+  if (!$("#onbPie")) { const p = document.createElement("div"); p.className = "onb-pie"; p.id = "onbPie";
+    p.innerHTML = `<button class="onb-x" data-accion="onb-saltar">Saltar por ahora</button>`;
+    fl.appendChild(p); }
   $("#appShell").setAttribute("inert", "");
   onbRender();
 }
@@ -2780,6 +2829,7 @@ function terminarOnb() {
   const fl = $("#flujo");
   fl.classList.add("oculto"); fl.classList.remove("onb-guia");
   const b = $("#onbTop"); if (b) b.remove();
+  const pie = $("#onbPie"); if (pie) pie.remove();
   $("#appShell").removeAttribute("inert");
   S.tab = "hoy"; S.cara = "rutina"; pintar();
   /* El recorrido arranca solo al terminar la bienvenida, y solo si no se ha
@@ -2799,14 +2849,18 @@ const TOUR = {
   pasos: [
     { t: "Cauce en un minuto", x: "Lo esencial, en unos cuantos toques. Puedes saltarlo y repetirlo después desde Ajustes.", btn: "Empezar" },
     { sel: ".port-meta", t: "Tu llama", x: "Una sola, y es la tuya. La alimentan tus propósitos: cuando las acciones están pasando, arde alto. Tócala para ver de dónde sale." },
-    { sel: ".resumen", t: "Cómo vas hoy", x: "Tres cuentas y nada más: la rutina, los pendientes y si hoy hubo algo por ti. Un tablero de seis cosas deja de leerse de un vistazo." },
-    { sel: ".caras-nav", t: "Tres listas, no una pared", x: "Rutina, pendientes y por ti. Se pasa con el dedo o tocando el nombre." },
+    { sel: ".caras-nav", t: "Tres listas, no una pared", x: "Rutina, pendientes y por ti. Se pasa con el dedo o tocando el nombre. Arriba, el resumen: tres cuentas y nada más." },
     { sel: '[data-cara="rutina"] .rt-c', alt: ".rt-c", t: "Tocar la tacha", x: "Un toque en el círculo y la actividad queda hecha. Otro toque la deshace." },
     { sel: '[data-cara="rutina"] .rt-ch', alt: ".rt-ch", t: "Las partes", x: "Si una actividad tiene partes, el galón las abre aquí mismo. El orden es el peso: la primera pesa más, y con las de arriba ya cuenta." },
     { sel: ".franja-ed", t: "Los bloques del día", x: "Tu rutina se reparte en cuatro tramos. Toca las horas para moverlos: el primero marca a qué hora empieza tu día." },
     { sel: '[data-cara="rutina"] .agregar', alt: ".agregar", t: "Escribir una línea", x: "Se agrega al bloque donde estás, y aparece hoy mismo. Los días y la cadencia se ajustan después, en su ficha." },
-    { sel: "#cauce", t: "La línea del día", x: "A la izquierda, de arriba abajo: por dónde va el día y cuánto llevas hecho. Se mueve sola." },
-    { sel: ".tabbar", t: "Lo demás", x: "Semana es la cadencia y los propósitos. Hecho es lo que ya pasó. Sonido es el paisaje y el temporizador de enfoque." },
+    /* A partir de aquí el recorrido mueve el carrusel. Señalar una cara que
+       está fuera de la pantalla sería apuntar a la nada, así que cada paso
+       dice en cuál vive y el carrusel se va ahí antes de medir. */
+    { cara: "pend", sel: '[data-cara="pend"] .niv1', alt: '[data-cara="pend"] .niv', t: "Los pendientes", x: "Lo que pasa una vez. Tres niveles: lo que sí o sí hoy, lo que puede esperar, y lo que si da tiempo." },
+    { cara: "pend", sel: '[data-cara="pend"] .it-n', alt: ".it-n", t: "Cambiar de prioridad", x: "Toca el número y cicla 1 → 2 → 3. Las flechas de al lado lo mueven de lugar y, desde el borde, lo pasan al nivel vecino." },
+    { cara: "porti", sel: '[data-cara="porti"] .pt', alt: '[data-cara="porti"] .porti-l', t: "Algo por ti", x: "No se cuenta ni se compara: solo si hubo o no hubo. Lo que ya hiciste esta semana se queda en tenue, para ver lo que llevas sin tocar." },
+    { cara: "rutina", sel: ".tabbar", t: "Lo demás", x: "Semana es la cadencia y los propósitos. Hecho es lo que ya pasó. Sonido es el paisaje y el temporizador de enfoque." },
     { sel: ".port-aj", t: "Ajustes", x: "Tu nombre, los bloques, los propósitos, sincronizar con otro dispositivo — y repetir este recorrido cuando quieras.", btn: "Listo" }
   ]
 };
@@ -2861,9 +2915,22 @@ const Tour = (() => {
       caja.classList.add("centro"); caja.style.top = caja.style.left = caja.style.width = ""; return;
     }
     foco.classList.remove("sin");
+    /* Si el paso vive en otra cara, el carrusel se va ahí primero. Las tres
+       están en el DOM a la vez, así que el elemento se encuentra igual;
+       lo que cambia es dónde está, y medirlo antes de que el carrusel
+       termine de correr deja el hueco a un lado de la pantalla. */
+    const c = $("#caras");
+    const cambia = !!(p.cara && c && caraVista(c) !== p.cara);
+    if (cambia) { marcarCara(p.cara); caraIr(p.cara, !quieto()); }
     if (desplazar) {
-      try { el.scrollIntoView({ block: "center", behavior: quieto() ? "auto" : "smooth" }); } catch (e) {}
-      setTimeout(() => { if (raiz) coloca(el); }, quieto() ? 30 : 420);   /* medir después del desplazamiento */
+      /* Tres tiempos: primero corre el carrusel, luego el desplazamiento
+         vertical, y hasta el final se mide. `inline: nearest` para que el
+         acomodo vertical no vuelva a mover el carrusel de lado. */
+      const t1 = cambia ? (quieto() ? 20 : 360) : 0;
+      const t2 = t1 + (quieto() ? 30 : 420);
+      setTimeout(() => { if (!raiz) return;
+        try { el.scrollIntoView({ block: "center", inline: "nearest", behavior: quieto() ? "auto" : "smooth" }); } catch (e) {} }, t1);
+      setTimeout(() => { if (raiz) coloca(el); }, t2);
     } else coloca(el);
   }
   function coloca(el) {
