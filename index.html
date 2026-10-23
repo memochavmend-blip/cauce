@@ -1453,6 +1453,28 @@ function normalizar(e) {
     if (typeof r.orden !== "number") r.orden = horaEnMin(r.hora);
     if (typeof r.semanal !== "number") r.semanal = 0; if (![1, 2, 3].includes(r.nivel)) r.nivel = 2;
     if (typeof r.hora !== "string") r.hora = ""; if (r.meta && !e.metas.some(m => m.id === r.meta)) r.meta = null; });
+  /* ── Las partes editadas antes del arreglo ──
+     Mientras las partes se guardaban solo en el día, lo editado quedó en el
+     día en que se hizo. Una sola vez se recupera: de cada rutina, la versión
+     del día más reciente cuyas partes no coinciden con las de la rutina.
+     Después ya no hace falta —la rutina es la que manda— y repetirlo
+     revivía lo que se hubiera quitado después. Una rutina con `partesEl`
+     ya se editó con el arreglo, quizá en el otro dispositivo: esa no se
+     toca, aunque este se actualice después. A las demás no se les agrega
+     ningún campo si no cambian: un campo nuevo en todas haría que, al
+     sincronizar, cada rutina pareciera editada aquí y ganara sobre lo de
+     allá. */
+  if (!e.marcas.partes) {
+    const diasDesc = Object.keys(e.dias).sort().reverse();
+    e.rutinas.forEach(r => {
+      if (r.partesEl) return;
+      const plantilla = JSON.stringify(r.pasos);
+      const k = diasDesc.find(f => { const s = ((e.dias[f] || {}).sub || {})[r.id];
+        return Array.isArray(s) && JSON.stringify(s.map(x => x && x.t)) !== plantilla; });
+      if (k) { r.pasos = e.dias[k].sub[r.id].map(x => String((x && x.t) || "").trim()).filter(Boolean); r.partesEl = k; }
+    });
+    e.marcas.partes = true;
+  }
   e.sueltos.forEach((s, i) => { s.tipo = "suelto"; if (![1, 2, 3].includes(s.nivel)) s.nivel = 2;
     if (typeof s.orden !== "number") s.orden = i;
     if (typeof s.pases !== "number") s.pases = 0; if (typeof s.hora !== "string") s.hora = "";
@@ -1747,14 +1769,24 @@ const A = {
     if (e.lista) d.hechas[r.id] = true; else delete d.hechas[r.id];
     return { antes, ahora: e.lista, e };
   },
+  /* ── Las partes son de la rutina; las marcas, del día ──
+     Agregar, quitar o reordenar una parte cambia la rutina: mañana amanece
+     igual, sin marcar. Antes el cambio se guardaba solo en el día en que se
+     hacía y la rutina conservaba sus partes originales, así que al día
+     siguiente volvían las de siempre. Los días ya vividos guardan su propia
+     copia, con sus marcas, y no se tocan. `partesEl` dice cuándo se
+     editaron por última vez: viaja con la rutina al sincronizar. */
+  fijarPartes(r, d, f) { r.pasos = (d.sub[r.id] || []).map(x => x.t); r.partesEl = f; },
   nuevaSub(r, texto, f) {
     const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
     sub.push({ t: texto, h: false });
+    A.fijarPartes(r, d, f);
     if (!Rg.estadoSub(r, d).lista) delete d.hechas[r.id];
   },
   quitarSub(r, i, f) {
     const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
     sub.splice(i, 1);
+    A.fijarPartes(r, d, f);
     const e = Rg.estadoSub(r, d);
     if (sub.length && e.lista) d.hechas[r.id] = true; else delete d.hechas[r.id];
   },
@@ -1795,6 +1827,7 @@ const A = {
     const d = diaMut(f), sub = (d.sub[r.id] = Rg.sub(r, d).map(x => ({ t: x.t, h: x.h })));
     const j = i + paso; if (!sub[i] || !sub[j]) return false;
     const t = sub[i]; sub[i] = sub[j]; sub[j] = t;
+    A.fijarPartes(r, d, f);
     if (Rg.estadoSub(r, d).lista) d.hechas[r.id] = true; else delete d.hechas[r.id];
     return true;
   },
@@ -2105,7 +2138,7 @@ function filaRutina(x, f) {
         `<button class="mover x" data-accion="quitar-sub" data-id="${x.id}" data-i="${i}" aria-label="Quitar ${esc(y.t)}">✕</button>` +
       `</span></li>`).join("") +
       (e.n ? "" : `<li class="pa-vacio">Sin partes todavía. Lo que escribas abajo pesa más mientras más arriba esté.</li>`) +
-      `</ul>` + filaAgregar(`sub_${x.id}`, "sub", "Agregar parte de hoy", true, ` data-rut="${x.id}"`) + `</li>`;
+      `</ul>` + filaAgregar(`sub_${x.id}`, "sub", "Agregar parte", true, ` data-rut="${x.id}"`) + `</li>`;
   }
   return h;
 }

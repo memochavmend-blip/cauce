@@ -4,7 +4,7 @@
    Si no hay señal, abre la copia guardada — marcar el gimnasio a las 5:30
    no debería depender de tener datos. */
 const PREFIJO = "cauce-";
-const CACHE = PREFIJO + "v5";
+const CACHE = PREFIJO + "v6";
 const BASE = ["./", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
