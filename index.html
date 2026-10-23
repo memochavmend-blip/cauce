@@ -797,7 +797,7 @@ input,select,textarea{font-size:16px}
 .hab-l span{width:8px;text-align:center;font-family:var(--mono);font-size:9.5px;line-height:1;color:var(--tinta-tenue)}
 .hab-l span.hoy{color:var(--tinta);font-weight:600}
 .habl{list-style:none;margin:0;padding:0}
-.hb{display:flex;align-items:stretch;min-height:52px;border-bottom:1px solid var(--linea)}
+.hb{position:relative;display:flex;align-items:stretch;min-height:52px;border-bottom:1px solid var(--linea)}
 .hb:first-child{border-top:1px solid var(--linea)}
 .hb-b{flex:1;min-width:0;display:flex;align-items:center;gap:11px;padding:10px 0}
 .hb-c{flex:0 0 auto;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;color:transparent;
@@ -1362,7 +1362,7 @@ function desdeViejo(g) {
     /* Una migración desde v7 no trae «por ti»: se siembra aquí, igual que en
        la semilla, porque normalizar ya no repuebla una lista vacía. */
     porti: POR_TI.map((t, i) => ({ id: uid(), texto: t, orden: (i + 1) * 10 })),
-    habitos: [],
+    habitos: Array.isArray(g.habitos) ? g.habitos : [],
     metas, rutinas, sueltos, dias: {}, marcas: { onboarding: true, ultimoDia: null }
   };
 }
@@ -1395,8 +1395,14 @@ function normalizar(e) {
     });
   });
   e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
+  /* Un día que no es un objeto —un null que llegó de un respaldo o de la
+     sincronización— tumbaba el arranque entero en la línea de abajo. */
+  Object.keys(e.dias).forEach(k => { const d = e.dias[k]; if (!d || typeof d !== "object" || Array.isArray(d)) delete e.dias[k]; });
+  /* «hab» se repara si viene roto, pero no se agrega a los días que no lo
+     traen: agregarlo haría que, al sincronizar, cada día pareciera cambiado
+     en los dos lados, y la unión de choques revive lo que se desmarcó allá. */
   Object.values(e.dias).forEach(d => { if (!Array.isArray(d.porti)) d.porti = [];
-    if (!d.hab || typeof d.hab !== "object" || Array.isArray(d.hab)) d.hab = {}; });
+    if ("hab" in d && (!d.hab || typeof d.hab !== "object" || Array.isArray(d.hab))) d.hab = {}; });
   /* Los hábitos: lo que falte se completa. Sin fecha de alta, se toma la de
      su primera marca —o hoy—: el porcentaje de la semana cuenta desde ahí,
      y un hábito nacido el jueves no carga con el lunes que no vivió. */
@@ -1405,6 +1411,16 @@ function normalizar(e) {
     h.texto = String(h.texto == null ? "" : h.texto);
     if (typeof h.orden !== "number") h.orden = (i + 1) * 10;
     h.pausado = !!h.pausado;
+    /* Los tramos en pausa no cuentan como días fallados: [desde, hasta) */
+    const fechaOk = x => typeof x === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x);
+    const lim = sumarDias(hoyISO(), -70);
+    /* Sin tramos no se escribe el campo: un campo agregado aquí haría que
+       al sincronizar el hábito pareciera cambiado contra la última versión
+       subida, y un borrado hecho allá se tomaría por choque. */
+    const ps = (Array.isArray(h.pausas) ? h.pausas : [])
+      .filter(p => Array.isArray(p) && fechaOk(p[0]) && fechaOk(p[1]) && p[0] < p[1] && p[1] >= lim);
+    if (ps.length) h.pausas = ps; else delete h.pausas;
+    if (h.pausaDesde !== undefined && !(h.pausado && fechaOk(h.pausaDesde))) delete h.pausaDesde;
     if (typeof h.creado !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(h.creado)) {
       const marcas = Object.keys(e.dias).filter(k => e.dias[k] && e.dias[k].hab && e.dias[k].hab[h.id]).sort();
       h.creado = marcas[0] || hoyISO();
@@ -1661,9 +1677,17 @@ const Rg = {
   habitos: () => E.habitos.slice().sort((a, b) => (a.orden || 0) - (b.orden || 0)),
   habActivos: () => Rg.habitos().filter(h => !h.pausado),
   habHecho: (h, f) => !!(((E.dias[f] || {}).hab || {})[h.id]),
+  /* Cuenta desde el alta, o desde la primera marca de la semana si es
+     anterior: quien agrega «agua» el miércoles y marca el lunes ya lo
+     llevaba. La fecha de alta no se toca al marcar —si se moviera, un
+     toque de más en el lunes no se podría deshacer—. Los días en pausa
+     tampoco cuentan: no son días fallados. */
   habSemana: (h, f) => {
-    const hoy = hoyISO(), desde = h.creado || "0000-00-00";
-    const dias = semanaDe(f).map(k => ({ fecha: k, hoy: k === hoy, futuro: k > hoy, antes: k < desde,
+    const hoy = hoyISO(), sem = semanaDe(f);
+    const primera = sem.find(k => k <= hoy && Rg.habHecho(h, k));
+    const desde = [h.creado || "0000-00-00", primera || "9999-99-99"].sort()[0];
+    const enPausa = k => (h.pausas || []).some(p => k >= p[0] && k < p[1]);
+    const dias = sem.map(k => ({ fecha: k, hoy: k === hoy, futuro: k > hoy, antes: k < desde || enPausa(k),
       hecha: k <= hoy && Rg.habHecho(h, k) }));
     const cuentan = dias.filter(x => !x.futuro && !x.antes);
     const n = cuentan.filter(x => x.hecha).length, de = cuentan.length;
@@ -1866,16 +1890,21 @@ const A = {
     const n = E.habitos.reduce((m, y) => Math.max(m, y.orden || 0), 0);
     const h = { id: uid(), texto: String(texto || "").trim().slice(0, 80), orden: n + 10, pausado: false, creado: hoyISO() };
     E.habitos.push(h); return h; },
-  /* Marcar un día: nunca uno que no ha llegado. Uno anterior a la fecha de
-     alta la recorre hacia atrás: quien agrega «agua» el miércoles y marca
-     el lunes está diciendo que ya lo llevaba, y el porcentaje lo cuenta. */
+  /* Marcar un día: nunca uno que no ha llegado */
   marcarHabito(h, f, v) {
     if (!h || f > hoyISO()) return false;
     const d = diaMut(f); d.hab = d.hab || {};
     const on = v === undefined ? !d.hab[h.id] : !!v;
-    if (on) { d.hab[h.id] = true; if (!h.creado || f < h.creado) h.creado = f; }
-    else delete d.hab[h.id];
+    if (on) d.hab[h.id] = true; else delete d.hab[h.id];
     return on; },
+  /* Pausar guarda desde cuándo; reactivar cierra el tramo, para que esos
+     días no cuenten como fallados en el porcentaje de la semana. */
+  pausarHabito(h) {
+    const hoy = hoyISO();
+    if (!h.pausado) { h.pausado = true; h.pausaDesde = hoy; return; }
+    h.pausado = false;
+    if (h.pausaDesde && h.pausaDesde < hoy) h.pausas = (h.pausas || []).concat([[h.pausaDesde, hoy]]);
+    delete h.pausaDesde; },
   quitarHabito(id) { E.habitos = E.habitos.filter(h => h.id !== id); },
   borrar(x) {
     if (x.tipo === "rutina") E.rutinas = E.rutinas.filter(r => r.id !== x.id);
@@ -2521,7 +2550,10 @@ const val = id => { const e = document.getElementById(id); return e ? e.value.tr
 function hojaHabito(id) {
   const h = Rg.habito(id); if (!h) return;
   const hoy = hoyISO(), dias = semanaDe(hoy);
-  Bo = { hab: {} }; dias.forEach(k => { Bo.hab[k] = Rg.habHecho(h, k); });
+  /* Se guarda también cómo estaban: Guardar aplica solo los días que se
+     tocaron aquí. Si mientras tanto llega una marca del otro dispositivo,
+     no se borra por no haberla visto. */
+  Bo = { hab: {}, orig: {} }; dias.forEach(k => { Bo.hab[k] = Bo.orig[k] = Rg.habHecho(h, k); });
   hoja(esc(h.texto) || "Hábito", "Sí o no, todos los días. Aquí corriges cualquier día de esta semana.",
     campo("hTxt", "Qué es", h.texto, "") +
     `<p class="campo-et">Esta semana</p><div class="dias">${dias.map(k => {
@@ -3490,11 +3522,11 @@ const ACC = {
     if (!(k in Bo.hab) || k > hoyISO()) return;
     Bo.hab[k] = !Bo.hab[k];
     b.classList.toggle("on", Bo.hab[k]); b.setAttribute("aria-pressed", String(Bo.hab[k])); },
-  "guardar-hab": d => { const h = Rg.habito(d.id); if (!h || !Bo || !Bo.hab) return; const mk = Bo.hab;
+  "guardar-hab": d => { const h = Rg.habito(d.id); if (!h || !Bo || !Bo.hab) return; const mk = Bo.hab, orig = Bo.orig || {};
     cambiar(() => { h.texto = val("hTxt").slice(0, 80) || h.texto;
-      Object.keys(mk).forEach(k => { if (k <= hoyISO() && mk[k] !== Rg.habHecho(h, k)) A.marcarHabito(h, k, mk[k]); }); });
+      Object.keys(mk).forEach(k => { if (k <= hoyISO() && mk[k] !== orig[k]) A.marcarHabito(h, k, mk[k]); }); });
     cerrarHoja(); nota("Guardado."); },
-  "pausar-hab": d => { const h = Rg.habito(d.id); if (!h) return; cambiar(() => { h.pausado = !h.pausado; });
+  "pausar-hab": d => { const h = Rg.habito(d.id); if (!h) return; cambiar(() => A.pausarHabito(h));
     cerrarHoja(); nota(h.pausado ? "En pausa. No cuenta en el porcentaje." : "De vuelta."); },
   "borrar-hab": d => { const h = Rg.habito(d.id); if (!h) return; cambiar(() => A.quitarHabito(h.id)); cerrarHoja(); nota("Eliminado."); },
   "hab-sug": d => { if (!d.v) return; cambiar(() => A.nuevoHabito(d.v)); },
@@ -3547,7 +3579,7 @@ const ACC = {
     try {
       const g = JSON.parse(t.value);
       if (!g || typeof g !== "object" || Array.isArray(g)) throw new Error("forma");
-      const tiene = ["rutinas", "sueltos", "metas", "acciones", "porti", "habitos"].some(k => Array.isArray(g[k]));
+      const tiene = ["rutinas", "sueltos", "metas", "acciones", "porti"].some(k => Array.isArray(g[k]));
       if (!tiene) throw new Error("forma");
       if (+g.v > VERSION) { if (er) er.textContent = "Ese respaldo es de una versión más nueva de Cauce."; return; }
       Guardado.escribir(PREVIA, E);                 /* la red de seguridad */
@@ -4652,8 +4684,14 @@ const Sync = {
         if (f) {
           const txt = f.truncated ? await (await fetch(f.raw_url)).text() : f.content;
           let remoto = JSON.parse(txt);
+          /* Un dispositivo que todavía corre la versión anterior —una PWA en
+             segundo plano no recarga sola— sube su estado sin «habitos». Eso
+             no es haberlos borrado: es no conocerlos. Sin esto, la fusión los
+             daba por eliminados allá y los borraba en los dos lados. */
+          const conoceHab = !!remoto && Array.isArray(remoto.habitos);
           if (!(+remoto.v >= 8)) remoto = desdeViejo(remoto);
           remoto = normalizar(remoto);
+          if (!conoceHab) remoto.habitos = JSON.parse(JSON.stringify(E.habitos || []));
           /* Un dispositivo recién estrenado trae su propia semilla, con ids
              nuevos para las mismas cosas. Fusionarla duplicaría la rutina
              entera, así que si aquí nunca se tocó nada se adopta lo de allá
