@@ -691,9 +691,11 @@ input,select,textarea{font-size:16px}
 .port-sep::before,.port-sep::after{content:"";flex:1;height:1px;background:var(--linea-fuerte)}
 .port-palabra{font-family:var(--serif);font-size:1.34rem;line-height:1.4;color:var(--tinta);
   margin:0;text-wrap:pretty;letter-spacing:-.008em}
-/* Tres cuentas y nada más: un tablero de seis deja de leerse de un vistazo */
-.resumen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0 0}
-.res{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 6px 12px;
+/* Una cuenta por lista y nada más: un tablero de seis deja de leerse de un
+   vistazo. Son cuatro desde que hay hábitos; el hueco entre tarjetas baja
+   para que «Pendientes» siga cabiendo a 360 px. */
+.resumen{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:20px 0 0}
+.res{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 3px 12px;min-width:0;
   border-radius:14px;background:var(--panel)}
 /* El aro y el número comparten una sola caja de 46px. Antes el svg iba
    absoluto a 10px del borde de la tarjeta y el número en flujo a 14px: 4px
@@ -721,13 +723,13 @@ input,select,textarea{font-size:16px}
 .port-meta-n{font-size:15px;color:var(--tinta);overflow-wrap:anywhere}
 .port-meta-s{font-size:12px;color:var(--tinta-baja)}
 
-/* ══ LAS TRES CARAS ══
+/* ══ LAS CARAS ══
    Una al lado de otra con scroll-snap: el navegador hace el gesto, sin
    librería y sin código que persiga el dedo. El indicador se actualiza al
    terminar el desplazamiento. */
-.caras-nav{display:flex;gap:22px;align-items:baseline;justify-content:center;margin:0 0 16px;
+.caras-nav{display:flex;gap:clamp(12px,4vw,22px);align-items:baseline;justify-content:center;margin:0 0 16px;
   position:sticky;top:0;z-index:4;padding:10px 0 10px;background:var(--noche)}
-.cara-b{font-family:var(--serif);font-size:1.22rem;color:var(--tinta-tenue);line-height:1;
+.cara-b{font-family:var(--serif);font-size:clamp(.98rem,4.3vw,1.22rem);color:var(--tinta-tenue);line-height:1;white-space:nowrap;
   transition:color .25s ease}
 .cara-b.on{color:var(--tinta)}
 /* Columnas del ancho exacto del carril: cada cara cae justo en su tope.
@@ -772,6 +774,64 @@ input,select,textarea{font-size:16px}
 .porti-sem .d.on{background:var(--cera);color:#4a3f2e}
 .porti-sem .d.fut{opacity:.4}
 .porti-sem-t{font-size:12.5px;color:var(--tinta-baja);margin:0}
+
+/* ══ HÁBITOS ══
+   Lo pequeño de cada día: sí o no, sin hora, sin nivel, sin propósito.
+   Va en tinta y no en color de llama: no alimenta la llama ni la línea
+   del día, y pintado como la rutina se leería como otra obligación.
+   El marcador dice dos cosas, hoy y la semana. La semana se mide contra
+   los días que ya pasaron, no contra los siete. */
+.hab-marc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
+.hab-m{min-width:0;display:flex;flex-direction:column;gap:2px;padding:13px 15px 14px;border-radius:14px;background:var(--panel)}
+.hab-et{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-baja)}
+.hab-pct{font-family:var(--serif);font-size:2rem;line-height:1.05;margin:3px 0 0;color:var(--tinta);font-variant-numeric:tabular-nums}
+.hab-pct small{font-size:.55em;color:var(--tinta-baja);margin-left:1px}
+.hab-barra{display:block;height:4px;border-radius:2px;margin:9px 0 7px;overflow:hidden;background:var(--linea-fuerte)}
+.hab-barra i{display:block;width:100%;height:100%;border-radius:2px;background:var(--tinta-baja);
+  transform-origin:0 50%;transition:transform .6s cubic-bezier(.22,.61,.36,1)}
+.hab-de{font-family:var(--mono);font-size:11px;color:var(--tinta-baja);font-variant-numeric:tabular-nums}
+/* Las letras de la semana, alineadas con los puntos de cada renglón: los
+   puntos terminan donde empieza el ⋯, que mide 44 px. */
+.hab-cab{display:flex;justify-content:flex-end;padding-right:44px;margin:0 0 5px}
+.hab-l{display:flex;gap:4px}
+.hab-l span{width:8px;text-align:center;font-family:var(--mono);font-size:9.5px;line-height:1;color:var(--tinta-tenue)}
+.hab-l span.hoy{color:var(--tinta);font-weight:600}
+.habl{list-style:none;margin:0;padding:0}
+.hb{position:relative;display:flex;align-items:stretch;min-height:52px;border-bottom:1px solid var(--linea)}
+.hb:first-child{border-top:1px solid var(--linea)}
+.hb-b{flex:1;min-width:0;display:flex;align-items:center;gap:11px;padding:10px 0}
+.hb-c{flex:0 0 auto;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;color:transparent;
+  box-shadow:inset 0 0 0 1.5px var(--linea-fuerte);transition:background .2s ease,box-shadow .2s ease,color .2s ease}
+.hb-c svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.hb.on .hb-c{background:var(--tinta);box-shadow:none;color:var(--noche)}
+.hb-x{flex:1;min-width:0;font-size:15px;line-height:1.3;color:var(--tinta-baja);overflow-wrap:anywhere;transition:color .2s ease}
+.hb.on .hb-x{color:var(--tinta)}
+/* Los puntos son para leer la semana, no para tocarlos: 8 px no es un
+   blanco para el dedo. Corregir otro día se hace en la ficha (⋯). */
+.hb-sem{flex:0 0 auto;display:flex;gap:4px;margin-left:auto}
+.hb-sem i{width:8px;height:8px;border-radius:50%;background:color-mix(in srgb,var(--tinta) 13%,transparent);transition:background .2s ease}
+.hb-sem i.on{background:var(--tinta-baja)}
+.hb-sem i.hoy{outline:1.5px solid var(--tinta-baja);outline-offset:1.5px}
+.hb-sem i.fut{background:none;box-shadow:inset 0 0 0 1px var(--linea-fuerte)}
+.hb-sem i.antes{opacity:.35}
+.hb.pausa .hb-x{color:var(--tinta-tenue)}
+.hb.pausa .hb-c{opacity:.45}
+.hb-pausa{flex:0 0 auto;margin-left:auto;padding-right:12px;font-family:var(--mono);font-size:10.5px;color:var(--tinta-baja)}
+.hab-sug-t{font-size:12.5px;color:var(--tinta-baja);margin:18px 0 8px}
+.hab-sug{display:flex;flex-wrap:wrap;gap:7px}
+.cad.hab .d.on{background:var(--tinta-baja);color:var(--noche)}
+html[data-modo="oscuro"] .cad.hab .d.on{color:var(--noche)}
+/* El aro de la portada lleva el porcentaje adentro, no la cuenta */
+.res.hab .res-prog{stroke:var(--tinta-baja)}
+.res.hab .res-n{font-size:14px}
+.res.hab .res-n small{font-size:.72em;color:var(--tinta-baja)}
+/* La ficha: los siete días con su número, y el de hoy marcado */
+.dia-b small{display:block;margin-top:1px;font-family:var(--mono);font-size:9.5px;opacity:.8}
+.dia-b.hoy{box-shadow:inset 0 0 0 1.5px var(--tinta-baja)}
+.dia-b.hoy.on{box-shadow:none}
+.dia-b:disabled{opacity:.35;cursor:default}
+.solo-lector{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 /* ══ EN HORIZONTAL NO ══
    Una lista de un día quiere alto, no ancho. En vez de reacomodarla a
@@ -1192,7 +1252,7 @@ function sueltoNuevo(o) {
   return Object.assign({ id: uid(), tipo: "suelto", texto: "", nivel: 2, hora: "", orden: 0,
     meta: null, creado: hoyISO(), pases: 0, hecha: false, hechaEl: null, archivada: false }, o || {});
 }
-function diaVacio() { return { hechas: {}, fuera: [], sub: {}, porti: [], frase: "", pase: false }; }
+function diaVacio() { return { hechas: {}, fuera: [], sub: {}, porti: [], hab: {}, frase: "", pase: false }; }
 function diaDe(f) { return Object.assign(diaVacio(), E.dias[f] || {}); }
 function diaMut(f) { const d = E.dias[f] = Object.assign(diaVacio(), E.dias[f] || {}); return d; }
 
@@ -1302,6 +1362,7 @@ function desdeViejo(g) {
     /* Una migración desde v7 no trae «por ti»: se siembra aquí, igual que en
        la semilla, porque normalizar ya no repuebla una lista vacía. */
     porti: POR_TI.map((t, i) => ({ id: uid(), texto: t, orden: (i + 1) * 10 })),
+    habitos: Array.isArray(g.habitos) ? g.habitos : [],
     metas, rutinas, sueltos, dias: {}, marcas: { onboarding: true, ultimoDia: null }
   };
 }
@@ -1309,7 +1370,7 @@ function desdeViejo(g) {
 function normalizar(e) {
   e.ajustes = Object.assign({ nombre: "", tema: "sistema", proposito: "", vista: "nivel",
     metodo: 0, dormir: 15, volumen: 0.5 }, e.ajustes || {});
-  ["metas", "rutinas", "sueltos", "porti"].forEach(k => { if (!Array.isArray(e[k])) e[k] = []; });
+  ["metas", "rutinas", "sueltos", "porti", "habitos"].forEach(k => { if (!Array.isArray(e[k])) e[k] = []; });
   /* «Haz algo solo por ti» no es una obligación: no tiene nivel, ni cadencia,
      ni fecha. Es una lista de la que se escoge, no una lista que se cumple. */
   /* Aquí NO se siembra «por ti». Antes se repoblaba cuando la lista estaba
@@ -1326,7 +1387,7 @@ function normalizar(e) {
      venga sin él lo recibe por su posición actual, para no barajar nada. */
   e.porti.forEach((x, i) => { if (typeof x.orden !== "number") x.orden = (i + 1) * 10; });
   const idSano = /^[A-Za-z0-9_-]{1,40}$/, vistos = new Set();
-  ["metas", "rutinas", "sueltos", "porti"].forEach(k => {
+  ["metas", "rutinas", "sueltos", "porti", "habitos"].forEach(k => {
     (e[k] || []).forEach(x => {
       if (!x || typeof x !== "object") return;
       if (typeof x.id !== "string" || !idSano.test(x.id) || x.id === "__proto__" || vistos.has(x.id)) x.id = uid();
@@ -1334,7 +1395,37 @@ function normalizar(e) {
     });
   });
   e.dias = e.dias && typeof e.dias === "object" ? e.dias : {};
-  Object.values(e.dias).forEach(d => { if (!Array.isArray(d.porti)) d.porti = []; });
+  /* Un día que no es un objeto —un null que llegó de un respaldo o de la
+     sincronización— tumbaba el arranque entero en la línea de abajo. */
+  Object.keys(e.dias).forEach(k => { const d = e.dias[k]; if (!d || typeof d !== "object" || Array.isArray(d)) delete e.dias[k]; });
+  /* «hab» se repara si viene roto, pero no se agrega a los días que no lo
+     traen: agregarlo haría que, al sincronizar, cada día pareciera cambiado
+     en los dos lados, y la unión de choques revive lo que se desmarcó allá. */
+  Object.values(e.dias).forEach(d => { if (!Array.isArray(d.porti)) d.porti = [];
+    if ("hab" in d && (!d.hab || typeof d.hab !== "object" || Array.isArray(d.hab))) d.hab = {}; });
+  /* Los hábitos: lo que falte se completa. Sin fecha de alta, se toma la de
+     su primera marca —o hoy—: el porcentaje de la semana cuenta desde ahí,
+     y un hábito nacido el jueves no carga con el lunes que no vivió. */
+  e.habitos = e.habitos.filter(h => h && typeof h === "object");
+  e.habitos.forEach((h, i) => {
+    h.texto = String(h.texto == null ? "" : h.texto);
+    if (typeof h.orden !== "number") h.orden = (i + 1) * 10;
+    h.pausado = !!h.pausado;
+    /* Los tramos en pausa no cuentan como días fallados: [desde, hasta) */
+    const fechaOk = x => typeof x === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x);
+    const lim = sumarDias(hoyISO(), -70);
+    /* Sin tramos no se escribe el campo: un campo agregado aquí haría que
+       al sincronizar el hábito pareciera cambiado contra la última versión
+       subida, y un borrado hecho allá se tomaría por choque. */
+    const ps = (Array.isArray(h.pausas) ? h.pausas : [])
+      .filter(p => Array.isArray(p) && fechaOk(p[0]) && fechaOk(p[1]) && p[0] < p[1] && p[1] >= lim);
+    if (ps.length) h.pausas = ps; else delete h.pausas;
+    if (h.pausaDesde !== undefined && !(h.pausado && fechaOk(h.pausaDesde))) delete h.pausaDesde;
+    if (typeof h.creado !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(h.creado)) {
+      const marcas = Object.keys(e.dias).filter(k => e.dias[k] && e.dias[k].hab && e.dias[k].hab[h.id]).sort();
+      h.creado = marcas[0] || hoyISO();
+    }
+  });
   e.marcas = Object.assign({ onboarding: false, tour: false, ultimoDia: null, tocado: false }, e.marcas || {});
   /* Si ya hay días capturados, esto no es una instalación en blanco aunque
      la marca falte: falla del lado de conservar, no del de pisar. */
@@ -1578,6 +1669,35 @@ const Rg = {
   portiDeLaSemana: f => { const hoy = hoyISO(), s = new Set();
     semanaDe(f).forEach(k => { if (k <= hoy) ((E.dias[k] || {}).porti || []).forEach(id => s.add(id)); });
     return s; },
+  /* ── Hábitos ──
+     Sí o no, cada día. El porcentaje de la semana se mide contra los días
+     que ya pasaron desde que el hábito existe, no contra los siete: un
+     lunes con todo hecho es 100%, no 14%. Los pausados no cuentan. */
+  habito: id => E.habitos.find(h => h.id === id) || null,
+  habitos: () => E.habitos.slice().sort((a, b) => (a.orden || 0) - (b.orden || 0)),
+  habActivos: () => Rg.habitos().filter(h => !h.pausado),
+  habHecho: (h, f) => !!(((E.dias[f] || {}).hab || {})[h.id]),
+  /* Cuenta desde el alta, o desde la primera marca de la semana si es
+     anterior: quien agrega «agua» el miércoles y marca el lunes ya lo
+     llevaba. La fecha de alta no se toca al marcar —si se moviera, un
+     toque de más en el lunes no se podría deshacer—. Los días en pausa
+     tampoco cuentan: no son días fallados. */
+  habSemana: (h, f) => {
+    const hoy = hoyISO(), sem = semanaDe(f);
+    const primera = sem.find(k => k <= hoy && Rg.habHecho(h, k));
+    const desde = [h.creado || "0000-00-00", primera || "9999-99-99"].sort()[0];
+    const enPausa = k => (h.pausas || []).some(p => k >= p[0] && k < p[1]);
+    const dias = sem.map(k => ({ fecha: k, hoy: k === hoy, futuro: k > hoy, antes: k < desde || enPausa(k),
+      hecha: k <= hoy && Rg.habHecho(h, k) }));
+    const cuentan = dias.filter(x => !x.futuro && !x.antes);
+    const n = cuentan.filter(x => x.hecha).length, de = cuentan.length;
+    return { dias, n, de, pct: de ? Math.round(n * 100 / de) : null };
+  },
+  habDia: f => { const a = Rg.habActivos(), n = a.filter(h => Rg.habHecho(h, f)).length;
+    return { n, de: a.length, pct: a.length ? Math.round(n * 100 / a.length) : null }; },
+  habSemanaTotal: f => { let n = 0, de = 0;
+    Rg.habActivos().forEach(h => { const s = Rg.habSemana(h, f); n += s.n; de += s.de; });
+    return { n, de, pct: de ? Math.round(n * 100 / de) : null }; },
   /* El repositorio: lo hecho sale de la lista y se guarda por día */
   hechos: () => {
     const ss = E.sueltos.filter(s => s.hecha && s.hechaEl).sort((a, b) => b.hechaEl.localeCompare(a.hechaEl));
@@ -1765,6 +1885,27 @@ const A = {
      que se borraba antes era justo lo único que esa cara guarda: que hubo
      algo ese día. Los días quedan intactos. */
   quitarPorti(id) { E.porti = E.porti.filter(x => x.id !== id); },
+  /* ── Hábitos ── */
+  nuevoHabito(texto) {
+    const n = E.habitos.reduce((m, y) => Math.max(m, y.orden || 0), 0);
+    const h = { id: uid(), texto: String(texto || "").trim().slice(0, 80), orden: n + 10, pausado: false, creado: hoyISO() };
+    E.habitos.push(h); return h; },
+  /* Marcar un día: nunca uno que no ha llegado */
+  marcarHabito(h, f, v) {
+    if (!h || f > hoyISO()) return false;
+    const d = diaMut(f); d.hab = d.hab || {};
+    const on = v === undefined ? !d.hab[h.id] : !!v;
+    if (on) d.hab[h.id] = true; else delete d.hab[h.id];
+    return on; },
+  /* Pausar guarda desde cuándo; reactivar cierra el tramo, para que esos
+     días no cuenten como fallados en el porcentaje de la semana. */
+  pausarHabito(h) {
+    const hoy = hoyISO();
+    if (!h.pausado) { h.pausado = true; h.pausaDesde = hoy; return; }
+    h.pausado = false;
+    if (h.pausaDesde && h.pausaDesde < hoy) h.pausas = (h.pausas || []).concat([[h.pausaDesde, hoy]]);
+    delete h.pausaDesde; },
+  quitarHabito(id) { E.habitos = E.habitos.filter(h => h.id !== id); },
   borrar(x) {
     if (x.tipo === "rutina") E.rutinas = E.rutinas.filter(r => r.id !== x.id);
     else E.sueltos = E.sueltos.filter(s => s.id !== x.id);
@@ -1988,7 +2129,7 @@ function lineaLlama(ll) {
 
 /* ── La portada ──
    Lo primero al abrir: quién eres, qué día es, una frase, y cómo vas. El
-   resumen son tres cuentas y nada más —rutina, pendientes, por ti— porque un
+   resumen es una cuenta por lista —rutina, pendientes, hábitos, por ti— porque un
    tablero que mide seis cosas deja de leerse de un vistazo. La llama al lado
    es una sola y es la suya: la alimentan todos los propósitos juntos. Antes
    aquí se asomaba el primer propósito de la lista, que con varios era una
@@ -2022,6 +2163,7 @@ function portada(f, mk) {
     `<div class="resumen">` +
       anillo(mk.rutH, mk.rut, "Rutina", "r1") +
       anillo(mk.pendH, mk.pend, "Pendientes", "r2") +
+      aroHab(f) +
       `<div class="res porti${Rg.portiHubo(f) ? " si" : ""}">` +
         `<span class="res-aro">` +
           `<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="res-pista" cx="20" cy="20" r="16"></circle>` +
@@ -2039,7 +2181,7 @@ function portada(f, mk) {
 /* Las tres caras del día, una al lado de otra: se pasa con el dedo o tocando
    el nombre. Es el mismo gesto de Instagram, y aquí sirve porque son tres
    cosas distintas que no caben de corrido sin volverse una pared. */
-const CARAS = [["rutina", "Rutina"], ["pend", "Pendientes"], ["porti", "Por ti"]];
+const CARAS = [["rutina", "Rutina"], ["pend", "Pendientes"], ["habitos", "Hábitos"], ["porti", "Por ti"]];
 
 /* Dónde empieza cada cara, medido en el momento. No se calcula multiplicando
    el ancho: si mañana el CSS le pone una sangría, la cuenta se desfasa y el
@@ -2061,6 +2203,71 @@ function caraVista(c) {
     if (d < min) { min = d; j = i; }
   }
   return CARAS[j] ? CARAS[j][0] : "rutina";
+}
+
+/* ── Hábitos ──
+   La cuarta cara. Tocar el renglón marca hoy y nada más; los puntos de la
+   semana son para leer. El marcador de arriba dice cómo va hoy y cómo va
+   la semana, en porcentaje. No alimentan la línea del día ni la llama:
+   son lo pequeño, y si contaran, el agua inflaría el día. */
+const HAB_SUG = ["2 L de agua", "10 min de sol", "Leer 10 min", "Comer sano", "Sin chatarra"];
+const HAB_TOPE = 6;
+const pctHab = x => x.pct == null ? "—" : x.pct + "<small>%</small>";
+const deHab = x => x.de ? x.n + " de " + x.de : "sin hábitos";
+const lectorHab = s => s.de ? `, ${s.n} de ${s.de} esta semana` : "";
+function puntosHab(s) {
+  return s.dias.map(x => `<i class="${[x.hecha ? "on" : "", x.futuro ? "fut" : "", x.antes ? "antes" : "", x.hoy ? "hoy" : ""]
+    .filter(Boolean).join(" ")}"></i>`).join("");
+}
+function aroHab(f) {
+  const x = Rg.habDia(f), C = 100.5;
+  return `<div class="res hab"><span class="res-aro">` +
+    `<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="res-pista" cx="20" cy="20" r="16"></circle>` +
+    `<circle class="res-prog" cx="20" cy="20" r="16" style="stroke-dasharray:${C};stroke-dashoffset:${(C * (1 - (x.pct || 0) / 100)).toFixed(1)}"></circle></svg>` +
+    `<span class="res-n"><span>${pctHab(x)}</span></span></span>` +
+    `<span class="res-et">Hábitos<i>${x.de ? x.n + " de " + x.de : "ninguno"}</i></span></div>`;
+}
+function marcadorHab(f) {
+  const m = (cl, et, x) => `<div class="hab-m ${cl}">` +
+    `<span class="hab-et">${et}</span>` +
+    `<span class="hab-pct">${pctHab(x)}</span>` +
+    `<span class="hab-barra" aria-hidden="true"><i style="transform:scaleX(${((x.pct || 0) / 100).toFixed(3)})"></i></span>` +
+    `<span class="hab-de">${deHab(x)}</span></div>`;
+  return `<div class="hab-marc">` + m("hoy", "Hoy", Rg.habDia(f)) + m("sem", "Esta semana", Rg.habSemanaTotal(f)) + `</div>`;
+}
+function filaHab(h, f) {
+  if (h.pausado) return `<li class="hb pausa" data-id="${h.id}">` +
+    `<button class="hb-b" data-accion="ver-hab" data-id="${h.id}">` +
+      `<span class="hb-c">${ICO.check}</span><span class="hb-x">${esc(h.texto)}</span>` +
+      `<span class="hb-pausa">en pausa</span></button></li>`;
+  const on = Rg.habHecho(h, f), s = Rg.habSemana(h, f);
+  return `<li class="hb${on ? " on" : ""}" data-id="${h.id}">` +
+    `<button class="hb-b" data-accion="hab" data-id="${h.id}" aria-pressed="${on}">` +
+      `<span class="hb-c">${ICO.check}</span>` +
+      `<span class="hb-x">${esc(h.texto)}<span class="solo-lector">${esc(lectorHab(s))}</span></span>` +
+      `<span class="hb-sem" aria-hidden="true">${puntosHab(s)}</span></button>` +
+    `<button class="it-mas" data-nodrag data-accion="ver-hab" data-id="${h.id}" aria-label="Opciones de ${esc(h.texto)}: corregir otro día">⋯</button></li>`;
+}
+function caraHabitos(f) {
+  const todos = Rg.habitos(), act = todos.filter(x => !x.pausado), pau = todos.filter(x => x.pausado);
+  const hoy = hoyISO();
+  let h = `<section class="cara" role="tabpanel" id="cara-habitos" data-cara="habitos">`;
+  h += marcadorHab(f);
+  h += `<p class="bloque-s">Lo pequeño de cada día: sí o no. Tócalo cuando ya está; con ⋯ corriges otro día de la semana.</p>`;
+  if (act.length) h += `<div class="hab-cab" aria-hidden="true"><span class="hab-l">${semanaDe(f).map(k =>
+    `<span${k === hoy ? ' class="hoy"' : ""}>${LETRAS[deISO(k).getDay()]}</span>`).join("")}</span></div>`;
+  h += `<ul class="habl">${todos.length ? act.concat(pau).map(x => filaHab(x, f)).join("")
+    : `<li class="zona-vacia">Todavía no hay hábitos. Escribe uno abajo o toca una sugerencia.</li>`}</ul>`;
+  if (act.length > HAB_TOPE) h += `<p class="aviso-tope">Son ${act.length} hábitos. Arriba de ${HAB_TOPE} deja de verse cuál importa: pausa los que no estés siguiendo.</p>`;
+  h += filaAgregar("nuevoHab", "habito", "Agregar hábito");
+  /* Sugerencias de un toque mientras la lista es corta: así nadie arranca
+     frente a un campo vacío, y el repo público sigue sin datos de nadie. */
+  const ya = new Set(todos.map(x => x.texto.trim().toLowerCase()));
+  const sug = HAB_SUG.filter(t => !ya.has(t.toLowerCase()));
+  if (todos.length < 3 && sug.length) h += `<p class="hab-sug-t">Para empezar, toca uno:</p><div class="hab-sug">` +
+    sug.map(t => `<button class="chip" data-accion="hab-sug" data-v="${esc(t)}">${esc(t)}</button>`).join("") + `</div>`;
+  h += `</section>`;
+  return h;
 }
 
 function pintarHoy() {
@@ -2110,6 +2317,9 @@ function pintarHoy() {
   if (viejo) h += `<p class="senal">${esc(viejo.texto)} lleva ${viejo.pases} pases sin hacerse. O es más chico de lo que parece, o no es de nivel ${viejo.nivel}.</p>`;
   if (mk.pendH) h += `<p class="nota-pie"><button class="enlace" data-accion="ir-hecho">${mk.pendH === 1 ? "1 pendiente hecho hoy" : mk.pendH + " pendientes hechos hoy"} · verlos</button></p>`;
   h += `</section>`;
+
+  /* ── HÁBITOS ── va entre pendientes y por ti, en el mismo orden que CARAS */
+  h += caraHabitos(f);
 
   /* ── POR TI ──
      Sin niveles, sin horas, sin cadencia. Se escoge de la lista, no se cumple.
@@ -2255,6 +2465,19 @@ function pintarSemana() {
     : `<p class="vacio">Ninguna rutina lleva cadencia semanal todavía.</p>`;
   h += `</section>`;
 
+  const hs = Rg.habActivos(), ht = Rg.habSemanaTotal(f);
+  h += `<section class="sec"><div class="sec-cab"><h2 class="sec-t">Hábitos</h2>` +
+    `<span class="cuenta">${ht.pct == null ? "" : ht.pct + "%"}</span></div>` +
+    `<p class="sec-s">Lo hecho contra los días que van de la semana, no contra los siete.</p>`;
+  h += hs.length ? `<ul class="cad hab">${hs.map(x => { const s = Rg.habSemana(x, f);
+    return `<li class="cad-f">` +
+      `<button class="cad-b" data-accion="ver-hab" data-id="${x.id}">` +
+      `<span class="cad-n">${esc(x.texto)}</span>` +
+      `<span class="cad-d" aria-hidden="true">${s.dias.map((d, i) => `<span class="d${d.hecha ? " on" : ""}${d.futuro ? " fut" : ""}${d.antes ? " no" : ""}">${LETRAS[(i + 1) % 7]}</span>`).join("")}</span>` +
+      `</button><span class="cad-c">${s.de ? s.n + " de " + s.de + " · " + s.pct + "%" : "—"}</span></li>`; }).join("")}</ul>`
+    : `<p class="vacio">Sin hábitos todavía. Se agregan en Hoy, en su propia lista.</p>`;
+  h += `</section>`;
+
   h += `<section class="sec"><div class="sec-cab"><h2 class="sec-t">Pendientes abiertos</h2><span class="cuenta">${ab.length}</span></div>` +
     `<p class="sec-s">Ordenados por cuántos pases llevan. Lo de arriba es lo que más veces ha reescrito sin hacer.</p>`;
   h += ab.length ? `<ul class="nota">${ab.map(s => `<li class="it"><span class="it-n n${s.nivel}">${s.nivel}</span>` +
@@ -2318,6 +2541,31 @@ const campo = (id, et, val, ph, tipo) => `<label class="campo"><span class="camp
 const btn = (t, a, id, cl) => `<button class="accion${cl ? " " + cl : ""}" data-accion="${a}"${id ? ` data-id="${id}"` : ""}>${t}</button>`;
 const dos = (a, b) => `<div class="acciones">${a}${b || ""}</div>`;
 const val = id => { const e = document.getElementById(id); return e ? e.value.trim() : ""; };
+
+/* ── La ficha de un hábito ──
+   Los días de la semana se corrigen aquí, con botones del tamaño de un
+   dedo. Es para lo que solo se sabe al final del día —«sin chatarra»— o
+   para lo que se olvidó marcar ayer. Como en las demás fichas, nada se
+   aplica hasta Guardar: «Cancelar» cancela de verdad. */
+function hojaHabito(id) {
+  const h = Rg.habito(id); if (!h) return;
+  const hoy = hoyISO(), dias = semanaDe(hoy);
+  /* Se guarda también cómo estaban: Guardar aplica solo los días que se
+     tocaron aquí. Si mientras tanto llega una marca del otro dispositivo,
+     no se borra por no haberla visto. */
+  Bo = { hab: {}, orig: {} }; dias.forEach(k => { Bo.hab[k] = Bo.orig[k] = Rg.habHecho(h, k); });
+  hoja(esc(h.texto) || "Hábito", "Sí o no, todos los días. Aquí corriges cualquier día de esta semana.",
+    campo("hTxt", "Qué es", h.texto, "") +
+    `<p class="campo-et">Esta semana</p><div class="dias">${dias.map(k => {
+      const dd = deISO(k), fut = k > hoy, on = Bo.hab[k];
+      return `<button class="dia-b${on ? " on" : ""}${k === hoy ? " hoy" : ""}" data-accion="hab-dia" data-id="${h.id}" data-v="${k}" aria-pressed="${on}"` +
+        ` aria-label="${DIAS_NOM[dd.getDay()]} ${dd.getDate()}${fut ? ", todavía no llega" : k === hoy ? ", hoy" : ""}"${fut ? " disabled" : ""}>` +
+        `${LETRAS[dd.getDay()]}<small>${dd.getDate()}</small></button>`; }).join("")}</div>` +
+    `<p class="campo-ayuda">Los días que todavía no llegan no se pueden marcar.</p>` +
+    dos(btn("Cancelar", "cerrar-hoja"), btn("Guardar", "guardar-hab", h.id, "llena")) +
+    `<div class="hoja-pie">` + btn(h.pausado ? "Reactivar" : "Pausar", "pausar-hab", h.id, "leve") +
+      btn("Eliminar", "borrar-hab", h.id, "leve") + `</div>`);
+}
 
 function hojaItem(id) {
   const x = Rg.item(id); if (!x) return;
@@ -2686,6 +2934,7 @@ function onbPantalla(tipo) {
       `<p class="paso-s">Una lista al día y las acciones que llevan a donde quieres ir. No es una agenda ni un gestor de proyectos: es la nota de papel que se vuelve a escribir cada mañana.</p>` +
       `<ul class="onb-l"><li>Tu <b>rutina</b>, repartida en bloques por hora.</li>` +
       `<li>Los <b>pendientes</b> sueltos, en tres niveles.</li>` +
+      `<li>Tus <b>hábitos</b>: lo pequeño de cada día, sí o no.</li>` +
       `<li>Algo <b>por ti</b>, que no te exige nadie.</li></ul>` +
       `<p class="onb-priv">Todo se queda en este dispositivo. No hay cuenta ni servidor. Si después lo quieres también en otro, se sincroniza con un archivo privado de tu propia cuenta de GitHub.</p>` +
       onbAcc("Empezar")
@@ -2864,7 +3113,7 @@ const TOUR = {
   pasos: [
     { t: "Cauce en un minuto", x: "Lo esencial, en unos cuantos toques. Puedes saltarlo y repetirlo después desde Ajustes.", btn: "Empezar" },
     { sel: ".port-meta", t: "Tu llama", x: "Una sola, y es la tuya. La alimentan tus propósitos: cuando las acciones están pasando, arde alto. Tócala para ver de dónde sale." },
-    { sel: ".caras-nav", t: "Tres listas, no una pared", x: "Rutina, pendientes y por ti. Se pasa con el dedo o tocando el nombre. Arriba, el resumen: tres cuentas y nada más." },
+    { sel: ".caras-nav", t: "Cuatro listas, no una pared", x: "Rutina, pendientes, hábitos y por ti. Se pasa con el dedo o tocando el nombre. Arriba, el resumen: una cuenta por lista." },
     { sel: '[data-cara="rutina"] .rt-c', alt: ".rt-c", t: "Tocar la tacha", x: "Un toque en el círculo y la actividad queda hecha. Otro toque la deshace." },
     { sel: '[data-cara="rutina"] .rt-ch', alt: ".rt-ch", t: "Las partes", x: "Si una actividad tiene partes, el galón las abre aquí mismo. El orden es el peso: la primera pesa más, y con las de arriba ya cuenta." },
     { sel: ".franja-ed", t: "Los bloques del día", x: "Tu rutina se reparte en cuatro tramos. Toca las horas para moverlos: el primero marca a qué hora empieza tu día." },
@@ -2874,6 +3123,7 @@ const TOUR = {
        dice en cuál vive y el carrusel se va ahí antes de medir. */
     { cara: "pend", sel: '[data-cara="pend"] .niv1', alt: '[data-cara="pend"] .niv', t: "Los pendientes", x: "Lo que pasa una vez. Tres niveles: lo que sí o sí hoy, lo que puede esperar, y lo que si da tiempo." },
     { cara: "pend", sel: '[data-cara="pend"] .it-n', alt: ".it-n", t: "Cambiar de prioridad", x: "Toca el número y cicla 1 → 2 → 3. Las flechas de al lado lo mueven de lugar y, desde el borde, lo pasan al nivel vecino." },
+    { cara: "habitos", sel: '[data-cara="habitos"] .hab-marc', alt: '[data-cara="habitos"] .habl', t: "Los hábitos", x: "Lo pequeño de cada día: sí o no. Tócalo cuando ya está; con ⋯ corriges otro día. Arriba, tu porcentaje de hoy y el de la semana." },
     { cara: "porti", sel: '[data-cara="porti"] .pt', alt: '[data-cara="porti"] .porti-l', t: "Algo por ti", x: "No se cuenta ni se compara: solo si hubo o no hubo. Lo que ya hiciste esta semana se queda en tenue, para ver lo que llevas sin tocar." },
     { cara: "rutina", sel: ".tabbar", t: "Lo demás", x: "Semana es la cadencia y los propósitos. Hecho es lo que ya pasó. Sonido es el paisaje y el temporizador de enfoque." },
     { sel: ".port-aj", t: "Ajustes", x: "Tu nombre, los bloques, los propósitos, sincronizar con otro dispositivo — y repetir este recorrido cuando quieras.", btn: "Listo" }
@@ -3070,7 +3320,35 @@ function refrescarCifras(f) {
     const h = items.filter(x => Rg.hecha(x, f)).length;
     e.textContent = items.length ? h + " de " + items.length : "libre";
   });
+  refrescarHab(f);
   lineaDia();
+}
+
+/* Los hábitos, en su sitio: el marcador de la cara y el aro de la portada.
+   Se mueve la barra que ya está, para que la transición corra. */
+function refrescarHab(f) {
+  const pone = (sel, x) => { const e = $(sel); if (!e) return;
+    const p = e.querySelector(".hab-pct"), b = e.querySelector(".hab-barra i"), de = e.querySelector(".hab-de");
+    if (p) p.innerHTML = pctHab(x);
+    if (b) b.style.transform = `scaleX(${((x.pct || 0) / 100).toFixed(3)})`;
+    if (de) de.textContent = deHab(x); };
+  const dia = Rg.habDia(f);
+  pone(".hab-m.hoy", dia); pone(".hab-m.sem", Rg.habSemanaTotal(f));
+  const r = $(".res.hab"); if (!r) return;
+  const p = r.querySelector(".res-prog"), n = r.querySelector(".res-n"), i = r.querySelector(".res-et i");
+  if (p) p.style.strokeDashoffset = (100.5 * (1 - (dia.pct || 0) / 100)).toFixed(1);
+  if (n) n.innerHTML = "<span>" + pctHab(dia) + "</span>";
+  if (i) i.textContent = dia.de ? dia.n + " de " + dia.de : "ninguno";
+}
+function habEnSitio(h, f) {
+  const li = $(`.hb[data-id="${h.id}"]`); if (!li || li.classList.contains("pausa")) return false;
+  const on = Rg.habHecho(h, f);
+  li.classList.toggle("on", on);
+  const b = li.querySelector(".hb-b"); if (b) b.setAttribute("aria-pressed", String(on));
+  const i = li.querySelector(".hb-sem i.hoy"); if (i) i.classList.toggle("on", on);
+  const sr = li.querySelector(".solo-lector"); if (sr) sr.textContent = lectorHab(Rg.habSemana(h, f));
+  refrescarCifras(f);
+  return true;
 }
 
 /* Devuelve false si no pudo hacerlo en su sitio: entonces toca repintar. */
@@ -3230,6 +3508,28 @@ const ACC = {
   "porti": d => { let si; cambiar(() => { si = A.porti(d.id, hoyISO()); });
     if (si) nota(Rg.portiHoy(hoyISO()).length === 1 ? "Algo por ti. Queda anotado." : "Otra más."); },
   "porti-quitar": d => { cambiar(() => A.quitarPorti(d.id)); },
+  /* ── Hábitos ── Marcar hoy se hace en su sitio, sin repintar */
+  "hab": d => { const h = Rg.habito(d.id); if (!h) return; const f = hoyISO();
+    const antes = Rg.habDia(f);
+    A.marcarHabito(h, f);
+    if (E.marcas) E.marcas.tocado = true;
+    guardar();
+    if (!habEnSitio(h, f)) pintar();
+    const desp = Rg.habDia(f);
+    if (desp.de > 1 && desp.n === desp.de && antes.n < desp.n) nota("Todos los hábitos de hoy."); },
+  "ver-hab": d => hojaHabito(d.id),
+  "hab-dia": (d, b) => { if (!Bo || !Bo.hab || !b || b.disabled) return; const k = d.v;
+    if (!(k in Bo.hab) || k > hoyISO()) return;
+    Bo.hab[k] = !Bo.hab[k];
+    b.classList.toggle("on", Bo.hab[k]); b.setAttribute("aria-pressed", String(Bo.hab[k])); },
+  "guardar-hab": d => { const h = Rg.habito(d.id); if (!h || !Bo || !Bo.hab) return; const mk = Bo.hab, orig = Bo.orig || {};
+    cambiar(() => { h.texto = val("hTxt").slice(0, 80) || h.texto;
+      Object.keys(mk).forEach(k => { if (k <= hoyISO() && mk[k] !== orig[k]) A.marcarHabito(h, k, mk[k]); }); });
+    cerrarHoja(); nota("Guardado."); },
+  "pausar-hab": d => { const h = Rg.habito(d.id); if (!h) return; cambiar(() => A.pausarHabito(h));
+    cerrarHoja(); nota(h.pausado ? "En pausa. No cuenta en el porcentaje." : "De vuelta."); },
+  "borrar-hab": d => { const h = Rg.habito(d.id); if (!h) return; cambiar(() => A.quitarHabito(h.id)); cerrarHoja(); nota("Eliminado."); },
+  "hab-sug": d => { if (!d.v) return; cambiar(() => A.nuevoHabito(d.v)); },
   "subir-porti": d => { const x = Rg.porti(d.id); if (x) cambiar(() => A.subirPorti(x)); },
   "bajar-porti": d => { const x = Rg.porti(d.id); if (x) cambiar(() => A.bajarPorti(x)); },
   "ir-sonido": () => { cerrarHoja(); S.tab = "sonido"; pintar(); },
@@ -3317,6 +3617,9 @@ const ENTER = {
     const n = +t.dataset.nivel || 2, id = t.id;
     cambiar(() => A.agregar(v, n));
     setTimeout(() => { const el = document.getElementById(id); if (el) { el.value = ""; el.focus(); } }, 40); },
+  "habito": t => { const v = t.value.trim(); if (!v) return;
+    cambiar(() => A.nuevoHabito(v)); t.value = "";
+    setTimeout(() => { const el = document.getElementById("nuevoHab"); if (el) { el.value = ""; el.focus(); } }, 40); },
   "porti": t => { const v = t.value.trim(); if (!v) return;
     cambiar(() => A.nuevoPorti(v)); t.value = "";
     setTimeout(() => { const el = document.getElementById("nuevoPorti"); if (el) el.focus(); }, 40); },
@@ -4266,6 +4569,8 @@ function unirDia(a, b) {
   d.fuera = [...new Set([...(a.fuera || []), ...(b.fuera || [])])];
   /* Lo que se hizo por uno se hizo, lo haya anotado el celular o la compu */
   d.porti = [...new Set([...(a.porti || []), ...(b.porti || [])])];
+  /* Un hábito marcado en cualquiera de los dos queda marcado: es un hecho */
+  d.hab = Object.assign({}, b.hab || {}, a.hab || {});
   /* Una frase escrita le gana al hueco vacío. Sin esto, el dispositivo que
      no armó frase subía su "" y borraba la del que sí la armó. */
   d.frase = String(a.frase || "").trim() ? a.frase : (b.frase || "");
@@ -4278,7 +4583,7 @@ function fusionar(base, local, remoto) {
   const out = JSON.parse(JSON.stringify(local));
   let choques = 0;
 
-  ["metas", "rutinas", "sueltos", "porti"].forEach(k => {
+  ["metas", "rutinas", "sueltos", "porti", "habitos"].forEach(k => {
     const B = idx(base && base[k]), L = idx(local[k]), R = idx(remoto[k]);
     const res = [];
     new Set([...Object.keys(L), ...Object.keys(R), ...Object.keys(B)]).forEach(id => {
@@ -4379,8 +4684,14 @@ const Sync = {
         if (f) {
           const txt = f.truncated ? await (await fetch(f.raw_url)).text() : f.content;
           let remoto = JSON.parse(txt);
+          /* Un dispositivo que todavía corre la versión anterior —una PWA en
+             segundo plano no recarga sola— sube su estado sin «habitos». Eso
+             no es haberlos borrado: es no conocerlos. Sin esto, la fusión los
+             daba por eliminados allá y los borraba en los dos lados. */
+          const conoceHab = !!remoto && Array.isArray(remoto.habitos);
           if (!(+remoto.v >= 8)) remoto = desdeViejo(remoto);
           remoto = normalizar(remoto);
+          if (!conoceHab) remoto.habitos = JSON.parse(JSON.stringify(E.habitos || []));
           /* Un dispositivo recién estrenado trae su propia semilla, con ids
              nuevos para las mismas cosas. Fusionarla duplicaría la rutina
              entera, así que si aquí nunca se tocó nada se adopta lo de allá
@@ -4514,6 +4825,9 @@ function semilla() {
     /* La lista de «por ti» se siembra aquí, no en normalizar: así vaciarla a
        propósito la deja vacía en vez de hacerla renacer en cada recarga. */
     porti: POR_TI.map((t, i) => ({ id: uid(), texto: t, orden: (i + 1) * 10 })),
+    /* Sin hábitos sembrados: la cara ofrece sugerencias de un toque. Unos
+       hábitos que nadie eligió serían porcentajes de alguien más. */
+    habitos: [],
     /* Lo único que la semilla deja sin ver: la bienvenida. Es la señal de
        que esto es una instalación nueva —nadie ha abierto la app todavía—
        y es lo que `arrancar()` lee para enseñarla. */
